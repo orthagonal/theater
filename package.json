@@ -1,0 +1,31 @@
+{
+  "name": "iris",
+  "version": "1.0.0",
+  "description": "A Puzzle in Three Bodies",
+  "main": "web/theater.html",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "chris harris",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^2.0.0-rc.6",
+    "jquery": "^3.1.0",
+    "json-fs-store": "^1.0.0",
+    "lodash": "^4.13.1",
+    "mongoose": "^4.4.17",
+    "mongoose-function": "^0.1.0",
+    "node-localdb": "0.0.3",
+    "underscore": "^1.8.3"
+  },
+  "devDependencies": {
+    "canvas-mock": "0.0.0",
+    "chai": "^3.5.0",
+    "jquery": "^3.0.0",
+    "jsdom": "^9.4.0",
+    "mocha": "^2.5.3",
+    "mocha-jsdom": "^1.1.0",
+    "mocha-sinon": "^1.1.5",
+    "sinon": "^1.17.4"
+  }
+}
