@@ -71,3 +71,6 @@ function canvasKey(evt){
 exports.start = function start(jquery){
 	coreController = new CoreController(jquery)
 };
+exports.click = function click(event) {
+	coreController.handleClick(event.clientX, event.clientY);
+}
