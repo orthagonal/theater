@@ -4,6 +4,5 @@ placeholders
 build
 saves.json
 *.log
-RoomOneJunction.js
-RoomOneDirector.js
 room_one.js
+modules

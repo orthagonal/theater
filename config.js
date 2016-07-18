@@ -1,10 +1,11 @@
 module.exports = {
   production: {
-    moviesDir: "movies",
+    moviesDir: "modules/IrisOne/movies",
     mode: 'production'
   },
   dev: {
-    moviesDir: "placeholders",
+    moviesDir: "modules/IrisOne/placeholders",
+    soundsDir: "modules/IrisOne",
     mode: 'dev'
   }
 };

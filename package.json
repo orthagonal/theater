@@ -2,7 +2,7 @@
   "name": "iris",
   "version": "1.0.0",
   "description": "A Puzzle in Three Bodies",
-  "main": "web/theater.html",
+  "main": "theater.html",
   "scripts": {
     "test": "mocha"
   },

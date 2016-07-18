@@ -1,3 +1,6 @@
+const config = require('../../config.js').dev;
+const path = require('path');
+
 // Audio controller
 function AudioController($){
 	var self = this;
@@ -15,14 +18,14 @@ function AudioController($){
 	self.setSoundtrack = function(src){
 		if (self.soundtrack)
 			self.clear();
-		self.soundtrackJquery = $("<audio src='" + src + "' type='audio/mpeg'></audio>");
+			self.soundtrackJquery = $(`<audio src="${config.soundsDir}${path.sep}${src}" type='audio/mpeg'></audio>`);
 		self.soundtrack = self.soundtrackJquery[0];
 		self.soundtrack.play();
 		self.soundtrack.volume = .2;
 		self.soundtrack.loop = true
 	}
 	self.loadEffect = function(data){
-		self.audioEffects[data.name] = $("<audio src='" + data.src + "' type='audio/mpeg'></audio>")[0];
+		self.audioEffects[data.name] = $(`<audio src="${config.soundsDir}${path.sep}${data.src}" type='audio/mpeg'></audio>`)[0];
 		if (data.volume) self.audioEffects[data.name].volume = data.volume;
 		if (data.loop) self.audioEffects[data.name].loop = data.loop;
 	}

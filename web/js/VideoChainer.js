@@ -18,7 +18,7 @@
 var FilmClip = require('./FilmClip');
 var AudioController = require('./AudioController');
 var async = require('async');
-
+var _ = require('lodash');
 // this is pretty complicated, might be better to do game loop with
 // async.until, etc
 function VideoChainer( videoCanvas, coreController, options, $){
