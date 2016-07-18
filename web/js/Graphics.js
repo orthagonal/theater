@@ -117,7 +117,7 @@ function Graphics(graphicsCanvas, $){
 			console.log(graphic);
 			// todo: add any special message:
 			if (graphic.element){
-				self.addOnscreenElements(new OnscreenHTMLElement(graphic, {x:200,y:200}, coreController, $));
+				self.addOnscreenElements(new OnscreenHTMLElement(graphic, {x:200,y:200}, self.coreController, $));
 			}
 			// if (graphic.text)
 			// 	self.addTextChain(graphic.text, graphic.position, graphic.fadeOut)

@@ -13,8 +13,6 @@
     "jquery": "^3.1.0",
     "json-fs-store": "^1.0.0",
     "lodash": "^4.13.1",
-    "mongoose": "^4.4.17",
-    "mongoose-function": "^0.1.0",
     "node-localdb": "0.0.3",
     "underscore": "^1.8.3"
   },

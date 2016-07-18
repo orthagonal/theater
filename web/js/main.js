@@ -1,6 +1,5 @@
 	// server stuff, should move to module
 var CoreController = require("./CoreController.js");
-var room_one = require("./room_one.js");
 // client begins here:
 // yes there are globals:
 var videoController; // object that manages video
@@ -26,7 +25,12 @@ var currentVideoElement = null;
 var currentBranch = 0;
 var queryType = "dir" // dir, eye, hand
 
-global.ClientHandlers = room_one.loadClientHandlers();
+function loadClientHandlers(path) {
+	global.ClientHandlers = require(path).loadClientHandlers();
+}
+// todo: this needs to be loaded by a user action:
+loadClientHandlers("../../modules/IrisOne/js/room_one.js");
+
 function getClipCount(graph){
 	return (graph.roots.length + graph.loops.length);
 }
