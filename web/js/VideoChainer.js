@@ -1,15 +1,15 @@
 //                  Video Controller
-// handles loading a junction's videos,
+// handles loading a room's videos,
 // handles showing the current playing video
 // handles showing the graphics on top of the video
 // handles transitioning between videos when onend events are called
 
 // graphics loop fires every 20 milliseconds
 
-// a junction has a
+// a room has a
 
-// load junction will:
-// create all junction film elements
+// load room will:
+// create all room film elements
 // add a series of onend event handlers to chain a group of them together
 // onend switches it to the next video
 /*
@@ -33,7 +33,13 @@ function VideoChainer( videoCanvas, coreController, options, $){
 	FilmClip.prototype.host = this;
 	FilmClip.prototype.$ = $;
 	var self = this;
-	this.audioController = new AudioController($)
+	this.audioController = new AudioController($);
+	this.audioController.loadEffect({
+		name : "ack",
+		src : "sounds/button.mp3",
+		volume : 1.0,
+		loop : false
+	});
 	// this.audioController.setSoundtrack("sounds/exhale.wav")
 	// this.audioController.autoplay = true
 	this.graphics = null;
@@ -42,8 +48,8 @@ function VideoChainer( videoCanvas, coreController, options, $){
 	var len = 4 * this.width * this.height
     var offset = new Array(len)
 	var delta = new Array(len)
-	this.junctionLoading = false;
-	this.junctionStarted = false;
+	this.roomLoading = false;
+	this.roomStarted = false;
 	this.branchPlaying = false;
 	self.behavior = null;//{behavior_type : "splice", interval : "random", min : 500, max : 8000}
 	self.currentBranchElement = null;
@@ -147,7 +153,7 @@ function VideoChainer( videoCanvas, coreController, options, $){
 				// here is where it needs to play the next
 				// if it hasn't been set to something else:
 				if (self.behavior.behavior_type === 'playthrough'){
-					// send signal to the server to load the next junction
+					// send signal to the server to load the next room
 					self.coreController.sendQuery({ query: 'playthrough' });
 				}
 			});
@@ -270,7 +276,7 @@ function VideoChainer( videoCanvas, coreController, options, $){
 		    }
 			self.videoContext.putImageData(result, 0, 0);
 		}
-    }
+  };
 
     // this needs to update at the right rate
     // this needs to sync up to bounding-box frames
@@ -333,13 +339,13 @@ function VideoChainer( videoCanvas, coreController, options, $){
 		}
 	}
 
-	// erase the previous junction:
-	self.clearPreviousJunction = function()	{
+	// erase the previous room:
+	self.clearPreviousRoom = function()	{
 		function clearClip(clip){
 			clip.clear();
 			delete clip;
 		}
-		// todo: loop over the previus junctions actual list of FilmClips:
+		// todo: loop over the previus room's actual list of FilmClips:
 		_.each(self.rootVideoElements, clearClip)
 		_.each(self.loopVideoElements, clearClip)
 		_.each(self.otherVideoElements, clearClip)
@@ -348,18 +354,18 @@ function VideoChainer( videoCanvas, coreController, options, $){
 		this.otherVideoElements = {};
 	}
 
-	this.loadJunction = function(junction, allDone, end) {
-		this.clearPreviousJunction()
-		self.currentJunction = junction;
-		this.junctionLoading = true;
-		this.junctionStarted = false;
+	this.loadRoom = function(room, allDone, end) {
+		this.clearPreviousRoom()
+		self.currentRoom = room;
+		this.roomLoading = true;
+		this.roomStarted = false;
 		// load roots:
 		async.auto({
 			roots: function(rootsDone) {
         // load each of the root video elements:
-				async.each(junction.roots, function(junctionRoot, done){
+				async.each(room.roots, function(roomRoot, done){
 					// load the root video elements with a start event that doesn't do anything
-					self.rootVideoElements.push(new FilmClip(junctionRoot, function(evt) {
+					self.rootVideoElements.push(new FilmClip(roomRoot, function(evt) {
 					}, end));
           return done();
 				}, function(){
@@ -368,9 +374,9 @@ function VideoChainer( videoCanvas, coreController, options, $){
 			},
 			loops: function(loopsDone) {
         // load each of the loop elements:
-				async.each(junction.loops, function(junctionLoop, done){
+				async.each(room.loops, function(roomLoop, done){
 					// load the loop video elements with a start event that doesn't do anything:
-					self.loopVideoElements.push(new FilmClip(junctionLoop, function(evt) {
+					self.loopVideoElements.push(new FilmClip(roomLoop, function(evt) {
 					}, end));
           return done();
 				}, function() {
@@ -381,48 +387,48 @@ function VideoChainer( videoCanvas, coreController, options, $){
 			allDone(err, res);
 		});
 		// load deaths:
-		// for ( i = 0; i < _.keys(junction.others).length; i++){
-		// 	//this.otherVideoElements[junction.others[i]] = new FilmClip(junction.deaths[i], begin, end);
+		// for ( i = 0; i < _.keys(room.others).length; i++){
+		// 	//this.otherVideoElements[room.others[i]] = new FilmClip(room.deaths[i], begin, end);
 		// }
 	};
 
-	// when we get a new junction:
-	this.handleNewJunction = function(junction){
-		self.behavior = junction.behavior
-		self.currentJunction = junction.junction
-		self.currentJunctionName = junction.junctionName;
+	// when we get a new room:
+	this.handleNewRoom = function(room){
+		self.behavior = room.behavior
+		self.currentRoom = room.room
+		self.currentRoomName = room.roomName;
 		var started = false;
 		async.auto({
-			// load junction play elements:
+			// load room play elements:
 			load: function(done) {
-				self.loadJunction(self.currentJunction, function(){
+				self.loadRoom(self.currentRoom, function(){
 					done();
 				}, self.end);
 			},
-			// load junction graphical elements:
+			// load room graphical elements:
 			graphics: ['load', function(results, done) {
-				self.graphics.loadJunction(junction);
+				self.graphics.loadRoom(room);
 				done();
 			}]
 		}, function(err, result) {
 			if (err) {
 				alert(err)
 			}
-			self.junctionLoading = false;
+			self.roomLoading = false;
 			if (!started) {
 				self.playBehavior(ClientHandlers.RootBehaviors, self.RootBehaviors);
 				started = true;
 			}
  		});
 	}
-	// branch to the same junction:
+	// branch to the same room:
 	this.branchToSame = function(bracket) {
 		self.currentBranchElement = new FilmClip(bracket.branch, function(evt){
 			self.branchPlaying = true;
 			self.switchToVideo(self.currentBranchElement);
 			self.currentBranchElement.play();
 		}, function(){
-			// branch to the same junction when this ends
+			// branch to the same room when this ends
 			self.branchPlaying = false;
 			self.playBehavior(ClientHandlers.RootBehaviors, self.RootBehaviors);
 		});
@@ -435,12 +441,12 @@ function VideoChainer( videoCanvas, coreController, options, $){
 	    self.currentVideoElement.videoElement.onended = function() {
 	      self.branchPlaying = true;
 	      self.switchToVideo(self.currentBranchElement, bracket.behavior.effect);
-	      self.loadJunction(bracket.junction, function() {
+	      self.loadRoom(bracket.room, function() {
 				}, undefined);
-	      self.graphics.loadJunction(bracket);
+	      self.graphics.loadRoom(bracket);
 	    };
 	  }, function(){
-	    // branch to the junction when this ends
+	    // branch to the room when this ends
 	    self.behavior = bracket.behavior
 	    self.branchPlaying = false;
 	    self.playBehavior(ClientHandlers.RootBehaviors, self.RootBehaviors);
@@ -453,13 +459,13 @@ function VideoChainer( videoCanvas, coreController, options, $){
 		self.currentBranchElement = new FilmClip(bracket.branch, function(evt) {
 			self.branchPlaying = true;
 			self.switchToVideo(self.currentBranchElement, bracket.behavior.effect);
-			self.loadJunction(bracket.junction, function() {
-				// alert("allDone branchNow junction loaded")
+			self.loadRoom(bracket.room, function() {
+				// alert("allDone branchNow room loaded")
 			}, undefined);
-			self.graphics.loadJunction(bracket);
+			self.graphics.loadRoom(bracket);
 		}
 		, function(){
-			// branch to the junction when this ends
+			// branch to the room when this ends
 			self.behavior = bracket.behavior
 			self.branchPlaying = false;
 			self.playBehavior(ClientHandlers.RootBehaviors, self.RootBehaviors);
@@ -469,8 +475,8 @@ function VideoChainer( videoCanvas, coreController, options, $){
 
 	// when we play a branch:
 	this.handleBranch = function(bracket){
-		// if we're self-branching to the same junction:
-		if (bracket.junctionName === self.currentJunctionName){
+		// if we're self-branching to the same room:
+		if (bracket.roomName === self.currentRoomName){
 			return self.branchToSame(bracket);
     }
 		if (self.currentBranchElement){
