@@ -24,7 +24,7 @@ function CoreController($){
   }
 	// put graphics/video here:
 	this.sendQuery = function(packet){
-		// query has to return to go to next junction:
+		// query has to return to go to next room:
 		packet.userId = 'mainUser';
 		Server.query(packet, self.handleQuery);
 	}
@@ -34,7 +34,7 @@ function CoreController($){
 		if (data.result && data.result.sound){
 			self.videoController.audioController.startEffect(data.result.sound);
 		}
-		if (data.msg === 'BranchToJunction'){
+		if (data.msg === 'BranchToRoom'){
 			self.videoController.handleBranch(data.result);
 		}
 	};
@@ -44,7 +44,7 @@ function CoreController($){
 		var userId = 'mainUser';
 		if (GAMEID=='newGame'){
 			Server.startNewGame( userId, function(runningGameState){
-				self.videoController.handleNewJunction(runningGameState);
+				self.videoController.handleNewRoom(runningGameState);
 			});
 		}
 		else{
@@ -52,7 +52,7 @@ function CoreController($){
 			Server.continueExistingGame(gameId, function(gameState){
 				// req.sessionStore.userId = req.body.username;
 				// req.sessionStore.gameId = req.body.gameId;
-				self.videoController.handleNewJunction(gameState);
+				self.videoController.handleNewRoom(gameState);
 			});
 		}
 	};
@@ -73,7 +73,7 @@ function CoreController($){
 			return this.sendQuery({
 				filmName : self.videoController.getVideoName(),
 				frameCount: self.videoController.getFrameCount(),
-				junctionName: self.currentJunction,
+				roomName: self.currentRoom,
 				action: 'click',
 				x:x,
 				y:y,

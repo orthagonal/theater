@@ -1,9 +1,11 @@
+'use strict';
 const config = require('../../config.js').dev;
 const path = require('path');
 
 // loads the url for clipData.title, call begin() when it is ready to play and end() when it ends:
 function FilmClip(clipData, begin, end){
-	var $ = FilmClip.prototype.$;
+	// get the jquery reference:
+	const $ = FilmClip.prototype.$;
 	var self = this;
 	this.data = clipData;
 	this.url = clipData.title;

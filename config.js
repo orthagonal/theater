@@ -1,3 +1,5 @@
+// your config will be different:
+// point your config to modules/<module name>/rootDirectory
 module.exports = {
   production: {
     moviesDir: "modules/IrisOne/movies",

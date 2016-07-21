@@ -18,7 +18,7 @@ function AudioController($){
 	self.setSoundtrack = function(src){
 		if (self.soundtrack)
 			self.clear();
-			self.soundtrackJquery = $(`<audio src="${config.soundsDir}${path.sep}${src}" type='audio/mpeg'></audio>`);
+		self.soundtrackJquery = $(`<audio src="${config.soundsDir}${path.sep}${src}" type='audio/mpeg'></audio>`);
 		self.soundtrack = self.soundtrackJquery[0];
 		self.soundtrack.play();
 		self.soundtrack.volume = .2;

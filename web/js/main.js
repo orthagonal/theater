@@ -1,64 +1,62 @@
+'use strict';
 	// server stuff, should move to module
-var CoreController = require("./CoreController.js");
-// client begins here:
-// yes there are globals:
-var videoController; // object that manages video
-var graphics = null; // object that manages overlay UI graphics:
-var coreController = null;
-var videoCanvas = null; // html5 canvas
-var videoContext = null; // html5 2d drawing context
-// get width and height from canvas element
-var started = false;
-var iconsWidth = 60;
-var iconsHeight = 60;
-var BranchToJunction = 222;
-var fontSize = 20;
-var yBase = 680;
-var thumbWidth = 100;
-var thumbHeight = 100;
+const CoreController = require('./CoreController.js');
+let coreController = null;
+let videoCanvas;
+/*
+let started = false;
+
+// some globals that may not be needed anymore:
+const iconsWidth = 60;
+const iconsHeight = 60;
+const BranchToJunction = 222;
+const fontSize = 20;
+const yBase = 680;
+const thumbWidth = 100;
+const thumbHeight = 100;
 
 // milliseconds per tick
-var tickRate = 3000;
-var playingLoop = true;
-var paused = false;
-var currentVideoElement = null;
-var currentBranch = 0;
-var queryType = "dir" // dir, eye, hand
-
+const tickRate = 3000;
+let playingLoop = true;
+let paused = false;
+let currentVideoElement = null;
+let currentBranch = 0;
+let queryType = "dir" // dir, eye, hand
+*/
 function loadClientHandlers(path) {
 	global.ClientHandlers = require(path).loadClientHandlers();
 }
 // todo: this needs to be loaded by a user action:
-loadClientHandlers("../../modules/IrisOne/js/room_one.js");
+loadClientHandlers('../../modules/IrisOne/js/room_one.js');
 
-function getClipCount(graph){
+function getClipCount(graph) {
 	return (graph.roots.length + graph.loops.length);
 }
 
-function canvasClick(event){
-	 coreController.handleClick(event.pageX-videoCanvas.offsetLeft,
-		 event.pageY-videoCanvas.offsetTop)
+function canvasClick(event) {
+	coreController.handleClick(event.pageX - videoCanvas.offsetLeft,
+		event.pageY - videoCanvas.offsetTop);
 }
 
 // fast map dec to int:
-var MapDecToInt = {
-	48 : 0,
-	49 : 1,
-	50 : 2,
-	51 : 3,
-	52 : 4,
-	53 : 5,
-	54 : 6,
-	55 : 7,
-	56 : 8,
-	57 : 9
-}
+const MapDecToInt = {
+	48: 0,
+	49: 1,
+	50: 2,
+	51: 3,
+	52: 4,
+	53: 5,
+	54: 6,
+	55: 7,
+	56: 8,
+	57: 9
+};
 
 // handle buttons for hitboxes
 // todo: test this by auto-generating some hitboxes for the videos:
-function canvasKey(evt){
-	if (MapDecToInt[evt.which]){
-		coreController.sendQuery({query:"fingers"});
+function canvasKey(evt) {
+	if (MapDecToInt[evt.which]) {
+		coreController.sendQuery({ query: 'fingers' });
 		// $.post('/click/', {
 		// 	filmName : coreController.getVideoName(),
 		// 	frameCount: coreController.getFrameCount(),
@@ -68,9 +66,9 @@ function canvasKey(evt){
 }
 
 // these are all singletons lanyway
-exports.start = function start(jquery){
-	coreController = new CoreController(jquery)
+exports.start = function start(jquery) {
+	coreController = new CoreController(jquery);
 };
 exports.click = function click(event) {
 	coreController.handleClick(event.clientX, event.clientY);
-}
+};

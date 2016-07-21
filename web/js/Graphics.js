@@ -111,9 +111,9 @@ function Graphics(graphicsCanvas, $){
 		}
 	}
 
-	this.loadJunction = function(junction){
+	this.loadRoom = function(room){
 		self.clearOnscreenElements();
-		_.each(junction.graphics, function(graphic){
+		_.each(room.graphics, function(graphic){
 			console.log(graphic);
 			// todo: add any special message:
 			if (graphic.element){
