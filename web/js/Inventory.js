@@ -1,39 +1,38 @@
-module.exports.InventoryItem = InventoryItem;
-module.exports.InventoryButton = InventoryButton;
-module.exports.InventoryThumbnail = InventoryThumbnail;
+'use strict';
 
 // item when it's center of the screen
-function InventoryItem(item){
-	var self = this;
-	// 'exit' and 'use' icons:
-	var xImage = document.createElement('img');
-	xImage.src = "/images/x.jpg";
-	var useImage = document.createElement('img');
-	useImage.src = "/images/use.jpg";
-	self.item = item;
-	self.position = {x: width/2, y: 10, radians: .35};
-	self.element=document.createElement('img');
-	this.width = 0; this.height = 0;
-	self.element.onload = function(res){
-		if (res && res.srcElement){
-			self.position.x -= (this.width/3);
-			self.width = res.srcElement.width;
-			self.height = res.srcElement.height; // Math.max(height-10, res.srcElement.height);
-			exitPositionX = self.position.x-10;
-			exitPositionY = self.position.y-5;
-			usePositionX = self.position.x+self.width-10;
-		}
+class InventoryItem{
+	constructor(item){
+		// 'exit' and 'use' icons:
+		var xImage = document.createElement('img');
+		xImage.src = "/images/x.jpg";
+		var useImage = document.createElement('img');
+		useImage.src = "/images/use.jpg";
+		this.item = item;
+		this.position = {x: width/2, y: 10, radians: .35};
+		this.element=document.createElement('img');
+		this.width = 0; this.height = 0;
+		this.element.onload = function(res){
+			if (res && res.srcElement){
+				this.position.x -= (this.width/3);
+				this.width = res.srcElement.width;
+				this.height = res.srcElement.height; // Math.max(height-10, res.srcElement.height);
+				exitPositionX = this.position.x-10;
+				exitPositionY = this.position.y-5;
+				usePositionX = this.position.x+this.width-10;
+			}
+		};
+		this.element.src=item.img;
+		var exitPositionX = this.position.x-10;
+		var exitPositionY = this.position.y-5;
+		var usePositionX = this.position.x+this.width-10;
+		this.selected = false;
 	}
-	self.element.src=item.img;
-	var exitPositionX = self.position.x-10;
-	var exitPositionY = self.position.y-5;
-	var usePositionX = self.position.x+self.width-10;
-	self.selected = false;
-	self.draw = function(context){
+	draw(context){
 		context.save();
-		// context.rotate(self.position.radians);
-		context.drawImage(self.element,self.position.x, self.position.y, self.width, self.height);
-		if (!self.selected){
+		// context.rotate(this.position.radians);
+		context.drawImage(this.element,this.position.x, this.position.y, this.width, this.height);
+		if (!this.selected){
 			// draw the x-out button:
 			context.drawImage(xImage,exitPositionX, exitPositionY, iconsWidth, iconsHeight);
 			// draw the use button:
@@ -41,74 +40,78 @@ function InventoryItem(item){
 		}
 		context.restore();
 	}
-	this.hitTest = function(x,y){
-		return ((x>self.position.x) && (x<self.position.x+self.width)
-		 && (y>self.position.y) && y<self.position.y+self.height)
+
+	hitTest(x,y){
+		return ((x>this.position.x) && (x<this.position.x+this.width)
+		 && (y>this.position.y) && y<this.position.y+this.height)
 	}
-	this.hitExit = function(x,y){
+	hitExit(x,y){
 		return ((x>exitPositionX) && (x<exitPositionX+iconsWidth)
 		 && (y>exitPositionY) && y<exitPositionY+iconsHeight)
 	}
-	this.hitUse = function(x,y){
+	hitUse(x,y){
 		return ((x>usePositionX) && (x<usePositionX+iconsWidth)
 		 && (y>exitPositionY) && y<exitPositionY+iconsHeight)
 	}
-	this.handleClick = function(x,y){
-		if (self.hitExit(x,y))
+	handleClick(x,y){
+		if (this.hitExit(x,y))
 			return {exit: true} ;
-		else if (self.hitUse(x,y))
-			return {use: self} ;
-		else if (self.hitTest(x,y))
-			return {inventory: self.item} ;
+		else if (this.hitUse(x,y))
+			return {use: this} ;
+		else if (this.hitTest(x,y))
+			return {inventory: this.item} ;
 	}
 }
 
 // inventory thumbnail
-function InventoryThumbnail( item, position, size){
-	var self = this;
-	self.item = item;
-	self.position = position;
-	if (!self.position.radians){
-		self.position.radians = 0;
+class InventoryThumbnail{
+	constructor( item, position, size){
+		this.item = item;
+		this.position = position;
+		if (!this.position.radians){
+			this.position.radians = 0;
+		}
+		this.element=document.createElement('img');
+		this.element.src=item.img;
+		this.opacity = 1.0;
+		this.width = size.width;
+		this.height = size.height;
 	}
-	self.element=document.createElement('img');
-	self.element.src=item.img;
-	this.opacity = 1.0;
-	this.width = size.width;
-	this.height = size.height;
-	self.draw = function(context){
-		// context.save();
-		// context.rotate(self.position.radians)
-		context.drawImage(self.element,position.x, position.y, self.width, self.height);
-		// context.restore();
+	draw(context) {
+			context.drawImage(this.element,position.x, position.y, this.width, this.height);
+		};
+	hitTest(x,y){
+		return ((x>this.position.x) && (x<this.position.x+this.width)
+		 && (y>this.position.y) && y<this.position.y+this.height)
 	}
-	this.hitTest = function(x,y){
-		return ((x>self.position.x) && (x<self.position.x+self.width)
-		 && (y>self.position.y) && y<self.position.y+self.height)
-	}
-	this.handleClick = function(x,y){
-		if (self.hitTest(x,y))
-			return {thumbnail: self.item} ;
+	handleClick(x,y){
+		if (this.hitTest(x,y))
+			return {thumbnail: this.item} ;
 	}
 }
 
 // item you click on to open the inventory
-function InventoryButton(){
-	var self = this;
-	self.position = {x: 10, y: 10}
-	self.width = 50;
-	self.height = 50;
-	self.element = document.createElement('img'),
-	self.element.src="/web/images/inventory.png";
-	this.draw = function(context){
-		context.drawImage(self.element,self.position.x, self.position.y, self.width, self.height);
+class InventoryButton{
+	constructor() {
+		this.position = {x: 10, y: 10}
+		this.width = 50;
+		this.height = 50;
+		this.element = document.createElement('img'),
+		this.element.src="/web/images/inventory.png";
 	}
-	this.hitTest = function(x,y){
-		return ((x>self.position.x) && (x<self.position.x+self.width)
-		 && (y>self.position.y) && y<self.position.y+self.height)
+	draw(context){
+		context.drawImage(this.element,this.position.x, this.position.y, this.width, this.height);
 	}
-	this.handleClick = function(x,y){
-		if (self.hitTest(x,y))
+	hitTest(x,y){
+		return ((x>this.position.x) && (x<this.position.x+this.width)
+		 && (y>this.position.y) && y<this.position.y+this.height)
+	}
+	handleClick(x,y){
+		if (this.hitTest(x,y))
 			return {inventoryButton: true} ;
 	}
 }
+
+module.exports.InventoryItem = InventoryItem;
+module.exports.InventoryButton = InventoryButton;
+module.exports.InventoryThumbnail = InventoryThumbnail;
