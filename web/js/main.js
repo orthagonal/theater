@@ -8,8 +8,6 @@ let videoCanvas;
 let started = false;
 
 // some globals that may not be needed anymore:
-const iconsWidth = 60;
-const iconsHeight = 60;
 const BranchToJunction = 222;
 const fontSize = 20;
 const yBase = 680;
