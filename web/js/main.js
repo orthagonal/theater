@@ -1,6 +1,7 @@
 'use strict';
 	// server stuff, should move to module
 const CoreController = require('./CoreController.js');
+
 let coreController = null;
 let videoCanvas;
 /*
@@ -68,6 +69,7 @@ function canvasKey(evt) {
 // these are all singletons lanyway
 exports.start = function start(jquery) {
 	coreController = new CoreController(jquery);
+	coreController.kickstart('newGame', 'mainUser');
 };
 exports.click = function click(event) {
 	coreController.handleClick(event.clientX, event.clientY);
