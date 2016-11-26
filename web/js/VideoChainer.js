@@ -21,11 +21,10 @@ var async = require('async');
 var _ = require('lodash');
 // this is pretty complicated, might be better to do game loop with
 // async.until, etc
-function VideoChainer( videoCanvas, coreController, options, $){
-
-	this.width = 1720;//options.width;
-	this.height = 1000;//options.height;
+function VideoChainer( videoCanvas, coreController, options, $, width, height){
 	this.videoContext = videoCanvas.getContext('2d');
+  this.width = width;
+  this.height = height;
 	this.rootVideoElements = [];
 	this.loopVideoElements = [];
 	this.otherVideoElements = {};
@@ -33,6 +32,15 @@ function VideoChainer( videoCanvas, coreController, options, $){
 	FilmClip.prototype.host = this;
 	FilmClip.prototype.$ = $;
 	var self = this;
+  // placeholders for doing transition effectxs:
+  var len = 4 * this.width * this.height
+  console.log('----')
+  console.log(this.width)
+  console.log(this.height)
+  console.log(len)
+  alert(this.width + ',' + this.height + ' ' + len)
+  var offset = new Array(len);
+  var delta = new Array(len);
 	this.audioController = new AudioController($);
 	this.audioController.loadEffect({
 		name : "ack",
@@ -44,10 +52,6 @@ function VideoChainer( videoCanvas, coreController, options, $){
 	// this.audioController.autoplay = true
 	this.graphics = null;
 	self.currentVideoElement = null;
-	// placeholders for doing transition effectxs:
-	var len = 4 * this.width * this.height
-    var offset = new Array(len)
-	var delta = new Array(len)
 	this.roomLoading = false;
 	this.roomStarted = false;
 	this.branchPlaying = false;
@@ -365,7 +369,9 @@ function VideoChainer( videoCanvas, coreController, options, $){
         // load each of the root video elements:
 				async.each(room.roots, function(roomRoot, done){
 					// load the root video elements with a start event that doesn't do anything
-					self.rootVideoElements.push(new FilmClip(roomRoot, function(evt) {
+          console.log('gonna load a root vid')
+					self.rootVideoElements.push(new FilmClip(roomRoot, (evt) => {
+            console.log('hi there');
 					}, end));
           return done();
 				}, function(){

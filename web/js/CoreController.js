@@ -4,12 +4,12 @@ var Server = require('../../lib/nwserver.js');
 
 //                  Server Interface                       //
 class CoreController {
-	constructor($) {
+	constructor($, width, height) {
 		this.$ = $;
 		this.videoCanvas = $('#videoCanvas')[0];
 		this.graphics = new Graphics(this.videoCanvas, $);
 		// graphics.addTextChain("the wolf has eaten the lamb", {x:320,y:240}, false);
-		this.videoController = new VideoChainer(this.videoCanvas, this, {}, $);
+		this.videoController = new VideoChainer(this.videoCanvas, this, {}, $, width, height);
 		this.graphics.videoChainer = this.videoController;
 		this.videoController.graphics = this.graphics;
 		this.graphics.coreController = this;
