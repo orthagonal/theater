@@ -14,7 +14,6 @@ class FilmClip {
     }
 		// a jquery wrapper for convenience:
     const src = path.normalize(`${config.moviesDir}${path.sep}${this.url}`);
-    console.log('loading source %s', src);
     this.jqueryElement = $(`<video src="${src}" height='0' width='0'></video>`);
     this.videoElement = this.jqueryElement[0];
     this.videoElement.oncanplay = begin;
@@ -44,9 +43,7 @@ class FilmClip {
   }
   start() {
     this.videoElement.load();
-    console.log('starting');
     this.oncanplay();
-    console.log('done');
   }
 }
 

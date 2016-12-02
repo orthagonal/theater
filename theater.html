@@ -9,12 +9,7 @@
     function onLoad() {
       // set size:
       var theWindow = nw.Screen.screens[0];
-      console.log(theWindow);
-      console.log(theWindow.bounds);
-      var videoCanvas = $('#videoCanvas')[0];
-      videoCanvas.width = theWindow.bounds.width;
-      videoCanvas.height = theWindow.bounds.height;
-      main.start($);
+      main.start($, theWindow.bounds.width, theWindow.bounds.height);
     }
     function onClick(event) {
       main.click(event);
@@ -60,8 +55,8 @@
 <body onload="onLoad();">
   <canvas id="videoCanvas" onclick="onClick(event);">
   </canvas>
-  <div id="mainElement">
+  <!-- <div id="mainElement">
     <input id="query" type="text" onkeydown="onKeyDown()" />
-  </div>
+  </div> -->
 </body>
 </html>

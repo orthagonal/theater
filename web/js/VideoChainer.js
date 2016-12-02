@@ -34,11 +34,6 @@ function VideoChainer( videoCanvas, coreController, options, $, width, height){
 	var self = this;
   // placeholders for doing transition effectxs:
   var len = 4 * this.width * this.height
-  console.log('----')
-  console.log(this.width)
-  console.log(this.height)
-  console.log(len)
-  alert(this.width + ',' + this.height + ' ' + len)
   var offset = new Array(len);
   var delta = new Array(len);
 	this.audioController = new AudioController($);
@@ -310,9 +305,6 @@ function VideoChainer( videoCanvas, coreController, options, $, width, height){
 
 	// transition from one video to another using the indicated transition type:
 	this.switchToVideo = function(video, effect){
-		console.log('-------------- switch to video' )
-		console.log(video);
-		console.log('--------------' )
 		// if no effect switch video right away
 		if (!effect){
 			var oldElement = self.currentVideoElement;
@@ -369,9 +361,7 @@ function VideoChainer( videoCanvas, coreController, options, $, width, height){
         // load each of the root video elements:
 				async.each(room.roots, function(roomRoot, done){
 					// load the root video elements with a start event that doesn't do anything
-          console.log('gonna load a root vid')
 					self.rootVideoElements.push(new FilmClip(roomRoot, (evt) => {
-            console.log('hi there');
 					}, end));
           return done();
 				}, function(){

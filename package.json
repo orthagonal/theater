@@ -4,7 +4,10 @@
   "description": "Theater: Interactive Video Engine",
   "main": "theater.html",
   "window": {
-    "kiosk": true
+    "fullscreen": true,
+    "resizable": false,
+    "toolbar": false,
+    "frame": false
   },
   "scripts": {
     "test": "mocha"

@@ -7,6 +7,8 @@ class CoreController {
 	constructor($, width, height) {
 		this.$ = $;
 		this.videoCanvas = $('#videoCanvas')[0];
+    this.videoCanvas.width = width;
+    this.videoCanvas.height = height;
 		this.graphics = new Graphics(this.videoCanvas, $);
 		// graphics.addTextChain("the wolf has eaten the lamb", {x:320,y:240}, false);
 		this.videoController = new VideoChainer(this.videoCanvas, this, {}, $, width, height);
@@ -29,8 +31,6 @@ class CoreController {
 		// query has to return to go to next room:
 		packet.userId = 'mainUser';
 		const handleQuery = (data) => {
-			console.log('CoreController.handleQuery returns, data is:')
-			console.log(data);
 			if (data.result && data.result.sound){
 				this.videoController.audioController.startEffect(data.result.sound);
 			}

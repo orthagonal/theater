@@ -65,8 +65,8 @@ function canvasKey(evt) {
 }
 
 // these are all singletons lanyway
-exports.start = function start(jquery) {
-	coreController = new CoreController(jquery);
+exports.start = function start(jquery, width, height) {
+	coreController = new CoreController(jquery, width, height);
 	coreController.kickstart('newGame', 'mainUser');
 };
 exports.click = function click(event) {
