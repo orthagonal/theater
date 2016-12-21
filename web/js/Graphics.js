@@ -1,9 +1,9 @@
+const _ = require('underscore');
 // const Text = require('./Text.js');
 const Inventory = require('./Inventory.js');
 const InventoryItem = Inventory.InventoryItem;
 const InventoryButton = Inventory.InventoryButton;
 const InventoryThumbnail = Inventory.InventoryThumbnail;
-
 // should have 'style' embedded in the element
 class OnscreenHTMLElement {
   constructor(graphics, coords, coreController, $) {

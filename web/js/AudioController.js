@@ -18,8 +18,9 @@ class AudioController {
 	}
 
 	setSoundtrack(src){
-		if (this.soundtrack)
+		if (this.soundtrack) {
 			this.clear();
+		}
 		this.soundtrackJquery = this.$(`<audio src="${config.soundsDir}${path.sep}${src}" type='audio/mpeg'></audio>`);
 		this.soundtrack = this.soundtrackJquery[0];
 		this.soundtrack.play();
@@ -28,6 +29,7 @@ class AudioController {
 	}
 
 	loadEffect(data) {
+		console.log('loading sound from %s', config.soundsDir)
 		this.audioEffects[data.name] = this.$(`<audio src="${config.soundsDir}${path.sep}${data.src}" type='audio/mpeg'></audio>`)[0];
 		if (data.volume) this.audioEffects[data.name].volume = data.volume;
 		if (data.loop) this.audioEffects[data.name].loop = data.loop;

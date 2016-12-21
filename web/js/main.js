@@ -1,9 +1,10 @@
+// server stuff, should move to module
 'use strict';
-	// server stuff, should move to module
 const CoreController = require('./CoreController.js');
 
 let coreController = null;
 let videoCanvas;
+let clientHandler;
 /*
 let started = false;
 
@@ -23,10 +24,11 @@ let currentBranch = 0;
 let queryType = "dir" // dir, eye, hand
 */
 function loadClientHandlers(path) {
-	global.ClientHandlers = require(path).loadClientHandlers();
+	clientHandler = coreController.clientHandler = require(path).loadClientHandlers(coreController);
+	// todo: are globals really bad inside core code of a game engine?
+	global.ClientHandler = clientHandler;
+	clientHandler.init();
 }
-// todo: this needs to be loaded by a user action:
-loadClientHandlers('../../modules/IrisOne/js/room_one.js');
 
 function getClipCount(graph) {
 	return (graph.roots.length + graph.loops.length);
@@ -68,6 +70,8 @@ function canvasKey(evt) {
 exports.start = function start(jquery, width, height) {
 	coreController = new CoreController(jquery, width, height);
 	coreController.kickstart('newGame', 'mainUser');
+	// todo: this needs to be loaded by a user action:
+	loadClientHandlers('../../modules/IrisOne/js/the_repository_1.js');
 };
 exports.click = function click(event) {
 	coreController.handleClick(event.clientX, event.clientY);
