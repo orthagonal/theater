@@ -32,10 +32,12 @@ class AudioController {
 		if (data.volume) this.audioEffects[data.name].volume = data.volume;
 		if (data.loop) this.audioEffects[data.name].loop = data.loop;
 	}
-	startEffect(data) {
-		if (this.audioEffects[data.name])
-			this.audioEffects[data.name].play()
-	}
+  startEffect(data, callback) {
+    if (this.audioEffects[data.name]) {
+      this.audioEffects[data.name].ended = callback;
+      this.audioEffects[data.name].play();
+    }
+  }
 	removeEffect(data) {
 		this.audioEffects[data.name].pause();
 		delete this.audioEffects[data.name];
