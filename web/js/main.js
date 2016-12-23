@@ -5,24 +5,7 @@ const CoreController = require('./CoreController.js');
 let coreController = null;
 let videoCanvas;
 let clientHandler;
-/*
-let started = false;
 
-// some globals that may not be needed anymore:
-const BranchToJunction = 222;
-const fontSize = 20;
-const yBase = 680;
-const thumbWidth = 100;
-const thumbHeight = 100;
-
-// milliseconds per tick
-const tickRate = 3000;
-let playingLoop = true;
-let paused = false;
-let currentVideoElement = null;
-let currentBranch = 0;
-let queryType = "dir" // dir, eye, hand
-*/
 function loadClientHandlers(path) {
 	clientHandler = coreController.clientHandler = require(path).loadClientHandlers(coreController);
 	// todo: are globals really bad inside core code of a game engine?
