@@ -16,11 +16,9 @@ class CoreController {
 		this.graphics.videoChainer = this.videoController;
 		this.videoController.graphics = this.graphics;
 		this.graphics.coreController = this;
-		this.module.videoController = this.videoController;
-		this.module.audioController = this.videoController.audioController;
-		this.module.graphics = this.graphics;
+		this.audioController = this.videoController.audioController;
 		//todo: make module initialization nicer:
-		this.module.init(this.videoController);
+		this.module.init();
 	}
 
 	// try to get the current frame of the current video:
