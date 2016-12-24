@@ -4,17 +4,23 @@ var Server = require('../../lib/nwserver.js');
 
 //                  Server Interface                       //
 class CoreController {
-	constructor($, width, height) {
+	constructor(modulePath, $, width, height) {
 		this.$ = $;
 		this.videoCanvas = $('#videoCanvas')[0];
     this.videoCanvas.width = width;
     this.videoCanvas.height = height;
-		this.graphics = new Graphics(this.videoCanvas, $);
+		this.module = require(modulePath).loadClientHandlers(this);
+		this.graphics = new Graphics(this.module, this.videoCanvas, $);
 		// graphics.addTextChain("the wolf has eaten the lamb", {x:320,y:240}, false);
-		this.videoController = new VideoChainer(this.videoCanvas, this, {}, $, width, height);
+		this.videoController = new VideoChainer(this.module, this.videoCanvas, this, {}, $, width, height);
 		this.graphics.videoChainer = this.videoController;
 		this.videoController.graphics = this.graphics;
 		this.graphics.coreController = this;
+		this.module.videoController = this.videoController;
+		this.module.audioController = this.videoController.audioController;
+		this.module.graphics = this.graphics;
+		//todo: make module initialization nicer:
+		this.module.init(this.videoController);
 	}
 
 	// try to get the current frame of the current video:
@@ -24,6 +30,10 @@ class CoreController {
   }
   // get the file name of the current video:
   getVideoName(){
+		console.log('+')
+		console.log('+')
+		console.log('+')
+		console.log(this)
   	return this.videoController.getVideoName();
   }
 	// put graphics/video here:

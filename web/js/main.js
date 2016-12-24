@@ -1,17 +1,9 @@
 // server stuff, should move to module
 'use strict';
 const CoreController = require('./CoreController.js');
-
+const path = require('path');
 let coreController = null;
 let videoCanvas;
-let clientHandler;
-
-function loadClientHandlers(path) {
-	clientHandler = coreController.clientHandler = require(path).loadClientHandlers(coreController);
-	// todo: are globals really bad inside core code of a game engine?
-	global.ClientHandler = clientHandler;
-	clientHandler.init();
-}
 
 function getClipCount(graph) {
 	return (graph.roots.length + graph.loops.length);
@@ -51,11 +43,12 @@ function canvasKey(evt) {
 
 // these are all singletons lanyway
 exports.start = function start(jquery, width, height) {
-	coreController = new CoreController(jquery, width, height);
+	// todo: make modules be npm modules:
+	coreController = new CoreController(path.join(process.cwd(), 'modules', 'IrisOne', 'js' ,'the_repository_1.js'), jquery, width, height);
 	coreController.kickstart('newGame', 'mainUser');
 	// todo: this needs to be loaded by a user action:
-	loadClientHandlers('../../modules/IrisOne/js/the_repository_1.js');
 };
+
 exports.click = function click(event) {
 	coreController.handleClick(event.clientX, event.clientY);
 };

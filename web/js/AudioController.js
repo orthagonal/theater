@@ -29,14 +29,17 @@ class AudioController {
 	}
 
 	loadEffect(data) {
-		console.log('loading sound from %s', config.soundsDir)
 		this.audioEffects[data.name] = this.$(`<audio src="${config.soundsDir}${path.sep}${data.src}" type='audio/mpeg'></audio>`)[0];
-		if (data.volume) this.audioEffects[data.name].volume = data.volume;
-		if (data.loop) this.audioEffects[data.name].loop = data.loop;
+		if (data.volume) {
+			this.audioEffects[data.name].volume = data.volume;
+		}
+		if (data.loop) {
+			this.audioEffects[data.name].loop = data.loop;
+		}
 	}
   startEffect(data, callback) {
     if (this.audioEffects[data.name]) {
-      this.audioEffects[data.name].ended = callback;
+			this.audioEffects[data.name].addEventListener('ended', callback, true);
       this.audioEffects[data.name].play();
     }
   }

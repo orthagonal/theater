@@ -21,7 +21,8 @@ var async = require('async');
 var _ = require('lodash');
 // this is pretty complicated, might be better to do game loop with
 // async.until, etc
-function VideoChainer( videoCanvas, coreController, options, $, width, height){
+function VideoChainer(module, videoCanvas, coreController, options, $, width, height){
+	this.module = module;
 	this.videoContext = videoCanvas.getContext('2d');
   this.width = width;
   this.height = height;
@@ -37,14 +38,6 @@ function VideoChainer( videoCanvas, coreController, options, $, width, height){
   var offset = new Array(len);
   var delta = new Array(len);
 	this.audioController = new AudioController($);
-	this.audioController.loadEffect({
-		name : "ack",
-		src : "sounds/button.mp3",
-		volume : 1.0,
-		loop : false
-	});
-	// this.audioController.setSoundtrack("sounds/exhale.wav")
-	// this.audioController.autoplay = true
 	this.graphics = null;
 	self.currentVideoElement = null;
 	this.roomLoading = false;
@@ -127,7 +120,7 @@ function VideoChainer( videoCanvas, coreController, options, $, width, height){
 			if (!self.currentVideoElement.jqueryElement.handlerSet){
 				self.currentVideoElement.jqueryElement.handlerSet = true;
 				self.currentVideoElement.jqueryElement.bind('ended', function(){
-					self.playBehavior(ClientHandlers.LoopBehaviors, self.LoopBehaviors);
+					self.playBehavior(self.module.LoopBehaviors, self.LoopBehaviors);
 				});
 			}
 		},
@@ -171,7 +164,7 @@ function VideoChainer( videoCanvas, coreController, options, $, width, height){
 			if (!self.currentVideoElement.jqueryElement.handlerSet){
 				self.currentVideoElement.jqueryElement.handlerSet = true;
 				self.currentVideoElement.jqueryElement.bind('ended', function(){
-					self.playBehavior(ClientHandlers.RootBehaviors, self.RootBehaviors);
+					self.playBehavior(self.module.RootBehaviors, self.RootBehaviors);
 				});
 			}
 		},
@@ -412,7 +405,7 @@ function VideoChainer( videoCanvas, coreController, options, $, width, height){
 			}
 			self.roomLoading = false;
 			if (!started) {
-				self.playBehavior(ClientHandlers.RootBehaviors, self.RootBehaviors);
+				self.playBehavior(self.module.RootBehaviors, self.RootBehaviors);
 				started = true;
 			}
  		});
@@ -426,7 +419,7 @@ function VideoChainer( videoCanvas, coreController, options, $, width, height){
 		}, function(){
 			// branch to the same room when this ends
 			self.branchPlaying = false;
-			self.playBehavior(ClientHandlers.RootBehaviors, self.RootBehaviors);
+			self.playBehavior(self.module.RootBehaviors, self.RootBehaviors);
 		});
 		self.currentBranchElement.start();
 	}
@@ -445,7 +438,7 @@ function VideoChainer( videoCanvas, coreController, options, $, width, height){
 	    // branch to the room when this ends
 	    self.behavior = bracket.behavior
 	    self.branchPlaying = false;
-	    self.playBehavior(ClientHandlers.RootBehaviors, self.RootBehaviors);
+	    self.playBehavior(self.module.RootBehaviors, self.RootBehaviors);
 	  });
 		self.currentBranchElement.start();
 	};
@@ -464,7 +457,7 @@ function VideoChainer( videoCanvas, coreController, options, $, width, height){
 			// branch to the room when this ends
 			self.behavior = bracket.behavior
 			self.branchPlaying = false;
-			self.playBehavior(ClientHandlers.RootBehaviors, self.RootBehaviors);
+			self.playBehavior(self.module.RootBehaviors, self.RootBehaviors);
 		});
 		//self.currentBranchElement.start();
 	};

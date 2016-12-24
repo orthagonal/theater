@@ -6,7 +6,8 @@ const InventoryButton = Inventory.InventoryButton;
 const InventoryThumbnail = Inventory.InventoryThumbnail;
 // should have 'style' embedded in the element
 class OnscreenHTMLElement {
-  constructor(graphics, coords, coreController, $) {
+  constructor(module, graphics, coords, coreController, $) {
+    this.module = module;
     this.coreController = coreController;
     this.position = coords.position;
     this.rotation = coords.rotation;
@@ -24,17 +25,17 @@ class OnscreenHTMLElement {
     }
     if (graphics.changehandler) {
       this.element.bind('change keyup input', function(evt) {
-        ClientHandlers[graphics.changehandler](evt, this);
+        this.module[graphics.changehandler](evt, this);
       });
     }
     if (graphics.clickhandler) {
       this.element.bind('click', function(evt) {
-        ClientHandlers[graphics.clickhandler](evt, this);
+        this.module[graphics.clickhandler](evt, this);
       });
     }
     if (graphics.draghandler) {
       this.element.bind('click', function(evt) {
-        ClientHandlers[graphics.draghandler](evt, this);
+        this.module[graphics.draghandler](evt, this);
       });
     }
   }
@@ -42,7 +43,8 @@ class OnscreenHTMLElement {
 
 // container for all graphics facilities
 class Graphics{
-  constructor(graphicsCanvas, $) {
+  constructor(module, graphicsCanvas, $) {
+    this.module = module;
     this.videoChainer = null;
     // this.stage.addChild()
     this.graphicsContext = graphicsCanvas.getContext('2d');
