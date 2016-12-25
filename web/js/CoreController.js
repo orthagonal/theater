@@ -32,40 +32,43 @@ class CoreController {
     return this.videoController.getVideoName();
   }
 
-	// put graphics/video here:
+	// todo: nwjs probably can make this pipeline much simpler:
   sendQuery(packet) {
-		// query has to return to go to next room:
+		// query has to return to go to next scene:
     packet.userId = 'mainUser';
     const handleQuery = (data) => {
       if (data.result && data.result.sound) {
         this.videoController.audioController.startEffect(data.result.sound);
       }
-      if (data.msg === 'BranchToRoom') {
+      if (data.msg === 'BranchToScene') {
         this.videoController.handleBranch(data.result);
       }
     };
     Server.query(packet, handleQuery);
   }
+
   kickstart(gameId, userId) {
 		// get the global value for gameId
     if (gameId === 'newGame') {
-      Server.startNewGame(userId, (runningGameState) => {
-        this.videoController.handleNewRoom(runningGameState);
+      Server.startNewGame( userId, (runningGameState) => {
+        this.videoController.handleNewScene(runningGameState);
       });
     } else {
-      gameId = '1';
+      let gameId = '1';
       Server.continueExistingGame(gameId, function(gameState) {
-        // req.sessionStore.userId = req.body.username;
-        // req.sessionStore.gameId = req.body.gameId;
-        this.videoController.handleNewRoom(gameState);
+				// req.sessionStore.userId = req.body.username;
+				// req.sessionStore.gameId = req.body.gameId;
+        this.videoController.handleNewScene(gameState);
       });
     }
   }
+
 	// inventory stuff
   useInventoryItem(item) {
 		// tell the item to go to the corner
     this.graphics.selectItem(item);
   }
+
   handleClick(x, y) {
 		// first see if they clicked on a client-side object:
     const result = this.graphics.handleClick(x, y);
@@ -104,13 +107,13 @@ class CoreController {
       this.activateInventory();
     } else if (result.text) {
       alert("returned a text result ");
-      this.sendQuery({ query: text });
+      this.sendQuery({ query: result.text });
     }
   }
 	// send request to server to refresh inventory
 	// then show it
   activateInventory() {
-    $.get('/inventory/', function (inventory) {
+    $.get('/inventory/', (inventory) => {
       if (inventory) {
         this.graphics.showInventory(inventory);
       }
@@ -128,10 +131,9 @@ class CoreController {
   hideInventory() {
     this.graphics.hideInventory();
   }
+
   checkIn() {
-    this.getGameState(() => {
-      return _.delay(this.checkIn, tickRate);
-    });
+    this.getGameState(() => _.delay(this.checkIn, tickRate));
   }
 }
 if (module) {

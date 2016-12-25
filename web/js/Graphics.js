@@ -121,9 +121,9 @@ class Graphics{
     }
   }
 
-  loadRoom(room) {
+  loadScene(scene) {
     this.clearOnscreenElements();
-    _.each(room.graphics, function(graphic) {
+    _.each(scene.graphics, function(graphic) {
       console.log(graphic);
       // todo: add any special message:
       if (graphic.element) {
