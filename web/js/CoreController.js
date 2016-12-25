@@ -34,25 +34,26 @@ class CoreController {
 		console.log(this)
   	return this.videoController.getVideoName();
   }
-	// put graphics/video here:
+	// todo: nwjs probably can make this pipeline much simpler:
 	sendQuery(packet){
-		// query has to return to go to next room:
+		// query has to return to go to next scene:
 		packet.userId = 'mainUser';
 		const handleQuery = (data) => {
 			if (data.result && data.result.sound){
 				this.videoController.audioController.startEffect(data.result.sound);
 			}
-			if (data.msg === 'BranchToRoom'){
+			if (data.msg === 'BranchToScene'){
 				this.videoController.handleBranch(data.result);
 			}
 		};
 		Server.query(packet, handleQuery);
 	}
+
 	kickstart(gameId, userId) {
 		// get the global value for gameId
 		if (gameId === 'newGame'){
 			Server.startNewGame( userId, (runningGameState) => {
-				this.videoController.handleNewRoom(runningGameState);
+				this.videoController.handleNewScene(runningGameState);
 			});
 		}
 		else{
@@ -60,7 +61,7 @@ class CoreController {
 			Server.continueExistingGame(gameId, function(gameState){
 				// req.sessionStore.userId = req.body.username;
 				// req.sessionStore.gameId = req.body.gameId;
-				this.videoController.handleNewRoom(gameState);
+				this.videoController.handleNewScene(gameState);
 			});
 		}
 	}
@@ -80,7 +81,7 @@ class CoreController {
 			return this.sendQuery({
 				filmName : this.videoController.getVideoName(),
 				frameCount: this.videoController.getFrameCount(),
-				roomName: this.currentRoom,
+				sceneName: this.currentName,
 				action: 'click',
 				x:x,
 				y:y,
