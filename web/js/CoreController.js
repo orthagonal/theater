@@ -1,6 +1,6 @@
 const _ = require('lodash');
-const VideoChainer = require("./VideoChainer.js");
-const Graphics = require("./Graphics.js");
+const VideoChainer = require('./VideoChainer.js');
+const Graphics = require('./Graphics.js');
 const Server = require('../../lib/nwserver.js');
 
 //                  Server Interface                       //
@@ -12,7 +12,7 @@ class CoreController {
     this.videoCanvas.height = height;
     this.module = require(modulePath).loadClientHandlers(this);
     this.graphics = new Graphics(this.module, this.videoCanvas, $);
-    // graphics.addTextChain("the wolf has eaten the lamb", {x:320,y:240}, false);
+    // graphics.addTextChain('the wolf has eaten the lamb', {x:320,y:240}, false);
     this.videoController = new VideoChainer(this.module, this.videoCanvas, this, {}, $, width, height);
     this.graphics.videoChainer = this.videoController;
     this.videoController.graphics = this.graphics;
@@ -27,6 +27,7 @@ class CoreController {
     return this.videoController.getFrameCount();
     //return (vid.currentTime * 24).toPrecision(6);
   }
+
   // get the file name of the current video:
   getVideoName() {
     return this.videoController.getVideoName();
@@ -98,7 +99,7 @@ class CoreController {
       this.useInventoryItem(result.use)
     }
     if (result.inventory) {
-      alert("needs to send inventory item");
+      alert('needs to send inventory item');
       //this.sendInventory({})
     } else if (result.thumbnail) {
       this.hideInventory();
@@ -106,11 +107,12 @@ class CoreController {
     } else if (result.inventoryButton) {
       this.activateInventory();
     } else if (result.text) {
-      alert("returned a text result ");
+      alert('returned a text result ');
       this.sendQuery({ query: result.text });
     }
   }
-	// send request to server to refresh inventory
+
+  // send request to server to refresh inventory
 	// then show it
   activateInventory() {
     $.get('/inventory/', (inventory) => {
@@ -124,9 +126,14 @@ class CoreController {
     this.graphics.showInventory(inventory);
   }
 
+  // get an invetory item or return 'false' if not in
+  getInventoryItem(name) {
+    // check game state
+    return false;
+  }
 	// this.showInventory([{
-	// 	img : "/images/girlwithdoll.jpg",
-	// 	name : "girlwithdoll"
+	// 	img : '/images/girlwithdoll.jpg',
+	// 	name : 'girlwithdoll'
 	// }]);
   hideInventory() {
     this.graphics.hideInventory();

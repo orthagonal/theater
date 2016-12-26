@@ -429,7 +429,7 @@ function VideoChainer(module, videoCanvas, coreController, options, $, width, he
 		self.currentBranchElement.start();
 	}
 
-	//
+	// branch to repeat
 	this.branchToRepeat = function(bracket) {
 		self.currentBranchElement = new FilmClip(bracket.branch, function(){
 	    // reset the current element to play this one:
