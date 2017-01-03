@@ -348,6 +348,8 @@ function VideoChainer(module, videoCanvas, coreController, options, $, width, he
 	}
 
 	this.loadScene = function(scene, allDone, end) {
+		console.log('^^^^ load scene')
+		console.log(scene)
 		this.clearPreviousScene()
 		self.currentScene = scene;
 		this.sceneLoading = true;
@@ -356,7 +358,7 @@ function VideoChainer(module, videoCanvas, coreController, options, $, width, he
 		async.auto({
 			roots: (rootsDone) => {
         // load each of the root video elements:
-				async.each(scene.roots, function(sceneRoot, done){
+				async.each(scene.core.roots, function(sceneRoot, done){
 					// load the root video elements with a start event that doesn't do anything
 					self.rootVideoElements.push(new FilmClip(sceneRoot, (evt) => {
 					}, end));
@@ -367,7 +369,7 @@ function VideoChainer(module, videoCanvas, coreController, options, $, width, he
 			},
 			loops: (loopsDone) => {
         // load each of the loop elements:
-				async.each(scene.loops, function(sceneLoop, done){
+				async.each(scene.core.loops, function(sceneLoop, done){
 					// load the loop video elements with a start event that doesn't do anything:
 					self.loopVideoElements.push(new FilmClip(sceneLoop, function(evt) {
 					}, end));
@@ -386,10 +388,14 @@ function VideoChainer(module, videoCanvas, coreController, options, $, width, he
 	};
 
 	// when we get a new scene:
-	this.handleNewScene = function(scene){
+	this.handleNewScene = (gameState) => {
+		console.log('----handleNewScene');
+		console.log(gameState);
+		const scene = gameState.scene;
 		self.behavior = scene.behavior
-		self.currentScene = scene.scene
+		self.currentScene = scene;
 		self.currentSceneName = scene.sceneName;
+
 		var started = false;
 		async.auto({
 			// load scene play elements:
@@ -431,6 +437,8 @@ function VideoChainer(module, videoCanvas, coreController, options, $, width, he
 
 	// branch to repeat
 	this.branchToRepeat = function(bracket) {
+		console.log('branchToRepeat')
+		console.log(bracket)
 		self.currentBranchElement = new FilmClip(bracket.branch, function(){
 	    // reset the current element to play this one:
 	    self.currentVideoElement.videoElement.onended = function() {
@@ -451,6 +459,8 @@ function VideoChainer(module, videoCanvas, coreController, options, $, width, he
 
 	// branch immediately:
 	this.branchNow = function(bracket) {
+		console.log('branchNow')
+		console.log(bracket)
 		// short-circuiting branches will play instantly:
 		self.currentBranchElement = new FilmClip(bracket.branch, function(evt) {
 			self.branchPlaying = true;

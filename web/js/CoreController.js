@@ -49,9 +49,7 @@ class CoreController {
   kickstart(gameId, userId) {
 		// get the global value for gameId
     if (gameId === 'newGame') {
-      this.module.startNewGame( userId, (runningGameState) => {
-        this.videoController.handleNewScene(runningGameState);
-      });
+      this.module.startNewGame( userId, this.videoController.handleNewScene);
     } else {
       let gameId = '1';
       this.module.continueExistingGame(gameId, function(gameState) {
