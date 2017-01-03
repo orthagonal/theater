@@ -6,3 +6,5 @@ saves.json
 *.log
 room_one.js
 modules
+build
+iris-win-*

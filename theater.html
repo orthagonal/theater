@@ -5,8 +5,11 @@
   <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script>
     var main = require(process.cwd()+'/web/js/main.js');
+    nw.Screen.Init();
     function onLoad() {
-      main.start($);
+      // set size:
+      var theWindow = nw.Screen.screens[0];
+      main.start($, theWindow.bounds.width, theWindow.bounds.height);
     }
     function onClick(event) {
       main.click(event);
@@ -50,10 +53,10 @@
 <!-- <% if (!isProduction) { %> onkeyup="canvasKey(event);" <% } %>  -->
 <!-- <body onload="onLoad();" > -->
 <body onload="onLoad();">
-  <canvas id="videoCanvas" height="760px" width="1880px" onclick="onClick(event);">
+  <canvas id="videoCanvas" onclick="onClick(event);">
   </canvas>
-  <div id="mainElement">
+  <!-- <div id="mainElement">
     <input id="query" type="text" onkeydown="onKeyDown()" />
-  </div>
+  </div> -->
 </body>
 </html>

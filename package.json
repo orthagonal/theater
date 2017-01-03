@@ -3,6 +3,12 @@
   "version": "1.0.0",
   "description": "Theater: Interactive Video Engine",
   "main": "theater.html",
+  "window": {
+    "fullscreen": true,
+    "resizable": false,
+    "toolbar": false,
+    "frame": false
+  },
   "scripts": {
     "test": "mocha"
   },
@@ -17,13 +23,11 @@
     "underscore": "^1.8.3"
   },
   "devDependencies": {
-    "eslint": "^2.9.0",
-    "eslint-config-airbnb": "^8.0.0",
-    "eslint-config-firstandthird": "^2.0.0",
-    "eslint-plugin-import": "^1.5.0",
-    "eslint-plugin-react": "^5.1.1",
     "canvas-mock": "0.0.0",
     "chai": "^3.5.0",
+    "eslint": "^3.4.0",
+    "eslint-config-firstandthird": "^3.0.2",
+    "eslint-plugin-import": "^1.14.0",
     "jquery": "^3.0.0",
     "jsdom": "^9.4.0",
     "mocha": "^2.5.3",

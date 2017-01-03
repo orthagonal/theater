@@ -1,31 +1,31 @@
 //                  Video Controller
-// handles loading a room's videos,
-// handles showing the current playing video
-// handles showing the graphics on top of the video
-// handles transitioning between videos when onend events are called
+// handles loading a scene's videos
+// handles showing the current playing video clip
+// handles transitioning between videos when various onend events are called
+// handles processing the graphics on top of that video
+// handles playing audio tracks on top of that video
 
 // graphics loop fires every 20 milliseconds
 
-// a room has a
+// a 'scene' is a self-contained unit containing film, audio, and graphical effects,
+// game behaviors that specify how those media components go together, and a list of adjacent scenes
 
-// load room will:
-// create all room film elements
-// add a series of onend event handlers to chain a group of them together
-// onend switches it to the next video
-/*
-*/
+// load scene will:
+// create all the scene's film clips
+// add a series of timer and onend event handlers that specify how those film clips are chained together
+// to create a meaningful montage
 
-var FilmClip = require('./FilmClip');
-var AudioController = require('./AudioController');
-var async = require('async');
-var _ = require('lodash');
+const FilmClip = require('./FilmClip');
+const AudioController = require('./AudioController');
+const async = require('async');
+const _ = require('lodash');
 // this is pretty complicated, might be better to do game loop with
 // async.until, etc
-function VideoChainer( videoCanvas, coreController, options, $){
-
-	this.width = 1720;//options.width;
-	this.height = 1000;//options.height;
+function VideoChainer(module, videoCanvas, coreController, options, $, width, height){
+	this.module = module;
 	this.videoContext = videoCanvas.getContext('2d');
+  this.width = width;
+  this.height = height;
 	this.rootVideoElements = [];
 	this.loopVideoElements = [];
 	this.otherVideoElements = {};
@@ -33,23 +33,15 @@ function VideoChainer( videoCanvas, coreController, options, $){
 	FilmClip.prototype.host = this;
 	FilmClip.prototype.$ = $;
 	var self = this;
+  // placeholders for doing transition effectxs:
+  var len = 4 * this.width * this.height
+  var offset = new Array(len);
+  var delta = new Array(len);
 	this.audioController = new AudioController($);
-	this.audioController.loadEffect({
-		name : "ack",
-		src : "sounds/button.mp3",
-		volume : 1.0,
-		loop : false
-	});
-	// this.audioController.setSoundtrack("sounds/exhale.wav")
-	// this.audioController.autoplay = true
 	this.graphics = null;
 	self.currentVideoElement = null;
-	// placeholders for doing transition effectxs:
-	var len = 4 * this.width * this.height
-    var offset = new Array(len)
-	var delta = new Array(len)
-	this.roomLoading = false;
-	this.roomStarted = false;
+	this.sceneLoading = false;
+	this.sceneStarted = false;
 	this.branchPlaying = false;
 	self.behavior = null;//{behavior_type : "splice", interval : "random", min : 500, max : 8000}
 	self.currentBranchElement = null;
@@ -65,6 +57,7 @@ function VideoChainer( videoCanvas, coreController, options, $){
 		duration : 0, // number of ms the transition will last
 		oldElement : undefined, // store the old video element
 	};
+
 	// for each switching schema there's one way to specify the roots
 	// and another way to specify the loops
 	this.RootBehaviors = {
@@ -128,7 +121,7 @@ function VideoChainer( videoCanvas, coreController, options, $){
 			if (!self.currentVideoElement.jqueryElement.handlerSet){
 				self.currentVideoElement.jqueryElement.handlerSet = true;
 				self.currentVideoElement.jqueryElement.bind('ended', function(){
-					self.playBehavior(ClientHandlers.LoopBehaviors, self.LoopBehaviors);
+					self.playBehavior(self.module.LoopBehaviors, self.LoopBehaviors);
 				});
 			}
 		},
@@ -153,7 +146,7 @@ function VideoChainer( videoCanvas, coreController, options, $){
 				// here is where it needs to play the next
 				// if it hasn't been set to something else:
 				if (self.behavior.behavior_type === 'playthrough'){
-					// send signal to the server to load the next room
+					// send signal to the server to load the next scene
 					self.coreController.sendQuery({ query: 'playthrough' });
 				}
 			});
@@ -172,7 +165,7 @@ function VideoChainer( videoCanvas, coreController, options, $){
 			if (!self.currentVideoElement.jqueryElement.handlerSet){
 				self.currentVideoElement.jqueryElement.handlerSet = true;
 				self.currentVideoElement.jqueryElement.bind('ended', function(){
-					self.playBehavior(ClientHandlers.RootBehaviors, self.RootBehaviors);
+					self.playBehavior(self.module.RootBehaviors, self.RootBehaviors);
 				});
 			}
 		},
@@ -193,9 +186,11 @@ function VideoChainer( videoCanvas, coreController, options, $){
     	return self.currentVideoElement.getVideoName();
     }
     // detect if its dstill playing:
+
 	this.isPlaying = function(){
 		return !self.currentVideoElement.paused && !self.currentVideoElement.ended;
 	};
+
 	// get a random integer:
 	function getRandomInt(min, max) {
     	return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -281,6 +276,7 @@ function VideoChainer( videoCanvas, coreController, options, $){
     // this needs to update at the right rate
     // this needs to sync up to bounding-box frames
     // this needs to show bounding box overlay if active
+
 	this.draw = function(w,h) {
 		if (!self.currentVideoElement) {
 	   		setTimeout(self.draw,20,w,h);
@@ -306,9 +302,6 @@ function VideoChainer( videoCanvas, coreController, options, $){
 
 	// transition from one video to another using the indicated transition type:
 	this.switchToVideo = function(video, effect){
-		console.log('-------------- switch to video' )
-		console.log(video);
-		console.log('--------------' )
 		// if no effect switch video right away
 		if (!effect){
 			var oldElement = self.currentVideoElement;
@@ -339,13 +332,13 @@ function VideoChainer( videoCanvas, coreController, options, $){
 		}
 	}
 
-	// erase the previous room:
-	self.clearPreviousRoom = function()	{
+	// erase the previous scene:
+	self.clearPreviousScene = function()	{
 		function clearClip(clip){
 			clip.clear();
 			delete clip;
 		}
-		// todo: loop over the previus room's actual list of FilmClips:
+		// todo: loop over the previus scene's actual list of FilmClips:
 		_.each(self.rootVideoElements, clearClip)
 		_.each(self.loopVideoElements, clearClip)
 		_.each(self.otherVideoElements, clearClip)
@@ -354,29 +347,29 @@ function VideoChainer( videoCanvas, coreController, options, $){
 		this.otherVideoElements = {};
 	}
 
-	this.loadRoom = function(room, allDone, end) {
-		this.clearPreviousRoom()
-		self.currentRoom = room;
-		this.roomLoading = true;
-		this.roomStarted = false;
+	this.loadScene = function(scene, allDone, end) {
+		this.clearPreviousScene()
+		self.currentScene = scene;
+		this.sceneLoading = true;
+		this.sceneStarted = false;
 		// load roots:
 		async.auto({
-			roots: function(rootsDone) {
+			roots: (rootsDone) => {
         // load each of the root video elements:
-				async.each(room.roots, function(roomRoot, done){
+				async.each(scene.roots, function(sceneRoot, done){
 					// load the root video elements with a start event that doesn't do anything
-					self.rootVideoElements.push(new FilmClip(roomRoot, function(evt) {
+					self.rootVideoElements.push(new FilmClip(sceneRoot, (evt) => {
 					}, end));
           return done();
 				}, function(){
 					rootsDone();
 				});
 			},
-			loops: function(loopsDone) {
+			loops: (loopsDone) => {
         // load each of the loop elements:
-				async.each(room.loops, function(roomLoop, done){
+				async.each(scene.loops, function(sceneLoop, done){
 					// load the loop video elements with a start event that doesn't do anything:
-					self.loopVideoElements.push(new FilmClip(roomLoop, function(evt) {
+					self.loopVideoElements.push(new FilmClip(sceneLoop, function(evt) {
 					}, end));
           return done();
 				}, function() {
@@ -387,96 +380,99 @@ function VideoChainer( videoCanvas, coreController, options, $){
 			allDone(err, res);
 		});
 		// load deaths:
-		// for ( i = 0; i < _.keys(room.others).length; i++){
-		// 	//this.otherVideoElements[room.others[i]] = new FilmClip(room.deaths[i], begin, end);
+		// for ( i = 0; i < _.keys(scene.others).length; i++){
+		// 	//this.otherVideoElements[scene.others[i]] = new FilmClip(scene.deaths[i], begin, end);
 		// }
 	};
 
-	// when we get a new room:
-	this.handleNewRoom = function(room){
-		self.behavior = room.behavior
-		self.currentRoom = room.room
-		self.currentRoomName = room.roomName;
+	// when we get a new scene:
+	this.handleNewScene = function(scene){
+		self.behavior = scene.behavior
+		self.currentScene = scene.scene
+		self.currentSceneName = scene.sceneName;
 		var started = false;
 		async.auto({
-			// load room play elements:
+			// load scene play elements:
 			load: function(done) {
-				self.loadRoom(self.currentRoom, function(){
+				self.loadScene(self.currentScene, function(){
 					done();
 				}, self.end);
 			},
-			// load room graphical elements:
+			// load scene graphical elements:
 			graphics: ['load', function(results, done) {
-				self.graphics.loadRoom(room);
+				self.graphics.loadScene(scene);
 				done();
 			}]
 		}, function(err, result) {
 			if (err) {
 				alert(err)
 			}
-			self.roomLoading = false;
+			self.sceneLoading = false;
 			if (!started) {
-				self.playBehavior(ClientHandlers.RootBehaviors, self.RootBehaviors);
+				self.playBehavior(self.module.RootBehaviors, self.RootBehaviors);
 				started = true;
 			}
  		});
 	}
-	// branch to the same room:
+
+	// branch to the same scene:
 	this.branchToSame = function(bracket) {
 		self.currentBranchElement = new FilmClip(bracket.branch, function(evt){
 			self.branchPlaying = true;
 			self.switchToVideo(self.currentBranchElement);
 			self.currentBranchElement.play();
 		}, function(){
-			// branch to the same room when this ends
+			// branch to the same scene when this ends
 			self.branchPlaying = false;
-			self.playBehavior(ClientHandlers.RootBehaviors, self.RootBehaviors);
+			self.playBehavior(self.module.RootBehaviors, self.RootBehaviors);
 		});
 		self.currentBranchElement.start();
 	}
-	//
+
+	// branch to repeat
 	this.branchToRepeat = function(bracket) {
 		self.currentBranchElement = new FilmClip(bracket.branch, function(){
 	    // reset the current element to play this one:
 	    self.currentVideoElement.videoElement.onended = function() {
 	      self.branchPlaying = true;
 	      self.switchToVideo(self.currentBranchElement, bracket.behavior.effect);
-	      self.loadRoom(bracket.room, function() {
+	      self.loadScene(bracket.scene, function() {
 				}, undefined);
-	      self.graphics.loadRoom(bracket);
+	      self.graphics.loadScene(bracket);
 	    };
 	  }, function(){
-	    // branch to the room when this ends
+	    // branch to the scene when this ends
 	    self.behavior = bracket.behavior
 	    self.branchPlaying = false;
-	    self.playBehavior(ClientHandlers.RootBehaviors, self.RootBehaviors);
+	    self.playBehavior(self.module.RootBehaviors, self.RootBehaviors);
 	  });
 		self.currentBranchElement.start();
 	};
+
 	// branch immediately:
 	this.branchNow = function(bracket) {
 		// short-circuiting branches will play instantly:
 		self.currentBranchElement = new FilmClip(bracket.branch, function(evt) {
 			self.branchPlaying = true;
 			self.switchToVideo(self.currentBranchElement, bracket.behavior.effect);
-			self.loadRoom(bracket.room, function() {
-				// alert("allDone branchNow room loaded")
+			self.loadScene(bracket.scene, function() {
+				// alert("allDone branchNow scene loaded")
 			}, undefined);
-			self.graphics.loadRoom(bracket);
+			self.graphics.loadScene(bracket);
 		}
 		, function(){
-			// branch to the room when this ends
+			// branch to the scene when this ends
 			self.behavior = bracket.behavior
 			self.branchPlaying = false;
-			self.playBehavior(ClientHandlers.RootBehaviors, self.RootBehaviors);
+			self.playBehavior(self.module.RootBehaviors, self.RootBehaviors);
 		});
 		//self.currentBranchElement.start();
 	};
 
 	// when we play a branch:
 	this.handleBranch = function(bracket){
-		// if we're self-branching to the same room:
-		if (bracket.roomName === self.currentRoomName){
+		// if we're self-branching to the same scene:
+		if (bracket.sceneName === self.currentSceneName){
 			return self.branchToSame(bracket);
     }
 		if (self.currentBranchElement){

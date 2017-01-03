@@ -1,32 +1,9 @@
+// server stuff, should move to module
 'use strict';
-	// server stuff, should move to module
 const CoreController = require('./CoreController.js');
-
+const path = require('path');
 let coreController = null;
 let videoCanvas;
-/*
-let started = false;
-
-// some globals that may not be needed anymore:
-const BranchToJunction = 222;
-const fontSize = 20;
-const yBase = 680;
-const thumbWidth = 100;
-const thumbHeight = 100;
-
-// milliseconds per tick
-const tickRate = 3000;
-let playingLoop = true;
-let paused = false;
-let currentVideoElement = null;
-let currentBranch = 0;
-let queryType = "dir" // dir, eye, hand
-*/
-function loadClientHandlers(path) {
-	global.ClientHandlers = require(path).loadClientHandlers();
-}
-// todo: this needs to be loaded by a user action:
-loadClientHandlers('../../modules/IrisOne/js/room_one.js');
 
 function getClipCount(graph) {
 	return (graph.roots.length + graph.loops.length);
@@ -65,10 +42,13 @@ function canvasKey(evt) {
 }
 
 // these are all singletons lanyway
-exports.start = function start(jquery) {
-	coreController = new CoreController(jquery);
+exports.start = function start(jquery, width, height) {
+	// todo: make modules be npm modules:
+	coreController = new CoreController(path.join(process.cwd(), 'modules', 'IrisOne', 'js' ,'the_repository_1.js'), jquery, width, height);
 	coreController.kickstart('newGame', 'mainUser');
+	// todo: this needs to be loaded by a user action:
 };
+
 exports.click = function click(event) {
 	coreController.handleClick(event.clientX, event.clientY);
 };
