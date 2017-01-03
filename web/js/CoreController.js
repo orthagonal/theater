@@ -1,9 +1,7 @@
 const _ = require('lodash');
 const VideoChainer = require('./VideoChainer.js');
 const Graphics = require('./Graphics.js');
-const Server = require('../../lib/nwserver.js');
 
-//                  Server Interface                       //
 class CoreController {
   constructor(modulePath, $, width, height) {
     this.$ = $;
@@ -45,18 +43,18 @@ class CoreController {
         this.videoController.handleBranch(data.result);
       }
     };
-    Server.query(packet, handleQuery);
+    this.module.query(packet, handleQuery);
   }
 
   kickstart(gameId, userId) {
 		// get the global value for gameId
     if (gameId === 'newGame') {
-      Server.startNewGame( userId, (runningGameState) => {
+      this.module.startNewGame( userId, (runningGameState) => {
         this.videoController.handleNewScene(runningGameState);
       });
     } else {
       let gameId = '1';
-      Server.continueExistingGame(gameId, function(gameState) {
+      this.module.continueExistingGame(gameId, function(gameState) {
 				// req.sessionStore.userId = req.body.username;
 				// req.sessionStore.gameId = req.body.gameId;
         this.videoController.handleNewScene(gameState);
