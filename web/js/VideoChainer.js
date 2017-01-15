@@ -127,10 +127,15 @@ function VideoChainer(module, videoCanvas, coreController, options, $, width, he
 		},
 		// play through this video and move to a new one:
 		playthrough : function(destination){
+			console.log('RootBehaviors.playThrough')
+			console.log(destination)
+			console.log(this)
+			console.log(self)
 			// don't interfere if a branch is playing:
 			if (self.branchPlaying) {
 				return;
 			}
+			console.log('')
 			// start playing the first root if no video is playing
 			if (!self.currentVideoElement) {
 				self.currentVideoElement = self.rootVideoElements[0];
@@ -142,7 +147,7 @@ function VideoChainer(module, videoCanvas, coreController, options, $, width, he
 			}
 			// on end branch to the new one:
 			self.currentVideoElement.jqueryElement.bind('ended', function(){
-				// alert('sending playthrough query');
+				alert('RootBehaviors.playthrough ended callback');
 				// here is where it needs to play the next
 				// if it hasn't been set to something else:
 				if (self.behavior.behavior_type === 'playthrough'){
@@ -198,13 +203,16 @@ function VideoChainer(module, videoCanvas, coreController, options, $, width, he
 
 	// fire a behavior from a customer behavior set,
 	// if not found fire one from a backup set of behaviors:
-	this.playBehavior = function(behaviorSet, backupSet){
+	this.playBehavior = function(behaviorSet, backupSet) {
+		console.log('videoController.playBehavior')
+		console.log(self)
+		console.log(self.behavior)
 		// play a customer behavior if present`
-		if (behaviorSet[self.behavior.behavior_type])
-			behaviorSet[self.behavior.behavior_type](self);
-		else
-			backupSet[self.behavior.behavior_type]();
-	}
+		if (behaviorSet[self.behavior.behavior_type]) {
+			return behaviorSet[self.behavior.behavior_type](self);
+		}
+		backupSet[self.behavior.behavior_type]();
+	};
 
 	this.getRandomClip = function(set){
 		var start = Math.floor(Math.random() * 1000);
@@ -348,8 +356,9 @@ function VideoChainer(module, videoCanvas, coreController, options, $, width, he
 	}
 
 	this.loadScene = function(scene, allDone, end) {
-		console.log('^^^^ load scene')
+		console.log('videoController.loadScene')
 		console.log(scene)
+		console.log(end)
 		this.clearPreviousScene()
 		self.currentScene = scene;
 		this.sceneLoading = true;
@@ -358,7 +367,7 @@ function VideoChainer(module, videoCanvas, coreController, options, $, width, he
 		async.auto({
 			roots: (rootsDone) => {
         // load each of the root video elements:
-				async.each(scene.core.roots, function(sceneRoot, done){
+				async.each(scene.roots, function(sceneRoot, done){
 					// load the root video elements with a start event that doesn't do anything
 					self.rootVideoElements.push(new FilmClip(sceneRoot, (evt) => {
 					}, end));
@@ -369,7 +378,7 @@ function VideoChainer(module, videoCanvas, coreController, options, $, width, he
 			},
 			loops: (loopsDone) => {
         // load each of the loop elements:
-				async.each(scene.core.loops, function(sceneLoop, done){
+				async.each(scene.loops, function(sceneLoop, done){
 					// load the loop video elements with a start event that doesn't do anything:
 					self.loopVideoElements.push(new FilmClip(sceneLoop, function(evt) {
 					}, end));
@@ -388,33 +397,40 @@ function VideoChainer(module, videoCanvas, coreController, options, $, width, he
 	};
 
 	// when we get a new scene:
-	this.handleNewScene = (gameState) => {
-		console.log('----handleNewScene');
+	this.processGameState = (gameState) => {
+		console.log('----videoChainer.processGameState');
 		console.log(gameState);
 		const scene = gameState.scene;
-		self.behavior = scene.behavior
+		console.log(scene.behavior)
+		console.log(gameState)
+		self.behavior = scene.behavior || gameState.behavior;
 		self.currentScene = scene;
 		self.currentSceneName = scene.sceneName;
 
 		var started = false;
-		async.auto({
+		async.autoInject({
 			// load scene play elements:
-			load: function(done) {
+			load: (done) => {
 				self.loadScene(self.currentScene, function(){
 					done();
 				}, self.end);
 			},
 			// load scene graphical elements:
-			graphics: ['load', function(results, done) {
+			graphics: (load, done) => {
 				self.graphics.loadScene(scene);
 				done();
-			}]
-		}, function(err, result) {
+			}
+		}, (err, result) => {
 			if (err) {
 				alert(err)
 			}
 			self.sceneLoading = false;
 			if (!started) {
+				console.log('not started will load the things now:')
+				console.log('not started will load the things now:')
+				console.log('not started will load the things now:')
+				console.log(self.behavior)
+				// self.behavior = gameState.behavior;
 				self.playBehavior(self.module.RootBehaviors, self.RootBehaviors);
 				started = true;
 			}

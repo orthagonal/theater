@@ -42,6 +42,8 @@ class AudioController {
   startEffect(name, callback) {
     if (this.audioEffects[name]) {
       this.audioEffects[name].addEventListener('ended', callback, true);
+      console.log('launching %s', name)
+      console.log(this.audioEffects[name])
       this.audioEffects[name].play();
     }
   }
