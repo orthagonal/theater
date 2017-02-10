@@ -20,7 +20,9 @@
     "json-fs-store": "^1.0.0",
     "lodash": "^4.13.1",
     "node-localdb": "0.0.3",
-    "underscore": "^1.8.3"
+    "parse-dir": "^1.0.0",
+    "underscore": "^1.8.3",
+    "yamljs": "^0.2.8"
   },
   "devDependencies": {
     "canvas-mock": "0.0.0",
