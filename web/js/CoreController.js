@@ -1,9 +1,7 @@
 const _ = require('lodash');
 const VideoChainer = require('./VideoChainer.js');
 const Graphics = require('./Graphics.js');
-const Server = require('../../lib/nwserver.js');
 
-//                  Server Interface                       //
 class CoreController {
   constructor(modulePath, $, width, height) {
     this.$ = $;
@@ -35,31 +33,35 @@ class CoreController {
 
 	// todo: nwjs probably can make this pipeline much simpler:
   sendQuery(packet) {
-		// query has to return to go to next scene:
+    console.log('CoreController.sendQuery')
     packet.userId = 'mainUser';
-    const handleQuery = (data) => {
-      if (data.result && data.result.sound) {
-        this.videoController.audioController.startEffect(data.result.sound);
-      }
-      if (data.msg === 'BranchToScene') {
-        this.videoController.handleBranch(data.result);
-      }
-    };
-    Server.query(packet, handleQuery);
+    this.module.query(packet, this.processGameState.bind(this));
   }
 
+  processGameState(currentGameState) {
+    console.log('callback CoreController.processGameState called withresult')
+    console.log(currentGameState)
+    console.log('CoreController.handleQuery callbaqck inside sendQuery')
+    console.log(currentGameState)
+    if (currentGameState.result && currentGameState.result.sound) {
+      this.videoController.audioController.startEffect(currentGameState.result.sound);
+    }
+    if (currentGameState.msg === 'BranchToScene') {
+      this.videoController.handleBranch(currentGameState.result);
+    } else {
+      this.videoController.processGameState(currentGameState);
+    }
+  }
   kickstart(gameId, userId) {
 		// get the global value for gameId
     if (gameId === 'newGame') {
-      Server.startNewGame( userId, (runningGameState) => {
-        this.videoController.handleNewScene(runningGameState);
-      });
+      this.module.startNewGame(userId, this.processGameState.bind(this));
     } else {
       let gameId = '1';
-      Server.continueExistingGame(gameId, function(gameState) {
+      this.module.continueExistingGame(gameId, function(gameState) {
 				// req.sessionStore.userId = req.body.username;
 				// req.sessionStore.gameId = req.body.gameId;
-        this.videoController.handleNewScene(gameState);
+        this.videoController.processGameState(gameState);
       });
     }
   }
