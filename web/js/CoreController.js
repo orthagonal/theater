@@ -1,5 +1,6 @@
 const _ = require('lodash');
-const VideoChainer = require('./VideoChainer.js');
+// const VideoChainer = require('./VideoChainer.js');
+const VideoChainer = require('./VideoController.js');
 const Graphics = require('./Graphics.js');
 
 class CoreController {
@@ -11,24 +12,15 @@ class CoreController {
     this.module = require(modulePath).loadClientHandlers(this);
     this.graphics = new Graphics(this.module, this.videoCanvas, $);
     // graphics.addTextChain('the wolf has eaten the lamb', {x:320,y:240}, false);
-    this.videoController = new VideoChainer(this.module, this.videoCanvas, this, {}, $, width, height);
+    this.videoController = new VideoChainer(this.module, this.videoCanvas, this, {}, $);
     this.graphics.videoChainer = this.videoController;
-    this.videoController.graphics = this.graphics;
+    // graphics should be a shader node:
+    // this.videoController.graphics = this.graphics;
     this.graphics.coreController = this;
-    this.audioController = this.videoController.audioController;
+    // audo controller should be it's own thing:
+    // this.audioController = this.videoController.audioController;
     //todo: make module initialization nicer:
     this.module.init();
-  }
-
-	// try to get the current frame of the current video:
-  getFrameCount() {
-    return this.videoController.getFrameCount();
-    //return (vid.currentTime * 24).toPrecision(6);
-  }
-
-  // get the file name of the current video:
-  getVideoName() {
-    return this.videoController.getVideoName();
   }
 
 	// todo: nwjs probably can make this pipeline much simpler:
@@ -82,8 +74,9 @@ class CoreController {
         selectedItem = this.graphics.selectedItem.item.name;
       }
       return this.sendQuery({
-        filmName: this.videoController.getVideoName(),
-        frameCount: this.videoController.getFrameCount(),
+        // todo: will need to update this?
+        // filmName: this.videoController.getVideoName(),
+        // frameCount: this.videoController.getFrameCount(),
         roomName: this.currentRoom,
         action: 'click',
         x,

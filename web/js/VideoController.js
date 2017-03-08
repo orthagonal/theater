@@ -1,6 +1,10 @@
 const AudioController = require('./AudioController');
 const VideoContext = require('./lib/videocontext.js');
 
+// scene video graph:
+// inventory shader effect node
+// (all the Scene videos and scene effects) -> Scene Behavior Node -> InterScene Switching -> Compositing Node -> destination
+                                                                                            // Inventory Shader ->
 // behavior nodes:
   // playthrough:
   // play root1 1 from 0 to length
@@ -21,63 +25,40 @@ const VideoContext = require('./lib/videocontext.js');
   // composes other video elements
 
 // current scene's video nodes:
-class SceneVideo {
-  constructor(videoContext, sceneDescription, sceneNode) {
-    this.sceneDescription = sceneDescription;
-    // load video nodes:
-    this.rootVideoNodes = [];
-    this.loopVideoNodes = [];
-    this.partialVideoNodes = {};
-    this.branchVideoNodes = {};
-    sceneDescription.roots.forEach((root) => {
-      this.rootVideoNodes.push(this.videoContext.video(root.title));
-    });
-    sceneDescription.loops.forEach((loop) => {
-      this.loopVideoNodes.push(this.videoContext.video(loop.title));
-    });
-    Object.keys(sceneDescription.branches).forEach((key) => {
-      this.branchVideoNodes[key] = [];
-      sceneDescription.branches[key].forEach((branch) => {
-        this.branchVideoNodes[key].push(this.videoContext.video(branch.title));
-      });
-    });
-    if (sceneDescription.partials) {
-      sceneDescription.partials.forEach((partial) => {
-        this.partialVideoNodes.push(this.videoContext.video(partial.title));
-      });
-    }
-  }
-  // connect everything to the scene node
-  // connect everything to the destination node:
-  activate() {
 
-  }
-}
-
-class VideoController {
+class VideoController extends VideoContext {
   constructor(module, videoCanvas, coreController, options, $){
+    super(videoCanvas);
     this.coreController = coreController;
     this.videoCanvas = videoCanvas;
     // the video context object:
-    this.videoContext = new VideoContext(videoCanvas);
     this.audioController = new AudioController($);
     this.currentSceneDescription = {};
     this.currentSceneVideo = {};
-    this.sceneLoading = false;
-    this.sceneStarted = false;
   }
 
+  handleBranch(currentGameStateResult) {
+    // attach all the input nodes
+    // notify InterScene Switcher
+  }
+  // when we get a new scene:
+  processGameState(currentGameState) {
+    // spawn the scene's nodes:
+    // const newSceneNodes = new SceneNodes(currentGameState);
+    // attach it to the crossfader
+    // notify the crossfader
+    // unattach the old ones after the crossfader switches:
+  }
+
+  branchNow(destinationSceneName, modifiers) {
+  }
   loadScene(scene, allDone) {
     this.currentSceneDescription = scene;
     // const sceneVideo = new SceneVideo(this.videoContext, scene);
     this.sceneLoading = true;
     this.sceneStarted = false;
   }
-
   switchToVideo() {
-  }
-
-  branchNow(bracket) {
   }
 }
 
