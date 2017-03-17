@@ -22,6 +22,7 @@
     "node-localdb": "0.0.3",
     "parse-dir": "^1.0.0",
     "underscore": "^1.8.3",
+    "videocontext": "^0.33.0",
     "yamljs": "^0.2.8"
   },
   "devDependencies": {

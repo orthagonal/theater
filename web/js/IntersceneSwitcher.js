@@ -4,8 +4,14 @@ class IntersceneSwitcher {
     this.transitionNode = videoContext.transition(videoContext.DEFINITIONS.CROSSFADE);
     this.currentNodes = undefined;
   }
-
-  transitionToScene(sceneNodes) {
+  // start a scene without hesitation:
+  start(sceneNodes) {
+    sceneNodes.sceneSwitchingNode.connect(this.transitionNode);
+    this.transitionNode.connect(this.videoContext.destination);
+    sceneNodes.play();
+  }
+  // transition to a scene:
+  transitionToScene(sceneNodes, transitionType) {
     // attach the new nodes
     sceneNodes.sceneSwitchingNode.connect(this.transitionNode);
     // transition to this.transitionNode

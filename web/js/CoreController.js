@@ -1,3 +1,4 @@
+'use strict';
 const _ = require('lodash');
 // const VideoChainer = require('./VideoChainer.js');
 const VideoChainer = require('./VideoController.js');
@@ -23,39 +24,45 @@ class CoreController {
     this.module.init();
   }
 
+  start(gameState) {
+    // load the current game state as nodes:
+    this.videoController.start(gameState);
+  }
 	// todo: nwjs probably can make this pipeline much simpler:
-  sendQuery(packet) {
-    console.log('CoreController.sendQuery')
-    packet.userId = 'mainUser';
-    this.module.query(packet, this.processGameState.bind(this));
-  }
+  // sendQuery(packet) {
+  //   console.log('CoreController.sendQuery')
+  //   packet.userId = 'mainUser';
+  //   this.module.query(packet, this.processGameState.bind(this));
+  // }
+  //
+  // processGameState(currentGameState) {
+  //   console.log('callback CoreController.processGameState called withresult')
+  //   console.log(currentGameState)
+  //   console.log('CoreController.handleQuery callbaqck inside sendQuery')
+  //   console.log(currentGameState)
+  //   if (currentGameState.result && currentGameState.result.sound) {
+  //     this.videoController.audioController.startEffect(currentGameState.result.sound);
+  //   }
+  //   if (currentGameState.msg === 'BranchToScene') {
+  //     this.videoController.handleBranch(currentGameState.result);
+  //   } else {
+  //     this.videoController.processGameState(currentGameState);
+  //   }
+  // }
 
-  processGameState(currentGameState) {
-    console.log('callback CoreController.processGameState called withresult')
-    console.log(currentGameState)
-    console.log('CoreController.handleQuery callbaqck inside sendQuery')
-    console.log(currentGameState)
-    if (currentGameState.result && currentGameState.result.sound) {
-      this.videoController.audioController.startEffect(currentGameState.result.sound);
-    }
-    if (currentGameState.msg === 'BranchToScene') {
-      this.videoController.handleBranch(currentGameState.result);
-    } else {
-      this.videoController.processGameState(currentGameState);
-    }
-  }
   kickstart(gameId, userId) {
 		// get the global value for gameId
-    if (gameId === 'newGame') {
-      this.module.startNewGame(userId, this.processGameState.bind(this));
-    } else {
-      let gameId = '1';
-      this.module.continueExistingGame(gameId, function(gameState) {
-				// req.sessionStore.userId = req.body.username;
-				// req.sessionStore.gameId = req.body.gameId;
-        this.videoController.processGameState(gameState);
-      });
-    }
+    // if (gameId === 'newGame') {
+    this.module.startNewGame(userId);
+    // this.module.startNewGame(userId, this.processGameState.bind(this));
+    // } else {
+    //   let gameId = '1';
+    //   this.module.continueExistingGame(gameId, function(gameState) {
+		// 		// req.sessionStore.userId = req.body.username;
+		// 		// req.sessionStore.gameId = req.body.gameId;
+    //     this.videoController.processGameState(gameState);
+    //   });
+    // }
   }
 
 	// inventory stuff

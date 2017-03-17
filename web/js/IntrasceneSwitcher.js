@@ -1,11 +1,15 @@
 'use strict';
 class IntrasceneSwitcher {
   constructor(videoContext, behavior) {
-    this.transitionNode = videoContext.transition(videoContext.DEFINITIONS.CROSSFADE);
+    this.transitionNode = videoContext.compositing(videoContext.DEFINITIONS.CROSSFADE);
     this.currentNodes = undefined;
     this.behavior = behavior;
   }
+  // just switch to a video
+  playVideo() {
 
+  }
+  
   startBehavior(gameState) {
     // start the behavior whatever it is
   }

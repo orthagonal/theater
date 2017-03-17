@@ -1,7 +1,10 @@
 'use strict';
+const SceneSwitchingNode = require('./IntrasceneSwitcher');
+
 // spawn all the video and effect nodes for this Scene:
 class SceneNodes {
   constructor(videoContext, sceneDescription) {
+    this.videoContext = videoContext;
     this.sceneDescription = sceneDescription;
     // load video nodes:
     this.rootVideoNodes = [];
@@ -27,6 +30,46 @@ class SceneNodes {
     }
     this.sceneSwitchingNode = new SceneSwitchingNode(this.videoContext, sceneDescription.behavior);
   }
+
+  // start playing the Scene at the beginning:
+  play() {
+    // ok not sure here
+    console.log('SceneNodes.play');
+  }
+
+  // branch to a new scene:
+  branchTo(branchVideoName, newSceneNodes, transitionType) {
+    const branchVideo = this.branchVideoNodes[branchVideoName];
+    branchVideo
+    // attach the new scene:
+    this.videoContext.attachNewScene(newSceneNodes);
+    // register the event so when it ends switch to the new Scene
+    branchVideo.registerCallback('ended', () => {
+      this.videoContext.switchTo(newSceneNodes);
+    });
+    // play the branch video and the rest is handled by the event handler:
+    branchVideo.play();
 }
 
 module.exports = SceneNodes;
+
+// behavior nodes:
+  // playthrough:
+  // play root1 1 from 0 to length
+  // play branch from 0 to length
+
+  // repeat:
+  // play root from 0 to length
+  // play loop from 0 to length
+  // (etc)
+
+  // switch:
+  // play root from 0 to n1
+  // play loop from n1 to n2
+  // play root from n2 to n3 (etc)
+
+  // custom video control node:
+  // plays whatever video
+  // composes other video elements
+
+// current scene's video nodes:
