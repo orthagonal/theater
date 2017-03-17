@@ -1,8 +1,7 @@
 'use strict';
-
 // spawn all the video and effect nodes for this Scene:
 class SceneNodes {
-  constructor(videoContext, sceneDescription, sceneNode) {
+  constructor(videoContext, sceneDescription) {
     this.sceneDescription = sceneDescription;
     // load video nodes:
     this.rootVideoNodes = [];
@@ -26,11 +25,7 @@ class SceneNodes {
         this.partialVideoNodes.push(this.videoContext.video(partial.title));
       });
     }
-  }
-
-  // connect everything to the scene node
-  // connect everything to the destination node:
-  connect() {
+    this.sceneSwitchingNode = new SceneSwitchingNode(this.videoContext, sceneDescription.behavior);
   }
 }
 

@@ -1,10 +1,13 @@
 const AudioController = require('./AudioController');
 const VideoContext = require('./lib/videocontext.js');
+const SceneNodes = require('./SceneNodes.js');
+const IntersceneSwitcher = require('./IntersceneSwitcher');
 
 // scene video graph:
 // inventory shader effect node
-// (all the Scene videos and scene effects) -> Scene Behavior Node -> InterScene Switching -> Compositing Node -> destination
-                                                                                            // Inventory Shader ->
+// (all the Scene videos and scene effects) -> Scene Switching Node
+//      -> InterScene Switching Node -> destination
+
 // behavior nodes:
   // playthrough:
   // play root1 1 from 0 to length
@@ -35,29 +38,30 @@ class VideoController extends VideoContext {
     this.audioController = new AudioController($);
     this.currentSceneDescription = {};
     this.currentSceneVideo = {};
+    this.sceneSwitchingNode = new IntersceneSwitcher(this);
   }
 
   handleBranch(currentGameStateResult) {
     // attach all the input nodes
     // notify InterScene Switcher
   }
+
   // when we get a new scene:
   processGameState(currentGameState) {
-    // spawn the scene's nodes:
-    // const newSceneNodes = new SceneNodes(currentGameState);
-    // attach it to the crossfader
-    // notify the crossfader
-    // unattach the old ones after the crossfader switches:
+    const newSceneNodes = new SceneNodes(currentGameState);
+    this.sceneSwitchingNode.transitionToScene(newSceneNodes);
   }
 
   branchNow(destinationSceneName, modifiers) {
   }
+
   loadScene(scene, allDone) {
     this.currentSceneDescription = scene;
-    // const sceneVideo = new SceneVideo(this.videoContext, scene);
+    const sceneVideo = new SceneVideo(this, scene);
     this.sceneLoading = true;
     this.sceneStarted = false;
   }
+
   switchToVideo() {
   }
 }
