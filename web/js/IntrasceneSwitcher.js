@@ -5,11 +5,12 @@ class IntrasceneSwitcher {
     this.currentNodes = undefined;
     this.behavior = behavior;
   }
+
   // just switch to a video
   playVideo() {
 
   }
-  
+
   startBehavior(gameState) {
     // start the behavior whatever it is
   }
