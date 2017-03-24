@@ -1,14 +1,13 @@
 'use strict';
 // const AudioController = require('./AudioController');
-// require('./lib/videocontext.js');
+// const VideoContext = require('./lib/videocontext.js');
 const SceneNodes = require('./SceneNodes.js');
 const IntersceneSwitcher = require('./IntersceneSwitcher');
 
 class VideoController {
   constructor(module, videoCanvas, coreController, options, $) {
     console.log('video controller initing')
-    console.log('u know');
-    // this.videoContext = new VideoContext(videoCanvas);
+    this.videoContext = VideoContext(videoCanvas);
     console.log('video controller inited')
     this.coreController = coreController;
     this.currentSceneDescription = {};
