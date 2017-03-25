@@ -1,6 +1,9 @@
 'use strict';
 class IntersceneSwitcher {
   constructor(videoContext) {
+    console.log('IntersceneSwitcher.constructor')
+    console.log(videoContext)
+    console.log(Object.keys(videoContext))
     this.transitionNode = videoContext.transition(videoContext.DEFINITIONS.CROSSFADE);
     this.currentNodes = undefined;
   }

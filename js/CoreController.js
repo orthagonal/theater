@@ -1,17 +1,18 @@
 'use strict';
 const VideoChainer = require('./VideoController.js');
+const AudioController = require('./AudioController');
 
 class CoreController {
-  constructor(modulePath, $, width, height) {
+  constructor(videoContext, modulePath, $, width, height) {
     this.$ = $;
     this.videoCanvas = $('#videoCanvas')[0];
     this.videoCanvas.width = width;
     this.videoCanvas.height = height;
     this.module = require(modulePath).loadClientHandlers(this);
     // graphics.addTextChain('the wolf has eaten the lamb', {x:320,y:240}, false);
-    this.videoController = new VideoChainer(this.module, this.videoCanvas, this, {}, $);
+    this.videoController = new VideoChainer(videoContext, this.videoCanvas, this, {}, $);
     // audo controller should be it's own thing:
-    // this.audioController = this.videoController.audioController;
+    this.audioController = new AudioController($);
     //todo: make module initialization nicer:
     this.module.init();
   }

@@ -10,7 +10,9 @@
     function onLoad() {
       // set size:
       var theWindow = nw.Screen.screens[0];
-      main.start($, theWindow.bounds.width, theWindow.bounds.height);
+      var videoContext = new VideoContext(videoCanvas);
+      videoContext.DEFINITIONS = VideoContext.DEFINITIONS;
+      main.start(videoContext, $, theWindow.bounds.width, theWindow.bounds.height);
     }
     function onClick(event) {
       main.click(event);
