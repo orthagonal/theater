@@ -10,3 +10,7 @@ exports.start = function start(videoContext, jquery, width, height) {
   coreController = new CoreController(videoContext, modulePath, jquery, width, height);
   coreController.kickstart('newGame', 'mainUser');
 };
+
+exports.click = (x, y, modifier) => {
+  // pass to the module object
+};
