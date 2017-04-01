@@ -5,53 +5,54 @@
   <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script src="js/lib/videocontext.js"></script>
   <script>
-    var main = require(process.cwd()+'/js/main.js');
-    nw.Screen.Init();
-    function onLoad() {
-      // set size:
-      var theWindow = nw.Screen.screens[0];
-      var videoContext = new VideoContext(videoCanvas);
-      videoContext.DEFINITIONS = VideoContext.DEFINITIONS;
-      main.start(videoContext, $, theWindow.bounds.width, theWindow.bounds.height);
-    }
-    function onClick(event) {
-      main.click(event);
-    }
+
+  var main = require(process.cwd()+'/js/main.js');
+  nw.Screen.Init();
+  function onLoad() {
+    // set size:
+    var theWindow = nw.Screen.screens[0];
+    var videoContext = new VideoContext(videoCanvas);
+    videoContext.DEFINITIONS = VideoContext.DEFINITIONS;
+    main.start(videoContext, $, theWindow.bounds.width, theWindow.bounds.height);
+  }
+  function onClick(event) {
+    main.click(event);
+  }
   </script>
-<style>
+  <style>
   @font-face {
-      font-family: 'TitleFont';
-      src: url('/fonts/Moonlight Shadow.ttf');
+    font-family: 'TitleFont';
+    src: url('/fonts/Moonlight Shadow.ttf');
   }
   .saveButton{
-     background : blue;
-     width: 20em;
-     top : -200px;
-     left : -200px;
-     position : relative;
+    background : blue;
+    width: 20em;
+    top : -200px;
+    left : -200px;
+    position : relative;
   }
   body {
     /*background-color:black;*/
   }
   #query {
     z-index: 200;
-     position: relative;
-     top: -100px;
-     right: -400px;
-     border: 2px solid #00ddff;
-     background: #ffffff;
-     -webkit-border-radius: 13px;
-     -moz-border-radius: 13px;
-     border-radius: 13px;
-     color: #00ccff;
-     -webkit-box-shadow: rgba(255,255,255,0.4) 0 1px 0, inset rgba(000,000,000,0.7) 0 0px 0px;
-     -moz-box-shadow: rgba(255,255,255,0.4) 0 1px 0, inset rgba(000,000,000,0.7) 0 0px 0px;
-     box-shadow: rgba(255,255,255,0.4) 0 1px 0, inset rgba(000,000,000,0.7) 0 0px 0px;
-     padding:8px;
-     margin-bottom:20px;
-     width:280px;
+    position: relative;
+    top: -100px;
+    right: -400px;
+    border: 2px solid #00ddff;
+    background: #ffffff;
+    -webkit-border-radius: 13px;
+    -moz-border-radius: 13px;
+    border-radius: 13px;
+    color: #00ccff;
+    -webkit-box-shadow: rgba(255,255,255,0.4) 0 1px 0, inset rgba(000,000,000,0.7) 0 0px 0px;
+    -moz-box-shadow: rgba(255,255,255,0.4) 0 1px 0, inset rgba(000,000,000,0.7) 0 0px 0px;
+    box-shadow: rgba(255,255,255,0.4) 0 1px 0, inset rgba(000,000,000,0.7) 0 0px 0px;
+    padding:8px;
+    margin-bottom:20px;
+    width:280px;
   }
-</style>
+  </style>
 </head>
 <!-- <% if (!isProduction) { %> onkeyup="canvasKey(event);" <% } %>  -->
 <!-- <body onload="onLoad();" > -->
@@ -59,7 +60,7 @@
   <canvas id="videoCanvas" onclick="onClick(event);">
   </canvas>
   <!-- <div id="mainElement">
-    <input id="query" type="text" onkeydown="onKeyDown()" />
-  </div> -->
+  <input id="query" type="text" onkeydown="onKeyDown()" />
+</div> -->
 </body>
 </html>

@@ -11,6 +11,9 @@ class VideoController {
     this.currentSceneDescription = {};
     this.currentSceneVideo = {};
     this.sceneSwitchingNode = new IntersceneSwitcher(this.videoContext);
+    console.log('video controller connecting to destination')
+    this.sceneSwitchingNode.connect(videoContext.destination);
+    console.log('video controller connected to destination')
     this.currentSceneNodes = '';
   }
 
