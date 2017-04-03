@@ -1,8 +1,9 @@
+/// why is this even here?
+
 'use strict';
 // const AudioController = require('./AudioController');
 require('./lib/videocontext.js');
-const SceneNodes = require('./SceneNodes.js');
-const IntersceneSwitcher = require('./IntersceneSwitcher');
+const MainSwitcher = require('./MainSwitcher');
 
 class VideoController {
   constructor(videoContext, coreController, options, $) {
@@ -10,17 +11,12 @@ class VideoController {
     this.videoContext = videoContext;
     this.currentSceneDescription = {};
     this.currentSceneVideo = {};
-    this.sceneSwitchingNode = new IntersceneSwitcher(this.videoContext);
+    this.mainSwitcher = new MainSwitcher(this.videoContext);
     this.currentSceneNodes = '';
   }
 
   // module will call this from init;
   start(gameState) {
-    console.log('videoController.start, gamestate:')
-    console.log(gameState);
-    // hydrate gamestate as a SceneNodes
-    const newSceneNodes = new SceneNodes(this.videoContext, gameState.scene);
-    this.sceneSwitchingNode.start(newSceneNodes);
   }
 }
 

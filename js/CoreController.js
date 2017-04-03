@@ -14,10 +14,7 @@ class CoreController {
     // audo controller should be it's own thing:
     this.audioController = new AudioController($);
     //todo: make module initialization nicer:
-    console.log('---------');
-    console.log(modulePath);
     const Module = require(modulePath);
-    console.log(Module)
     this.module = new Module(this);
   }
 
