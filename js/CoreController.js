@@ -1,13 +1,10 @@
 'use strict';
-const VideoChainer = require('./VideoController.js');
 const AudioController = require('./AudioController');
 const MainSwitcher = require('./MainSwitcher');
 
 class CoreController {
   constructor(videoContext, modulePath, $) {
     this.$ = $;
-    this.videoCanvas = $('#videoCanvas')[0];
-    this.videoContext = videoContext;
     this.videoContext = videoContext;
     this.currentSceneDescription = {};
     this.currentSceneVideo = {};
@@ -15,7 +12,7 @@ class CoreController {
     this.currentSceneNodes = '';
     // audo controller should be it's own thing:
     this.audioController = new AudioController($);
-    //todo: make module initialization nicer:
+    // todo: make module initialization nicer:
     const Module = require(modulePath);
     this.module = new Module(this);
   }

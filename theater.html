@@ -12,9 +12,9 @@
     nw.Screen.Init();
     var theWindow = nw.Screen.screens[0];
     var canvas = document.getElementById("videoCanvas");
-    var videoContext = new VideoContext(videoCanvas);
-    videoContext.DEFINITIONS = VideoContext.DEFINITIONS;
-    main.start(videoContext, $);
+    theWindow.videoContext = new VideoContext(videoCanvas);
+    theWindow.videoContext.DEFINITIONS = VideoContext.DEFINITIONS;
+    main.start(theWindow.videoContext, $);
   }
   </script>
   <style>
