@@ -5,17 +5,16 @@
   <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script src="js/lib/videocontext.js"></script>
   <script>
-  var main = require(process.cwd()+'/js/main.js');
-  nw.Screen.Init();
+
   function onLoad() {
     // set size:
+    var main = require(process.cwd()+'/js/main.js');
+    nw.Screen.Init();
     var theWindow = nw.Screen.screens[0];
+    var canvas = document.getElementById("videoCanvas");
     var videoContext = new VideoContext(videoCanvas);
     videoContext.DEFINITIONS = VideoContext.DEFINITIONS;
-    main.start(videoContext, $, theWindow.bounds.width, theWindow.bounds.height);
-  }
-  function onClick(event) {
-    main.click(event);
+    main.start(videoContext, $);
   }
   </script>
   <style>
