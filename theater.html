@@ -14,6 +14,7 @@
     main = require(process.cwd()+'/js/main.js');
     nw.Screen.Init();
     var theWindow = nw.Screen.screens[0];
+    console.log(theWindow.height)
     var canvas = document.getElementById("videoCanvas");
     theWindow.videoContext = new VideoContext(videoCanvas);
     theWindow.videoContext.DEFINITIONS = VideoContext.DEFINITIONS;
@@ -33,7 +34,13 @@
     position : relative;
   }
   body {
-    /*background-color:black;*/
+    width: 100%;
+    height: 100%;
+    background-color:black;
+  }
+  canvas {
+    width: 100%;
+    height: 100%;
   }
   #query {
     z-index: 200;
