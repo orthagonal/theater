@@ -5,10 +5,13 @@
   <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script src="js/lib/videocontext.js"></script>
   <script>
-
+  var main;
+  function onClick(evt) {
+    main.query(evt);
+  }
   function onLoad() {
     // set size:
-    var main = require(process.cwd()+'/js/main.js');
+    main = require(process.cwd()+'/js/main.js');
     nw.Screen.Init();
     var theWindow = nw.Screen.screens[0];
     var canvas = document.getElementById("videoCanvas");

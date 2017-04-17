@@ -11,6 +11,8 @@ exports.start = function start(videoContext, jquery) {
   coreController.kickstart('newGame', 'mainUser');
 };
 
-exports.click = (x, y, modifier) => {
+exports.query = (evt) => {
+  console.log('%s, %s', evt.x, evt.y);
   // pass to the module object
+  coreController.module.query(evt);
 };
