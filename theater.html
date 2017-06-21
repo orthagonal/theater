@@ -12,10 +12,11 @@
   function onLoad() {
     // set size:
     main = require(process.cwd()+'/js/main.js');
-    nw.Screen.Init();
+    nw.Screen.Init()  ;
     var theWindow = nw.Screen.screens[0];
-    console.log(theWindow.height)
-    var canvas = document.getElementById("videoCanvas");
+    var videoCanvas = document.getElementById("videoCanvas");
+    videoCanvas.width = theWindow.bounds.width;
+    videoCanvas.height = theWindow.bounds.height;
     theWindow.videoContext = new VideoContext(videoCanvas);
     theWindow.videoContext.DEFINITIONS = VideoContext.DEFINITIONS;
     main.start(theWindow.videoContext, $);
@@ -38,10 +39,6 @@
     height: 100%;
     background-color:black;
   }
-  canvas {
-    width: 100%;
-    height: 100%;
-  }
   #query {
     z-index: 200;
     position: relative;
@@ -62,13 +59,8 @@
   }
   </style>
 </head>
-<!-- <% if (!isProduction) { %> onkeyup="canvasKey(event);" <% } %>  -->
-<!-- <body onload="onLoad();" > -->
 <body onload="onLoad();">
-  <canvas id="videoCanvas" onclick="onClick(event);">
+  <canvas id="videoCanvas" onclick="onClick(event);" onkeypress="onClick(event);" onkeydown="onClick(event);" onkeyup="onClick(event);">
   </canvas>
-  <!-- <div id="mainElement">
-  <input id="query" type="text" onkeydown="onKeyDown()" />
-</div> -->
 </body>
 </html>
