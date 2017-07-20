@@ -10,10 +10,24 @@ class MainSwitcher {
     this.currentNodes = undefined;
   }
 
-  // plug a src scene switcher into this one:
-  connect(intrasceneSwitcher) {
-    intrasceneSwitcher.effectNode.connect(this.mainNode);
+  // plug a src node from the main output:
+  connect(node) {
+    node.connect(this.mainNode);
   }
+
+  // remove a src scene
+  // disconnect(node) {
+  //   const connections = this.videoContext._renderGraph.connections;
+  //   for (let i = 0; i < connections.length; i++) {
+  //     const sourceNode = connections[i].source;
+  //     console.log(sourceNode)
+  //     if (node === sourceNode) {
+  //       console.log('disconnecting')
+  //       console.log(sourceNode)
+  //       node.disconnect(this.mainNode);
+  //     }
+  //   }
+  // }
 }
 
 module.exports = MainSwitcher;
