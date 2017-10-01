@@ -9,6 +9,9 @@
   function onClick(evt) {
     main.query(evt);
   }
+  function onMouseMove(evt) {
+    main.query(evt);
+  }
   function onLoad() {
     // set size:
     main = require(process.cwd()+'/js/main.js');
@@ -60,7 +63,7 @@
   </style>
 </head>
 <body onload="onLoad();">
-  <canvas id="videoCanvas" onclick="onClick(event);" onkeypress="onClick(event);" onkeydown="onClick(event);" onkeyup="onClick(event);">
+  <canvas id="videoCanvas" onclick="onClick(event);" onkeypress="onClick(event);" onkeydown="onClick(event);" onkeyup="onClick(event);" onmousemove="onMouseMove(event);">
   </canvas>
 </body>
 </html>
