@@ -3,6 +3,7 @@ const CoreController = require('./CoreController.js');
 const path = require('path');
 let coreController = null;
 let lastTime = new Date().getTime();
+
 // these are all singletons anyway
 exports.start = function start(videoContext, jquery) {
   // create a game controller and kickstart a module with it:
@@ -12,10 +13,10 @@ exports.start = function start(videoContext, jquery) {
 };
 
 exports.query = (evt) => {
-  // pass to the module object
-  if (evt.altKey && new Date().getTime() - lastTime > 500) {
+  // rate limit:
+  if (new Date().getTime() - lastTime > 500) {
     lastTime = new Date().getTime();
-    evt.toggleInventory = true;
+    // pass to the module object
     coreController.module.query(evt);
   }
 };

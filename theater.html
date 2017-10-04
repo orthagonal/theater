@@ -15,9 +15,10 @@
   function onLoad() {
     // set size:
     main = require(process.cwd()+'/js/main.js');
-    nw.Screen.Init()  ;
+    nw.Screen.Init();
     var theWindow = nw.Screen.screens[0];
     var videoCanvas = document.getElementById("videoCanvas");
+    videoCanvas.addEventListener("keypress", onClick, false );
     videoCanvas.width = theWindow.bounds.width;
     videoCanvas.height = theWindow.bounds.height;
     theWindow.videoContext = new VideoContext(videoCanvas);
@@ -42,28 +43,10 @@
     height: 100%;
     background-color:black;
   }
-  #query {
-    z-index: 200;
-    position: relative;
-    top: -100px;
-    right: -400px;
-    border: 2px solid #00ddff;
-    background: #ffffff;
-    -webkit-border-radius: 13px;
-    -moz-border-radius: 13px;
-    border-radius: 13px;
-    color: #00ccff;
-    -webkit-box-shadow: rgba(255,255,255,0.4) 0 1px 0, inset rgba(000,000,000,0.7) 0 0px 0px;
-    -moz-box-shadow: rgba(255,255,255,0.4) 0 1px 0, inset rgba(000,000,000,0.7) 0 0px 0px;
-    box-shadow: rgba(255,255,255,0.4) 0 1px 0, inset rgba(000,000,000,0.7) 0 0px 0px;
-    padding:8px;
-    margin-bottom:20px;
-    width:280px;
-  }
   </style>
 </head>
-<body onload="onLoad();">
-  <canvas id="videoCanvas" onclick="onClick(event);" onkeypress="onClick(event);" onkeydown="onClick(event);" onkeyup="onClick(event);" onmousemove="onMouseMove(event);">
+<body onload="onLoad();" onkeyup="onClick(event)" onmousedown="onClick(event);" onkeydown="onClick(event)" onkeypress="onClick(event)">
+  <canvas id="videoCanvas">
   </canvas>
 </body>
 </html>
