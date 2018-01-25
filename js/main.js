@@ -5,10 +5,11 @@ let coreController = null;
 let lastTime = new Date().getTime();
 
 // these are all singletons anyway
-exports.start = function start(videoContext, jquery) {
+exports.start = function start(videoContext, burnthrough, jquery) {
   // create a game controller and kickstart a module with it:
   const modulePath = path.join('..', 'modules', 'IrisOne', 'js', 'the_repository_1.js');
   coreController = new CoreController(videoContext, modulePath, jquery);
+  coreController.burnthrough = burnthrough;
   coreController.kickstart('newGame', 'mainUser');
 };
 

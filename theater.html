@@ -23,7 +23,11 @@
     videoCanvas.height = theWindow.bounds.height;
     theWindow.videoContext = new VideoContext(videoCanvas);
     theWindow.videoContext.DEFINITIONS = VideoContext.DEFINITIONS;
-    main.start(theWindow.videoContext, $);
+    var burnthrough = document.getElementById("burnthrough");
+    burnthrough.width = theWindow.bounds.width;
+    burnthrough.height = theWindow.bounds.height;
+
+    main.start(theWindow.videoContext, burnthrough, $);
   }
   </script>
   <style>
@@ -43,10 +47,18 @@
     height: 100%;
     background-color:black;
   }
+  #burnthrough {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    display: none;
+  }
   </style>
 </head>
 <body onload="onLoad();" onkeyup="onClick(event)" onmousedown="onClick(event);" onkeydown="onClick(event)" onkeypress="onClick(event)">
   <canvas id="videoCanvas">
+  </canvas>
+  <canvas id="burnthrough">
   </canvas>
 </body>
 </html>
