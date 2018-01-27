@@ -1,6 +1,8 @@
 'use strict';
 const AudioController = require('./AudioController');
 const MainSwitcher = require('./MainSwitcher');
+// iris-specific but useful for development:
+const Module = require('../modules/IrisOne/js/the_repository_1.js');
 
 class CoreController {
   constructor(videoContext, modulePath, $) {
@@ -12,8 +14,8 @@ class CoreController {
     this.currentSceneNodes = '';
     // audo controller should be it's own thing:
     this.audioController = new AudioController($);
-    // todo: make module initialization nicer:
-    const Module = require(modulePath);
+    // this loads any module:
+    // const Module = require(modulePath);
     this.gameObjects = {};
     this.module = new Module(this);
     this.activeObject = null;

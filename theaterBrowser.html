@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html ng-app="VideoChaining">
+<head>
+  <meta charset="utf-8">
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="js/lib/videocontext.js"></script>
+  <script src="windowBundle.js"></script>
+  <script>
+  var main;
+  var launched;
+  function start() {
+    if (!launched && typeof iris === 'object') {
+      iris.startGame();
+      launched = true;
+    }
+  }
+  setTimeout(start, 10000);
+  function onClick(evt) {
+    if (iris && launched) {
+      iris.query(evt);
+    }
+  }
+  function onMouseMove(evt) {
+    // iris.query(evt);
+  }
+  </script>
+  <style>
+  @font-face {
+    font-family: 'TitleFont';
+    src: url('/fonts/Moonlight Shadow.ttf');
+  }
+  .saveButton{
+    background : blue;
+    width: 20em;
+    top : -200px;
+    left : -200px;
+    position : relative;
+  }
+  body {
+    width: 100%;
+    height: 100%;
+    background-color:black;
+  }
+  #burnthrough {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    display: none;
+  }
+  </style>
+</head>
+<body onkeyup="onClick(event)" onmousedown="onClick(event);" onkeydown="onClick(event)" onkeypress="onClick(event)">
+  <canvas id="videoCanvas">
+  </canvas>
+  <canvas id="burnthrough">
+  </canvas>
+</body>
+</html>
