@@ -14,7 +14,7 @@
       launched = true;
     }
   }
-  setTimeout(start, 10000);
+  setTimeout(start, 2000);
   function onClick(evt) {
     if (iris && launched) {
       iris.query(evt);
@@ -41,18 +41,12 @@
     height: 100%;
     background-color:black;
   }
-  #burnthrough {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    display: none;
-  }
   </style>
 </head>
 <body onkeyup="onClick(event)" onmousedown="onClick(event);" onkeydown="onClick(event)" onkeypress="onClick(event)">
   <canvas id="videoCanvas">
   </canvas>
-  <canvas id="burnthrough">
+  <canvas id="hitboxCanvas">
   </canvas>
 </body>
 </html>

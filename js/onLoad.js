@@ -11,11 +11,11 @@ module.exports.startGame = function () {
   videoCanvas.height = theWindow.innerHeight;
   theWindow.videoContext = new VideoContext(videoCanvas);
   theWindow.videoContext.DEFINITIONS = VideoContext.DEFINITIONS;
-  var burnthrough = document.getElementById("burnthrough");
-  burnthrough.width = theWindow.innerWidth;
-  burnthrough.height = theWindow.innerHeight;
+  var hitboxCanvas = document.getElementById("hitboxCanvas");
+  hitboxCanvas.width = theWindow.innerWidth;
+  hitboxCanvas.height = theWindow.innerHeight;
 
-  main.start(theWindow.videoContext, burnthrough, $);
+  main.start(theWindow.videoContext, hitboxCanvas, $);
 };
 
 module.exports.query = main.query;

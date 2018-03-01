@@ -5,11 +5,12 @@ const MainSwitcher = require('./MainSwitcher');
 const Module = require('../modules/IrisOne/js/the_repository_1.js');
 
 class CoreController {
-  constructor(videoContext, modulePath, $) {
+  constructor(videoContext, hitboxCanvas, modulePath, $) {
     this.$ = $;
     this.videoContext = videoContext;
     this.currentSceneDescription = {};
     this.currentSceneVideo = {};
+    this.hitboxCanvas = hitboxCanvas;
     this.mainSwitcher = new MainSwitcher(this.videoContext);
     this.currentSceneNodes = '';
     // audo controller should be it's own thing:
