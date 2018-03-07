@@ -5,17 +5,23 @@ module.exports.startGame = function () {
   // nw.Screen.Init();
   // var theWindow = nw.Screen.screens[0];
   var theWindow = window;
-  var videoCanvas = document.getElementById("videoCanvas");
-  videoCanvas.addEventListener("keypress", onClick, false );
-  videoCanvas.width = theWindow.innerWidth;
-  videoCanvas.height = theWindow.innerHeight;
-  theWindow.videoContext = new VideoContext(videoCanvas);
-  theWindow.videoContext.DEFINITIONS = VideoContext.DEFINITIONS;
+  var finalDestinationCanvas = document.getElementById("finalDestinationCanvas");
+  finalDestinationCanvas.addEventListener("keypress", onClick, false );
+  finalDestinationCanvas.width = theWindow.innerWidth;
+  finalDestinationCanvas.height = theWindow.innerHeight;
   var hitboxCanvas = document.getElementById("hitboxCanvas");
   hitboxCanvas.width = theWindow.innerWidth;
   hitboxCanvas.height = theWindow.innerHeight;
 
-  main.start(theWindow.videoContext, hitboxCanvas, $);
+  main.start(finalDestinationCanvas, hitboxCanvas, $, {
+    width: finalDestinationCanvas.width,
+    height: finalDestinationCanvas.height,
+    // todo: use these in the future
+    videoWidth: finalDestinationCanvas.width,
+    videoHeight: finalDestinationCanvas.height,
+    outputWidth: finalDestinationCanvas.width,
+    outputHeight: finalDestinationCanvas.height
+  });
 };
 
 module.exports.query = main.query;
