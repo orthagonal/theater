@@ -4,16 +4,15 @@ const SwitcherShader = require('./SwitcherShader');
 class VideoController extends EventEmitter {
   constructor(controller, gl) {
     super();
+    this.sceneDescription = false;
     this.controller = controller;
     this.dimensions = controller.dimensions;
-    this.currentScene = false;
     this.currentVideo = false;
     this.lastVideo = false;
     this.nextVideo = false;
     this.videoFetcher = false;
     this.activeObject = false;
     this.currentVideoIndex = -1;
-
     this.switcher = new SwitcherShader(this, gl, controller.dimensions);
   }
 
@@ -26,14 +25,28 @@ class VideoController extends EventEmitter {
     }
   }
 
-  // Active Object uses these:
-  loadCurrentScene(sceneDescription) {
-    this.currentScene = sceneDescription;
+  previousEnd() {
+    // delete this.currentVideo.onended;
+    this.currentVideo = this.getNextVideo();
+    this.switcher.connectVideo(this.currentVideo.element);
+    this.currentVideo.element.onended = this.previousEnd.bind(this);
+    this.currentVideo.element.play();
+  }
+
+  // Active object calls this:
+  startScene(scene) {
+    // todo: might need to remove previous element.eventHandler
+    this.sceneDescription = scene;
+    this.currentVideo = this.getNextVideo();
+    this.switcher.connectVideo(this.currentVideo.element);
+    this.currentVideo.element.onended = this.previousEnd.bind(this);
+    this.currentVideo.element.play();
   }
 
   // just a function that picks out the next video to play
   // can be overloaded by the active object:
   getNextVideo() {
+    // todo: this should probably just always get from the active object:
     if (this.activeObject.videoFetcher) {
       return this.activeObject.videoFetcher();
     }
@@ -43,9 +56,9 @@ class VideoController extends EventEmitter {
     if (this.currentVideoIndex >= this.sceneDescription.roots.length) {
       this.currentVideoIndex = 0;
     }
-    const scene = this.sceneDescription.roots[this.currentVideoIndex];
+    const video = this.sceneDescription.roots[this.currentVideoIndex];
     // todo: do i need to rewind the video to start here?
-    return scene;
+    return video;
   }
 }
 

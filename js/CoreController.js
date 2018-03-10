@@ -38,7 +38,15 @@ class CoreController {
   }
 
   loadGameObject(gameObject) {
-
+    // deactivate old object:
+    if (this.activeObject) {
+      this.activeObject.deactivate();
+    }
+    gameObject.gameState = this.gameState;
+    this.activeObject = gameObject;
+    gameObject.activate(this.videoController);
+    this.videoController.setActiveObject(gameObject);
+    // todo: this.audiController.setActiveObject(gameObject);
   }
 }
 if (module) {
