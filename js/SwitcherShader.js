@@ -53,7 +53,6 @@ class SwitcherShader {
     this.vertexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, 1, -1, -1, 1, -1, 1, 1]), gl.STATIC_DRAW);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0, 1, 0, 0, 1, 0, 1, 1]), gl.STATIC_DRAW);
     this.a_position = gl.getAttribLocation(this.program, 'a_position');
     this.a_texCoord = gl.getAttribLocation(this.program, 'a_texCoord');
     this.v_texCoord = gl.getUniformLocation(this.program, 'v_texCoord');
@@ -62,7 +61,7 @@ class SwitcherShader {
 
     // set the u_resolution for the shader:
     this.u_resolution = gl.getUniformLocation(this.program, 'u_resolution');
-    gl.uniform2fv(this.u_resolution, [dimensions.width * 1.0, dimensions.height * 1.0]);
+    gl.uniform2fv(this.u_resolution, [dimensions.width, dimensions.height]);
 
     // active channel:
     this.u_activeChannel = this.gl.getUniformLocation(this.program, 'u_activeChannel');
@@ -145,12 +144,16 @@ class SwitcherShader {
       gl.bindTexture(gl.TEXTURE_2D, this.videoTexture0);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.video0);
       // gl.uniform1i(this.u_video0, 0);
-    }
-    if (this.ready1) {
+    } else if (this.ready1) {
       // gl.activeTexture(gl.TEXTURE1);
       gl.bindTexture(gl.TEXTURE_2D, this.videoTexture1);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.video1);
       // gl.uniform1i(this.u_video1, 1);
+    } else if (this.readyBranch) {
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, this.branchVideoTexture);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.video0);
+      // gl.uniform1i(this.u_video0, 0);
     }
     gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
     requestAnimationFrame(this.render.bind(this));

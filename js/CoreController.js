@@ -1,6 +1,8 @@
 'use strict';
+// const GameObject = require('./GameObject.js');
 const VideoController = require('./VideoController');
 const AudioController = require('./AudioController');
+const InterfaceController = require('./InterfaceController');
 
 const Module = require('../modules/IrisOne/js/the_repository_1.js');
 
@@ -18,6 +20,8 @@ class CoreController {
 
     this.audioController = new AudioController($);
     this.videoController = new VideoController(this, this.gl);
+    this.interfaceController = new InterfaceController(this);
+    // this.interfaceController = new InterfaceController(this, GameObject.videoDirectory);
 
     // this loads any module:
     // const Module = require(modulePath);
@@ -42,11 +46,15 @@ class CoreController {
     if (this.activeObject) {
       this.activeObject.deactivate();
     }
-    gameObject.gameState = this.gameState;
     this.activeObject = gameObject;
     gameObject.activate(this.videoController);
-    this.videoController.setActiveObject(gameObject);
     // todo: this.audiController.setActiveObject(gameObject);
+  }
+
+  // todo: this will eventually need to dynamically load
+  branchTo(sourceVideo, destinationObjectName, transitionType) {
+    const destinationObject = this.gameObjects[destinationObjectName];
+    this.videoController.branchTo(sourceVideo, destinationObject);
   }
 }
 if (module) {

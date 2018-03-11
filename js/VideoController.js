@@ -12,54 +12,53 @@ class VideoController extends EventEmitter {
     this.nextVideo = false;
     this.videoFetcher = false;
     this.activeObject = false;
-    this.currentVideoIndex = -1;
     this.switcher = new SwitcherShader(this, gl, controller.dimensions);
   }
 
-  // CoreController uses this:
-  setActiveObject(gameObject) {
-    this.activeObject = gameObject;
-    // now start the object playing:
-    if (gameObject.onConnect) {
-      gameObject.onConnect(this);
-    }
-  }
-
+  // called when previous video is finished playing:
   previousEnd() {
     // delete this.currentVideo.onended;
-    this.currentVideo = this.getNextVideo();
+    this.currentVideo = this.activeObject.getNextVideo();
     this.switcher.connectVideo(this.currentVideo.element);
+    if (this.currentVideo.hasMask) {
+      this.controller.interfaceController.connectMask(this.currentVideo.maskPath);
+    }
     this.currentVideo.element.onended = this.previousEnd.bind(this);
+    this.currentVideo.element.play();
+  }
+
+  branchTo(sourceVideo, destinationObject) {
+    // when the video is done activate the new object:
+    sourceVideo.element.onended = () => {
+      destinationObject.activate(this);
+    };
+    // play source video
+    if (this.currentVideo) {
+      this.currentVideo.element.onended = undefined;
+    }
+    this.currentVideo = sourceVideo;
+    this.switcher.connectVideo(this.currentVideo.element);
     this.currentVideo.element.play();
   }
 
   // Active object calls this:
   startScene(scene) {
+    if (this.currentVideo) {
+      this.currentVideo.element.onended = undefined;
+    }
     // todo: might need to remove previous element.eventHandler
     this.sceneDescription = scene;
-    this.currentVideo = this.getNextVideo();
+    this.currentVideo = this.activeObject.getNextVideo();
     this.switcher.connectVideo(this.currentVideo.element);
     this.currentVideo.element.onended = this.previousEnd.bind(this);
     this.currentVideo.element.play();
+    if (this.currentVideo.hasMask) {
+      this.controller.interfaceController.connectMask(this.currentVideo.maskPath);
+    }
   }
 
   // just a function that picks out the next video to play
   // can be overloaded by the active object:
-  getNextVideo() {
-    // todo: this should probably just always get from the active object:
-    if (this.activeObject.videoFetcher) {
-      return this.activeObject.videoFetcher();
-    }
-    // otherwise do default 'sequential' behavior:
-    // todo: add other basic behaviors
-    this.currentVideoIndex++;
-    if (this.currentVideoIndex >= this.sceneDescription.roots.length) {
-      this.currentVideoIndex = 0;
-    }
-    const video = this.sceneDescription.roots[this.currentVideoIndex];
-    // todo: do i need to rewind the video to start here?
-    return video;
-  }
 }
 
 module.exports = VideoController;
