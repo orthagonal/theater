@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html ng-app="VideoChaining">
+<head>
+  <meta charset="utf-8">
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="windowBundle.js"></script>
+  <script>
+  var main;
+  var launched;
+  function start() {
+    if (!launched && typeof iris === 'object') {
+      iris.startGame();
+      launched = true;
+    }
+  }
+  setTimeout(start, 2000);
+  function onClick(evt) {
+    if (iris && launched) {
+      iris.query(evt);
+    }
+  }
+  function onMouseMove(evt) {
+    // iris.query(evt);
+  }
+  </script>
+  <style>
+  @font-face {
+    font-family: 'TitleFont';
+    src: url('/fonts/Moonlight Shadow.ttf');
+  }
+  .saveButton{
+    background : blue;
+    width: 20em;
+    top : -200px;
+    left : -200px;
+    position : relative;
+  }
+  body {
+    width: 100%;
+    height: 100%;
+    background-color:black;
+  }
+  </style>
+</head>
+<body onkeyup="onClick(event)" onmousedown="onClick(event);" onkeydown="onClick(event)" onkeypress="onClick(event)">
+  <canvas id="finalDestinationCanvas">
+  </canvas>
+  <canvas id="hitboxCanvas" hidden>
+  </canvas>
+</body>
+</html>
