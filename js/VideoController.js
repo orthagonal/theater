@@ -1,6 +1,9 @@
 const EventEmitter = require('events');
 const SwitcherShader = require('./SwitcherShader');
 
+global.NO_EFFECT = 0.0;
+global.MOUSE_MISS_EFFECT = 1.0;
+
 class VideoController extends EventEmitter {
   constructor(controller, gl) {
     super();
@@ -55,6 +58,13 @@ class VideoController extends EventEmitter {
     if (this.currentVideo.hasMask) {
       this.controller.interfaceController.connectMask(this.currentVideo.maskPath);
     }
+  }
+
+  mouseMiss(mouseEvent, timestamp) {
+    // get end time of current video
+    // future: be able to carry an effect over to the next video
+    const videoDuration = 3000.0;
+    this.switcher.mouseMiss(mouseEvent, timestamp, videoDuration);
   }
 
   // just a function that picks out the next video to play

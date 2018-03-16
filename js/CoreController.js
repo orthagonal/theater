@@ -21,7 +21,6 @@ class CoreController {
     this.audioController = new AudioController($);
     this.videoController = new VideoController(this, this.gl);
     this.interfaceController = new InterfaceController(this);
-    // this.interfaceController = new InterfaceController(this, GameObject.videoDirectory);
 
     // this loads any module:
     // const Module = require(modulePath);
@@ -55,6 +54,11 @@ class CoreController {
   branchTo(sourceVideo, destinationObjectName, transitionType) {
     const destinationObject = this.gameObjects[destinationObjectName];
     this.videoController.branchTo(sourceVideo, destinationObject);
+  }
+
+  mouseMiss(mouseEvent, timestamp) {
+    // todo: play a sound
+    this.videoController.mouseMiss(mouseEvent, timestamp);
   }
 }
 if (module) {
