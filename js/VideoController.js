@@ -66,9 +66,6 @@ class VideoController extends EventEmitter {
     const videoDuration = 3000.0;
     this.switcher.mouseMiss(mouseEvent, timestamp, videoDuration);
   }
-
-  // just a function that picks out the next video to play
-  // can be overloaded by the active object:
 }
 
 module.exports = VideoController;

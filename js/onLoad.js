@@ -1,9 +1,12 @@
 const main = require('./main.js')
+
+// nwjs code:
+// set size:
+// main = require(process.cwd()+'/js/main.js');
+// nw.Screen.Init();
+// var theWindow = nw.Screen.screens[0];
+
 module.exports.startGame = function () {
-  // set size:
-  // main = require(process.cwd()+'/js/main.js');
-  // nw.Screen.Init();
-  // var theWindow = nw.Screen.screens[0];
   var theWindow = window;
   var finalDestinationCanvas = document.getElementById("finalDestinationCanvas");
   finalDestinationCanvas.addEventListener("keypress", onClick, false );
