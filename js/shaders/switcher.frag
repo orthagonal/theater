@@ -16,7 +16,7 @@ float noise2(vec2 st) {
   return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
 }
 
-vec3 lensflare(vec2 uv,vec2 pos) {
+vec3 lensflare(vec2 uv, vec2 pos) {
 	vec2 main = uv-pos;
 	vec2 uvd = uv*(length(uv));
 
@@ -59,16 +59,18 @@ vec3 cc(vec3 color, float factor,float factor2) {
 	return mix(color,vec3(w)*factor,w*factor2);
 }
 
-vec4 lensFlare(vec2 fragCoord ) {
-	vec2 uv = fragCoord.xy / u_resolution.xy - 0.5;
-	uv.x *= u_resolution.x/u_resolution.y; //fix aspect ratio
-	vec3 mouse = vec3(u_mouse.xy / u_resolution.xy - 0.5, .4);
-	mouse.x *= u_resolution.x / u_resolution.y;
-	mouse.x=sin(u_currentTime)*.5;
-	mouse.y=sin(u_currentTime*.913)*.5;
-	vec3 color = vec3(1.4,1.2,1.0)*lensflare(uv,mouse.xy);
-	color = cc(color,.5,.1);
-	return vec4(color,1.0);
+vec4 flareEffect(vec2 fragCoord ) {
+	vec2 uv = fragCoord.xy / u_resolution.xy;
+	// uv.x *= u_resolution.x / u_resolution.y;
+	vec3 mouse = vec3(u_mouse.xy / u_resolution.xy, .5);
+  mouse.y = 1.0 - mouse.y;
+  // mouse.x -= .2;
+	// mouse.x *= u_resolution.x / u_resolution.y;
+	// mouse.x=sin(u_currentTime)*.5;
+	// mouse.y=sin(u_currentTime*.913)*.5;
+	vec3 color = vec3(1.4, 1.2, 1.0) * lensflare(uv, mouse.xy);
+	color = cc(color, .5, .1);
+	return vec4(color, 1.0);
 }
 
 void main() {
@@ -77,7 +79,7 @@ void main() {
   gl_FragColor = texture2D(u_video0, normalizedCoords);
   // mouse miss:
   if (u_activeEffect == 1.0) {
-    vec4 flare = lensFlare(gl_FragCoord.xy);
+    vec4 flare = flareEffect(gl_FragCoord.xy);
     gl_FragColor = mix(flare, gl_FragColor, u_percentDone);
     // vec4(0.0, u_percentDone, 0.0, 1.0);
   }

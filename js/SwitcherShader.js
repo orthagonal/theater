@@ -133,7 +133,7 @@ class SwitcherShader {
     this.gl.useProgram(this.program);
     this.gl.uniform1f(this.u_activeEffect, global.MOUSE_MISS_EFFECT);
     this.gl.uniform1f(this.u_percentDone, 0.0);
-    this.gl.uniform1f(this.u_mouse, [mouseEvent.clientX, mouseEvent.clientY]);
+    this.gl.uniform2fv(this.u_mouse, [mouseEvent.clientX * 1.0, mouseEvent.clientY]);
     this.effectStartTime = effectStartTime;
     this.videoDuration = videoDuration;
   }
