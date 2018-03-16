@@ -1,5 +1,5 @@
 'use strict';
-const config = require('../config.js').dev;
+const config = {};
 const path = require('path');
 
 // Audio controller
