@@ -3,6 +3,7 @@ const SwitcherShader = require('./SwitcherShader');
 
 global.NO_EFFECT = 0.0;
 global.MOUSE_MISS_EFFECT = 1.0;
+global.MOUSE_BW_EFFECT = 2.0;
 
 class VideoController extends EventEmitter {
   constructor(controller, gl) {
@@ -60,11 +61,10 @@ class VideoController extends EventEmitter {
     }
   }
 
-  mouseMiss(mouseEvent, timestamp) {
-    // get end time of current video
-    // future: be able to carry an effect over to the next video
+  // get time remaining in current video:
+  getRemainingTime() {
     const videoDuration = 3000.0;
-    this.switcher.mouseMiss(mouseEvent, timestamp, videoDuration);
+    return videoDuration;
   }
 }
 

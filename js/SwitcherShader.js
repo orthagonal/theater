@@ -46,29 +46,22 @@ class SwitcherShader {
     this.u_video0 = gl.getUniformLocation(this.program, 'u_video0');
 
     // shader variables
-
-    // the default shader effect is null:
-    this.u_activeEffect = gl.getUniformLocation(this.program, 'u_activeEffect');
-    gl.uniform1f(this.u_activeEffect, global.NO_EFFECT);
-
-    // set the u_resolution for the shader:
-    this.u_resolution = gl.getUniformLocation(this.program, 'u_resolution');
-    gl.uniform2fv(this.u_resolution, [dimensions.width, dimensions.height]);
-
-    // allow effect requests to specify the start time of the request:
-    this.u_effectStartTime = gl.getUniformLocation(this.program, 'u_effectStartTime');
-
-    // make sure the current time is passed:
-    this.u_currentTime = gl.getUniformLocation(this.program, 'u_currentTime');
-
-    // pass the duration of the currently playing video:
-    this.u_videoDuration = gl.getUniformLocation(this.program, 'u_videoDuration');
-
-    // just pass the % done:
-    this.u_percentDone = gl.getUniformLocation(this.program, 'u_percentDone');
-
-    // the mouse:
-    this.u_mouse = gl.getUniformLocation(this.program, 'u_mouse');
+    this.shaderVariables = {
+      u_mouse: { setter: 'uniform2fv' },
+      u_resolution: { setter: 'uniform2fv', default: [dimensions.width, dimensions.height] },
+      u_currentTime: { setter: 'uniform1f' },
+      u_startTime: { setter: 'uniform1f' },
+      u_percentDone: { setter: 'uniform1f' },
+      u_activeEffect: { setter: 'uniform1f', default: global.NO_EFFECT },
+      u_videoDuration: { setter: 'uniform1f' }
+    };
+    Object.keys(this.shaderVariables).forEach(varName => {
+      const shaderInfo = this.shaderVariables[varName];
+      this[varName] = gl.getUniformLocation(this.program, varName);
+      if (shaderInfo.default) {
+        this.setShaderVariable(varName);
+      }
+    });
 
     gl.enableVertexAttribArray(this.a_position);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
@@ -79,6 +72,19 @@ class SwitcherShader {
     gl.vertexAttribPointer(this.a_texCoord, 2, gl.FLOAT, false, 0, 0);
     gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
     requestAnimationFrame(this.render.bind(this));
+  }
+
+  deactivateEffect() {
+    this.setShaderVariable('u_activeEffect', global.NO_EFFECT);
+  }
+
+  setShaderVariable(varName, value) {
+    const shaderVarInfo = this.shaderVariables[varName];
+    this.gl[shaderVarInfo.setter](this[varName], value || shaderVarInfo.default);
+  }
+
+  activateEffect(effectInfo) {
+
   }
 
   // bind each of video0, video1 and branchVideo

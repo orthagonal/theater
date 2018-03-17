@@ -56,6 +56,17 @@ class CoreController {
     this.videoController.branchTo(sourceVideo, destinationObject);
   }
 
+  deactivateEffect() {
+    this.videoController.switcher.deactivateEffect();
+  }
+
+  activateEffect(info) {
+    if (info.when === 'videoEnd') {
+      info.when = this.videoController.getRemainingTime();
+    }
+    this.videoController.switcher.activateEffect(info);
+  }
+
   mouseMiss(mouseEvent, timestamp) {
     // todo: play a sound
     this.videoController.mouseMiss(mouseEvent, timestamp);
