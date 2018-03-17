@@ -73,8 +73,13 @@ vec4 bwSubtraction(vec2 mouse, vec2 fragCoord) {
   if (u_percentDone > .5) {
     factor = factor - (u_percentDone - .5);
   }
-  float val = smoothstep(factor, .0, dist);
-  return vec4(val, val, val, 1.0);
+  float val = smoothstep(factor, .1, dist);
+	return vec4(val, val, val, 0.0);
+}
+
+// returns pixel for a partial:
+vec4 displayPartial(vec2 upperLeft, vec2 dimensions) {
+	return vec4(0.0, 0.0, 0.0, 0.0);
 }
 
 ///////////////////////
