@@ -84,7 +84,15 @@ class SwitcherShader {
   }
 
   activateEffect(effectInfo) {
-
+    this.effectStartTime = new Date().getTime();
+    if (effectInfo.duration) {
+      this.videoDuration = effectInfo.duration;
+    }
+    Object.keys(effectInfo).forEach(varName => {
+      if (this.shaderVariables[varName]) {
+        this.setShaderVariable(varName, effectInfo[varName]);
+      }
+    });
   }
 
   // bind each of video0, video1 and branchVideo

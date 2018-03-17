@@ -64,6 +64,9 @@ class CoreController {
     if (info.when === 'videoEnd') {
       info.when = this.videoController.getRemainingTime();
     }
+    if (info.when && info.callback) {
+      setTimeout(info.callback.bind(this), info.when);
+    }
     this.videoController.switcher.activateEffect(info);
   }
 
