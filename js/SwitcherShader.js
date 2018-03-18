@@ -168,7 +168,7 @@ class SwitcherShader {
       this.gl.uniform1f(this.u_activeEffect, global.NO_EFFECT);
     }, videoDuration);
     this.gl.useProgram(this.program);
-    this.gl.uniform1f(this.u_activeEffect, global.MOUSE_MISS_EFFECT);
+    this.gl.uniform1f(this.u_activeEffect, global.MOUSE_FLARE_EFFECT);
     this.gl.uniform1f(this.u_percentDone, 0.0);
     this.gl.uniform2fv(this.u_mouse, [mouseEvent.clientX * 1.0, mouseEvent.clientY]);
     this.effectStartTime = effectStartTime;

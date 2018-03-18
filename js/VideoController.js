@@ -2,7 +2,7 @@ const EventEmitter = require('events');
 const SwitcherShader = require('./SwitcherShader');
 
 global.NO_EFFECT = 0.0;
-global.MOUSE_MISS_EFFECT = 1.0;
+global.MOUSE_FLARE_EFFECT = 1.0;
 global.MOUSE_BW_EFFECT = 2.0;
 
 class VideoController extends EventEmitter {
