@@ -16,6 +16,10 @@ exports.query = (evt) => {
   // rate limit:
   if (new Date().getTime() - lastTime > 500) {
     lastTime = new Date().getTime();
+    // if it's the dev key turn on dev mode:
+    if (evt.code === 'KeyD') {
+      coreController.toggleDevMode();
+    }
     // pass to the module object
     coreController.module.query(evt);
   }

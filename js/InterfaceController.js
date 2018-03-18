@@ -18,6 +18,7 @@ class InterfaceController {
     this.videoElement.width = this.dimensions.width;
     this.videoElement.height = this.dimensions.height;
     setTimeout(this.ping.bind(this), this.checkRate);
+    return this.videoElement;
   }
 
   ping() {

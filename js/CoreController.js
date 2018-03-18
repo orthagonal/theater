@@ -9,6 +9,7 @@ const Module = require('../modules/IrisOne/js/the_repository_1.js');
 class CoreController {
   constructor(finalDestinationCanvas, hitboxCanvas, modulePath, $, dimensions) {
     this.$ = $;
+    this.devMode = false;
     this.dimensions = dimensions;
     this.currentSceneDescription = {};
     this.currentSceneVideo = {};
@@ -56,6 +57,24 @@ class CoreController {
     this.videoController.branchTo(sourceVideo, destinationObject);
   }
 
+  deactivateEffect() {
+    this.videoController.switcher.deactivateEffect();
+  }
+
+  activateEffect(info) {
+    if (info.when === 'videoEnd') {
+      info.when = this.videoController.getRemainingTime();
+    }
+    if (info.when && info.callback) {
+      setTimeout(info.callback.bind(this), info.when);
+    }
+    this.videoController.switcher.activateEffect(info);
+  }
+
+  toggleDevMode() {
+    this.devMode = this.devMode === 1.0 ? 0.0 : 1.0;
+    this.videoController.switcher.setShaderVariable('u_debugMode', this.devMode);
+  }
   mouseMiss(mouseEvent, timestamp) {
     // todo: play a sound
     this.videoController.mouseMiss(mouseEvent, timestamp);
