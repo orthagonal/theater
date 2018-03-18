@@ -1,6 +1,8 @@
 precision mediump float;
 uniform vec2 u_resolution; // incoming resolution
-uniform sampler2D u_video0; // incoming video
+uniform sampler2D u_mainVideo; // incoming video
+uniform sampler2D u_hitboxVideo; // hitbox/mask video
+uniform float u_debugMode; // 1.0 if using debug mode
 uniform float u_activeEffect; // index of the current effect
 uniform float u_videoDuration; // time current video will end (used by effects)
 uniform float u_currentTime; // current time
@@ -77,9 +79,19 @@ vec4 bwSubtraction(vec2 mouse, vec2 fragCoord) {
 	return vec4(val, val, val, 0.0);
 }
 
-// returns pixel for a partial:
+// returns pixel for partial 1:
 vec4 displayPartial(vec2 upperLeft, vec2 dimensions) {
 	return vec4(0.0, 0.0, 0.0, 0.0);
+}
+
+// used in development:
+void renderHitbox(out vec4 fragColor, vec2 normalizedCoords) {
+	vec4 hitboxPixel = texture2D(u_hitboxVideo, normalizedCoords);
+	float threshold = .5;
+	// show hitboxes:
+	if (step(threshold, hitboxPixel.r) == 0.0) {
+		fragColor = mix(fragColor, hitboxPixel, .5);
+	}
 }
 
 ///////////////////////
@@ -90,7 +102,11 @@ void main() {
   normalizedCoords.y = 1.0 - normalizedCoords.y;
   vec2 normalizedMouse = u_mouse.xy / u_resolution.xy;
 
-  gl_FragColor = texture2D(u_video0, normalizedCoords);
+	gl_FragColor = texture2D(u_mainVideo, normalizedCoords);
+	if (u_debugMode == 1.0) {
+		renderHitbox(gl_FragColor, normalizedCoords);
+	}
+
   // mouse miss:
   if (u_activeEffect == 1.0) {
     vec4 flare = flareEffect(gl_FragCoord.xy);
