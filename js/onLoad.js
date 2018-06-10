@@ -23,7 +23,9 @@ module.exports.startGame = function (options = {}) {
     outputHeight: finalDestinationCanvas.height
   };
   options.devMode = true;
-  options.$ = $;
+  if (!options.$ && $) {
+    options.$ = $;
+  }
   // now start:
   main.start(options);
 };
