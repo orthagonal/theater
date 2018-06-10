@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Theater: Interactive Video Engine",
   "main": "theater.html",
+  "chromium-args": [
+    "--ignore-gpu-blacklist",
+    "--disable-raf-throttling"
+  ],
   "window": {
     "fullscreen": true,
     "resizable": false,

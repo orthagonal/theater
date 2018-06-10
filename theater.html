@@ -3,10 +3,14 @@
 <head>
   <meta charset="utf-8">
   <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script src="js/lib/videocontext.js"></script>
   <script>
   var main;
+  var started = false;
   function onClick(evt) {
+    if (!started) {
+      started = true;
+      return onLoad();
+    }
     main.query(evt);
   }
   function onMouseMove(evt) {
@@ -17,17 +21,28 @@
     main = require(process.cwd()+'/js/main.js');
     nw.Screen.Init();
     var theWindow = nw.Screen.screens[0];
-    var videoCanvas = document.getElementById("videoCanvas");
-    videoCanvas.addEventListener("keypress", onClick, false );
-    videoCanvas.width = theWindow.bounds.width;
-    videoCanvas.height = theWindow.bounds.height;
-    theWindow.videoContext = new VideoContext(videoCanvas);
-    theWindow.videoContext.DEFINITIONS = VideoContext.DEFINITIONS;
-    var burnthrough = document.getElementById("burnthrough");
-    burnthrough.width = theWindow.bounds.width;
-    burnthrough.height = theWindow.bounds.height;
-
-    main.start(theWindow.videoContext, burnthrough, $);
+    var finalDestinationCanvas = document.getElementById("finalDestinationCanvas");
+    finalDestinationCanvas.addEventListener("keypress", onClick, false );
+    finalDestinationCanvas.width = theWindow.bounds.width;
+    finalDestinationCanvas.height = theWindow.bounds.height;
+    var hitboxCanvas = document.getElementById("hitboxCanvas");
+    hitboxCanvas.width = theWindow.innerWidth;
+    hitboxCanvas.height = theWindow.innerHeight;
+    main.start({
+      finalDestinationCanvas,
+      hitboxCanvas,
+      $,
+      dimensions: {
+        width: finalDestinationCanvas.width,
+        height: finalDestinationCanvas.height,
+        // todo: use these in the future
+        videoWidth: finalDestinationCanvas.width,
+        videoHeight: finalDestinationCanvas.height,
+        outputWidth: finalDestinationCanvas.width,
+        outputHeight: finalDestinationCanvas.height
+      },
+      devMode: false,
+      theWindow: window);
   }
   </script>
   <style>
@@ -47,18 +62,12 @@
     height: 100%;
     background-color:black;
   }
-  #burnthrough {
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    display: none;
-  }
   </style>
 </head>
 <body onload="onLoad();" onkeyup="onClick(event)" onmousedown="onClick(event);" onkeydown="onClick(event)" onkeypress="onClick(event)">
-  <canvas id="videoCanvas">
+  <canvas id="finalDestinationCanvas">
   </canvas>
-  <canvas id="burnthrough">
+  <canvas id="hitboxCanvas" hidden>
   </canvas>
 </body>
 </html>
