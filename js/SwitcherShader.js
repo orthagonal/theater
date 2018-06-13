@@ -150,6 +150,7 @@ class SwitcherShader {
     // gl.depthFunc(gl.LEQUAL);            // Near things obscure far things
     // Clear the canvas before we start drawing on it.
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.useProgram(this.program);
     if (this.mainVideoReady) {
       this.mainVideoUnit = gl.getUniformLocation(this.program, 'u_mainVideo');
       this.gl.uniform1i(this.mainVideoUnit, 0);
