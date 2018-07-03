@@ -79,6 +79,58 @@ vec4 bwSubtraction(vec2 mouse, vec2 fragCoord) {
 	return vec4(val, val, val, 0.0);
 }
 
+vec4 blurRadius(vec2 mouse, vec2 fragCoord, vec2 dir) {
+	float dist = distance(mouse, fragCoord);
+	float radius = u_percentDone * .25;
+	if (u_percentDone > .5) {
+		radius = .25 - radius;
+	}
+	if (dist > radius) {
+		return vec4(0.0, 0.0, 0.0, 0.0);
+	}
+	vec4 sum = vec4(0.0, 0.0, 0.0, 0.0);
+	float blur = dist * u_percentDone;
+
+	//the direction of our blur
+	//(1.0, 0.0) -> x-axis blur
+	//(0.0, 1.0) -> y-axis blur
+	float hstep = dir.x;
+	float vstep = dir.y;
+
+	//apply blurring, using a 9-tap filter with predefined gaussian weights
+
+	sum += texture2D(u_mainVideo, vec2(fragCoord.x - 4.0*blur*hstep, fragCoord.y - 4.0*blur*vstep)) * 0.0162162162;
+	sum += texture2D(u_mainVideo, vec2(fragCoord.x - 3.0*blur*hstep, fragCoord.y - 3.0*blur*vstep)) * 0.0540540541;
+	sum += texture2D(u_mainVideo, vec2(fragCoord.x - 2.0*blur*hstep, fragCoord.y - 2.0*blur*vstep)) * 0.1216216216;
+	sum += texture2D(u_mainVideo, vec2(fragCoord.x - 1.0*blur*hstep, fragCoord.y - 1.0*blur*vstep)) * 0.1945945946;
+
+	sum += texture2D(u_mainVideo, vec2(fragCoord.x, fragCoord.y)) * 0.2270270270;
+
+	sum += texture2D(u_mainVideo, vec2(fragCoord.x + 1.0*blur*hstep, fragCoord.y + 1.0*blur*vstep)) * 0.1945945946;
+	sum += texture2D(u_mainVideo, vec2(fragCoord.x + 2.0*blur*hstep, fragCoord.y + 2.0*blur*vstep)) * 0.1216216216;
+	sum += texture2D(u_mainVideo, vec2(fragCoord.x + 3.0*blur*hstep, fragCoord.y + 3.0*blur*vstep)) * 0.0540540541;
+	sum += texture2D(u_mainVideo, vec2(fragCoord.x + 4.0*blur*hstep, fragCoord.y + 4.0*blur*vstep)) * 0.0162162162;
+
+	return gl_FragColor * vec4(sum.rgb, 1.0);
+}
+
+void ripple(vec2 mouse, vec2 fragCoord) {
+	float dist = distance(mouse, fragCoord);
+	// float radius = u_percentDone * .45;
+	float radius = .45;
+	if (u_percentDone > .5) {
+		radius = .45 - radius;
+	}
+	if (dist < radius) {
+		vec2 tc = mouse.xy;
+		vec2 cPos = -1.0 + 2.0 * mouse.xy;
+		vec2 uv = mouse.xy + (cPos/dist) * cos(dist*36.0*u_percentDone)*.03;
+	  // vec2 uv = tc + (cPos/len)*cos(len*12.0-u_currentTime * 4.0)*0.03;
+	  vec3 col = texture2D(u_mainVideo, uv).xyz;
+	  gl_FragColor = vec4(col,1.0);
+	}
+}
+
 // returns pixel for partial 1:
 vec4 displayPartial(vec2 upperLeft, vec2 dimensions) {
 	return vec4(0.0, 0.0, 0.0, 0.0);
@@ -113,7 +165,21 @@ void main() {
     gl_FragColor = mix(flare, gl_FragColor, u_percentDone);
   }
   if (u_activeEffect == 2.0) {
-    vec4 bw = bwSubtraction(normalizedCoords, normalizedMouse);
-    gl_FragColor -= bw;
+		ripple(normalizedMouse, normalizedCoords);
+		// vec4 blur = blurRadius(normalizedMouse, normalizedCoords, vec2(0.0, 1.0));
+		// if (blur.x != 0.0) {
+		// 	if (blur.y != 0.0) {
+		// 		gl_FragColor = blur;
+		// 	}
+		// }
+		// vec4 blur2 = blurRadius(normalizedMouse, normalizedCoords, vec2(1.0, 0.0));
+		// if (blur2.x != 0.0) {
+		// 	if (blur2.y != 0.0) {
+		// 		gl_FragColor = blur2;
+		// 	}
+		// }
+
+		// vec4 bw = bwSubtraction(normalizedMouse, normalizedCoords);
+		// gl_FragColor -= bw;
   }
 }
