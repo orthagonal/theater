@@ -9,7 +9,7 @@
   var launched;
   function start() {
     if (!launched && typeof iris === 'object') {
-      iris.startGame();
+      iris.startGame({ devMode: true });
       launched = true;
     }
   }

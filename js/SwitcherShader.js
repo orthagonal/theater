@@ -1,12 +1,24 @@
 // browserify-shader will load these in dev mode:
-const vertexShaderSource = require('./shaders/screen.vert');
-const pixelShaderSource = require('./shaders/switcher.frag');
+// otherwise in production mode do this:
+// todo: maybe just put these in as strings?
+const fs = require('fs');
+const path = require('path');
 
 class SwitcherShader {
-  constructor(videoController, gl, dimensions) {
+  constructor(videoController, gl, dimensions, devMode = true) {
+    console.log('switcher dev mode is %s', devMode);
     this.gl = gl;
     this.videoController = videoController;
-
+    let vertexShaderSource;
+    let pixelShaderSource;
+    if (devMode) {
+      vertexShaderSource = require('./shaders/screen.vert');
+      pixelShaderSource = require('./shaders/switcher.frag');
+    } else {
+      vertexShaderSource = () => fs.readFileSync(path.join(__dirname, 'shaders', 'screen.vert'), 'utf-8').toString();
+      pixelShaderSource = () => fs.readFileSync(path.join(__dirname, 'shaders', 'switcher.frag'), 'utf-8').toString();
+    }
+    console.log(vertexShaderSource);
     // setup the video elements and textures:
     this.mainVideo = undefined;
     this.mainVideoReady = false;
@@ -20,8 +32,7 @@ class SwitcherShader {
 
     // set up the shader
     const program = this.program = gl.createProgram();
-
-    const vertexShader = gl.createShader(gl.VERTEX_SHADER)
+    const vertexShader = gl.createShader(gl.VERTEX_SHADER);
     gl.shaderSource(vertexShader, vertexShaderSource());
     gl.compileShader(vertexShader);
     gl.attachShader(program, vertexShader);
@@ -75,7 +86,7 @@ class SwitcherShader {
 
     gl.vertexAttribPointer(this.a_texCoord, 2, gl.FLOAT, false, 0, 0);
     gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
-    requestAnimationFrame(this.render.bind(this));
+    this.videoController.theWindow.requestAnimationFrame(this.render.bind(this));
   }
 
   deactivateEffect() {
@@ -139,6 +150,7 @@ class SwitcherShader {
     // gl.depthFunc(gl.LEQUAL);            // Near things obscure far things
     // Clear the canvas before we start drawing on it.
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.useProgram(this.program);
     if (this.mainVideoReady) {
       this.mainVideoUnit = gl.getUniformLocation(this.program, 'u_mainVideo');
       this.gl.uniform1i(this.mainVideoUnit, 0);
@@ -158,7 +170,7 @@ class SwitcherShader {
     this.gl.uniform1f(this.u_currentTime, this.currentTime);
     this.gl.uniform1f(this.u_percentDone, elapsedTime / this.videoDuration);
     gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
-    requestAnimationFrame(this.render.bind(this));
+    this.videoController.theWindow.requestAnimationFrame(this.render.bind(this));
   }
 
   // effects:

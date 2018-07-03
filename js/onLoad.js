@@ -1,22 +1,19 @@
+// only called from dev mode:
 const main = require('./main.js')
 
-// nwjs code:
-// set size:
-// main = require(process.cwd()+'/js/main.js');
-// nw.Screen.Init();
-// var theWindow = nw.Screen.screens[0];
-
-module.exports.startGame = function () {
+module.exports.startGame = function (options = {}) {
+  // get window, main canvas, and hitbox canvas:
   var theWindow = window;
+  options.theWindow = theWindow;
   var finalDestinationCanvas = document.getElementById("finalDestinationCanvas");
+  options.finalDestinationCanvas = finalDestinationCanvas;
   finalDestinationCanvas.addEventListener("keypress", onClick, false );
   finalDestinationCanvas.width = theWindow.innerWidth;
   finalDestinationCanvas.height = theWindow.innerHeight;
-  var hitboxCanvas = document.getElementById("hitboxCanvas");
-  hitboxCanvas.width = theWindow.innerWidth;
-  hitboxCanvas.height = theWindow.innerHeight;
-
-  main.start(finalDestinationCanvas, hitboxCanvas, $, {
+  options.hitboxCanvas = document.getElementById("hitboxCanvas");
+  options.hitboxCanvas.width = theWindow.innerWidth;
+  options.hitboxCanvas.height = theWindow.innerHeight;
+  options.dimensions = {
     width: finalDestinationCanvas.width,
     height: finalDestinationCanvas.height,
     // todo: use these in the future
@@ -24,7 +21,13 @@ module.exports.startGame = function () {
     videoHeight: finalDestinationCanvas.height,
     outputWidth: finalDestinationCanvas.width,
     outputHeight: finalDestinationCanvas.height
-  });
+  };
+  options.devMode = true;
+  if (!options.$ && $) {
+    options.$ = $;
+  }
+  // now start:
+  main.start(options);
 };
 
 module.exports.query = main.query;

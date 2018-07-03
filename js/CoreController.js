@@ -1,5 +1,4 @@
 'use strict';
-// const GameObject = require('./GameObject.js');
 const VideoController = require('./VideoController');
 const AudioController = require('./AudioController');
 const InterfaceController = require('./InterfaceController');
@@ -7,20 +6,21 @@ const InterfaceController = require('./InterfaceController');
 const Module = require('../modules/IrisOne/js/the_repository_1.js');
 
 class CoreController {
-  constructor(finalDestinationCanvas, hitboxCanvas, modulePath, $, dimensions) {
-    this.$ = $;
-    this.devMode = false;
-    this.dimensions = dimensions;
+  constructor(options) {
+    this.theWindow = options.theWindow;
+    this.$ = options.$;
+    this.devMode = options.devMode;
+    this.dimensions = options.dimensions;
     this.currentSceneDescription = {};
     this.currentSceneVideo = {};
 
-    this.hitboxCanvas = hitboxCanvas;
-    this.finalDestinationCanvas = finalDestinationCanvas;
+    this.hitboxCanvas = options.hitboxCanvas;
+    this.finalDestinationCanvas = options.finalDestinationCanvas;
 
     this.gl = this.finalDestinationCanvas.getContext('webgl');
 
-    this.audioController = new AudioController($);
-    this.videoController = new VideoController(this, this.gl);
+    this.audioController = new AudioController(options.$);
+    this.videoController = new VideoController(this, this.gl, options.theWindow);
     this.interfaceController = new InterfaceController(this);
 
     // this loads any module:
@@ -75,6 +75,7 @@ class CoreController {
     this.devMode = this.devMode === 1.0 ? 0.0 : 1.0;
     this.videoController.switcher.setShaderVariable('u_debugMode', this.devMode);
   }
+
   mouseMiss(mouseEvent, timestamp) {
     // todo: play a sound
     this.videoController.mouseMiss(mouseEvent, timestamp);

@@ -6,17 +6,18 @@ global.MOUSE_FLARE_EFFECT = 1.0;
 global.MOUSE_BW_EFFECT = 2.0;
 
 class VideoController extends EventEmitter {
-  constructor(controller, gl) {
+  constructor(controller, gl, theWindow) {
     super();
     this.sceneDescription = false;
     this.controller = controller;
+    this.theWindow = theWindow;
     this.dimensions = controller.dimensions;
     this.currentVideo = false;
     this.lastVideo = false;
     this.nextVideo = false;
     this.videoFetcher = false;
     this.activeObject = false;
-    this.switcher = new SwitcherShader(this, gl, controller.dimensions);
+    this.switcher = new SwitcherShader(this, gl, controller.dimensions, controller.devMode);
   }
 
   // called when previous video is finished playing:
