@@ -124,10 +124,16 @@ void ripple(vec2 mouse, vec2 fragCoord) {
 	if (dist < radius) {
 		vec2 tc = mouse.xy;
 		vec2 cPos = -1.0 + 2.0 * mouse.xy;
-		vec2 uv = mouse.xy + (cPos/dist) * cos(dist*16.0*u_percentDone * 8.0)*.03;
+		vec2 uv = mouse.xy + (cPos/dist) * cos(dist*16.0-u_percentDone * 6.0)*.003;
 	  // vec2 uv = tc + (cPos/len)*cos(len*12.0-u_currentTime * 4.0)*0.03;
 	  vec3 col = texture2D(u_mainVideo, uv).xyz;
-	  gl_FragColor = vec4(col,1.0);
+		vec3 hitboxPixel = texture2D(u_hitboxVideo, fragCoord).xyz;
+		float threshold = .5;
+		if (step(threshold, hitboxPixel.r) == 0.0) {
+			gl_FragColor.r += .2;
+			return;
+		}
+		gl_FragColor = vec4(col,1.0);
 	}
 }
 
