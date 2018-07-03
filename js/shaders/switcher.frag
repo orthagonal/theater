@@ -116,15 +116,15 @@ vec4 blurRadius(vec2 mouse, vec2 fragCoord, vec2 dir) {
 
 void ripple(vec2 mouse, vec2 fragCoord) {
 	float dist = distance(mouse, fragCoord);
-	// float radius = u_percentDone * .45;
-	float radius = .45;
+	// todo: make it irregular:
+	float radius = u_percentDone * .25;
 	if (u_percentDone > .5) {
-		radius = .45 - radius;
+		radius = .25 - radius;
 	}
 	if (dist < radius) {
 		vec2 tc = mouse.xy;
 		vec2 cPos = -1.0 + 2.0 * mouse.xy;
-		vec2 uv = mouse.xy + (cPos/dist) * cos(dist*36.0*u_percentDone)*.03;
+		vec2 uv = mouse.xy + (cPos/dist) * cos(dist*16.0*u_percentDone * 8.0)*.03;
 	  // vec2 uv = tc + (cPos/len)*cos(len*12.0-u_currentTime * 4.0)*0.03;
 	  vec3 col = texture2D(u_mainVideo, uv).xyz;
 	  gl_FragColor = vec4(col,1.0);
