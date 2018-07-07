@@ -37,6 +37,7 @@ class VideoController extends EventEmitter {
     // when the video is done activate the new object:
     sourceVideo.element.onended = () => {
       destinationObject.activate(this);
+      this.controller.branching = false;
     };
     // play source video
     if (this.currentVideo) {

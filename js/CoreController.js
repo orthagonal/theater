@@ -28,6 +28,7 @@ class CoreController {
     this.gameObjects = {};
     this.module = new Module(this);
     this.activeObject = null;
+    this.branching = false;
     this.gameState = {
       meta: {
         started: false
@@ -53,6 +54,7 @@ class CoreController {
 
   // todo: this will eventually need to dynamically load
   branchTo(sourceVideo, destinationObjectName, transitionType) {
+    this.branching = true;
     const destinationObject = this.gameObjects[destinationObjectName];
     this.videoController.branchTo(sourceVideo, destinationObject);
   }
