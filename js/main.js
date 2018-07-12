@@ -14,7 +14,8 @@ exports.start = function start(options) {
 
 exports.query = (evt) => {
   // rate limit:
-  if (new Date().getTime() - lastTime > 500) {
+  // if (new Date().getTime() - lastTime > 3000) {
+  if (new Date().getTime() - lastTime > 0) {
     lastTime = new Date().getTime();
     // if it's the dev key turn on dev mode:
     if (evt.code === 'KeyD') {

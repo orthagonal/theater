@@ -69,14 +69,17 @@ vec4 flareEffect(vec2 fragCoord ) {
 ////////////////////////////
 // B&W effect
 ////////////////////////////
-vec4 bwSubtraction(vec2 mouse, vec2 fragCoord) {
+void bwSubtraction(vec2 mouse, vec2 fragCoord) {
   float dist = distance(mouse, fragCoord);
-  float factor = .4 * u_percentDone;
-  if (u_percentDone > .5) {
-    factor = factor - (u_percentDone - .5);
-  }
+	if (dist > .25) {
+		return;
+	}
+  float factor = .02;// * u_percentDone;
+  // if (u_percentDone > .5) {
+  //   factor = factor - (u_percentDone - .5);
+  // }
   float val = smoothstep(factor, .1, dist);
-	return vec4(val, val, val, 0.0);
+	gl_FragColor -= vec4(val, val, val, 0.0);
 }
 
 vec4 blurRadius(vec2 mouse, vec2 fragCoord, vec2 dir) {
@@ -114,6 +117,37 @@ vec4 blurRadius(vec2 mouse, vec2 fragCoord, vec2 dir) {
 	return gl_FragColor * vec4(sum.rgb, 1.0);
 }
 
+float hash( float n ){
+    return fract(sin(n)*43758.5453);
+}
+
+float noise( vec2 uv ) {
+  vec3 x = vec3(uv, 0);
+
+  vec3 p = floor(x);
+  vec3 f = fract(x);
+
+  f       = f*f*(3.0-2.0*f);
+  float n = p.x + p.y*57.0 + 113.0*p.z;
+
+  return mix(mix(mix( hash(n+0.0), hash(n+1.0),f.x),
+                 mix( hash(n+57.0), hash(n+58.0),f.x),f.y),
+             mix(mix( hash(n+113.0), hash(n+114.0),f.x),
+                 mix( hash(n+170.0), hash(n+171.0),f.x),f.y),f.z);
+}
+
+mat2 m = mat2(0.8,0.6,-0.6,0.8);
+
+float fbm(vec2 p) {
+  float f = 0.0;
+  f += 0.9000*noise( p ); p*=m*2.02;
+  f += 0.2500*noise( p ); p*=m*2.03;
+  f += 0.1250*noise( p ); p*=m*2.01;
+  f += 0.0625*noise( p );
+  f /= 0.9375;
+  return f;
+}
+
 void ripple(vec2 mouse, vec2 fragCoord) {
 	float dist = distance(mouse, fragCoord);
 	// todo: make it irregular:
@@ -121,19 +155,18 @@ void ripple(vec2 mouse, vec2 fragCoord) {
 	if (u_percentDone > .5) {
 		radius = .25 - radius;
 	}
-	if (dist < radius) {
+	if (dist < radius + (fbm(fragCoord) * .15)) {
 		vec2 tc = mouse.xy;
 		vec2 cPos = -1.0 + 2.0 * mouse.xy;
 		vec2 uv = mouse.xy + (cPos/dist) * cos(dist*16.0-u_percentDone * 6.0)*.003;
-	  // vec2 uv = tc + (cPos/len)*cos(len*12.0-u_currentTime * 4.0)*0.03;
 	  vec3 col = texture2D(u_mainVideo, uv).xyz;
 		vec3 hitboxPixel = texture2D(u_hitboxVideo, fragCoord).xyz;
 		float threshold = .5;
 		if (step(threshold, hitboxPixel.r) == 0.0) {
-			gl_FragColor.r += .2;
-			return;
+			// todo: apply fire stuff
+			// retu	rn;
 		}
-		gl_FragColor = vec4(col,1.0);
+			gl_FragColor = vec4(col,.50);
 	}
 }
 
@@ -152,6 +185,31 @@ void renderHitbox(out vec4 fragColor, vec2 normalizedCoords) {
 	}
 }
 
+#define PI 3.14159265
+
+	vec4 ripple2(vec2 mouse, out vec4 fragColor, in vec2 fragCoord ) {
+		float basicDist = distance(mouse, fragCoord);
+		float radius = u_percentDone * .25;
+		if (u_percentDone > .5) {
+			radius = .25 - radius;
+		}
+		if (basicDist < radius + (fbm(fragCoord) * .15)) {
+		  vec2 center = mouse;
+		  vec2 coord = fragCoord;
+		  vec2 centered_coord = 2.0 * fragCoord - 1.0;
+
+		  float shutter = 0.9;
+		  float texelDistance = distance(center, coord);
+		  float dist = 1.41*1.41*shutter - texelDistance;
+
+		  float ripples = 1.0- sin(texelDistance * 32.0 - 2.0 * (u_percentDone * 2.0));
+		  coord -= normalize(centered_coord-center)*clamp(ripples,0.0,1.0)*0.050;
+			vec4 color = texture2D(u_mainVideo, coord);
+		  return color.rgba;
+		}
+		return fragColor;
+	}
+
 ///////////////////////
 // main
 ///////////////////////
@@ -165,27 +223,16 @@ void main() {
 		renderHitbox(gl_FragColor, normalizedCoords);
 	}
 
-  // mouse miss:
+  // mouse hit:
   if (u_activeEffect == 1.0) {
     vec4 flare = flareEffect(gl_FragCoord.xy);
     gl_FragColor = mix(flare, gl_FragColor, u_percentDone);
   }
+	// mouse miss:
   if (u_activeEffect == 2.0) {
-		ripple(normalizedMouse, normalizedCoords);
-		// vec4 blur = blurRadius(normalizedMouse, normalizedCoords, vec2(0.0, 1.0));
-		// if (blur.x != 0.0) {
-		// 	if (blur.y != 0.0) {
-		// 		gl_FragColor = blur;
-		// 	}
-		// }
-		// vec4 blur2 = blurRadius(normalizedMouse, normalizedCoords, vec2(1.0, 0.0));
-		// if (blur2.x != 0.0) {
-		// 	if (blur2.y != 0.0) {
-		// 		gl_FragColor = blur2;
-		// 	}
-		// }
-
-		// vec4 bw = bwSubtraction(normalizedMouse, normalizedCoords);
-		// gl_FragColor -= bw;
+		// ripple(normalizedMouse, normalizedCoords);
+		gl_FragColor = ripple2(normalizedMouse, gl_FragColor, normalizedCoords);
+		// gl_FragColor -= blurRadius(normalizedMouse, normalizedCoords, vec2(-1.0, 1.0));
+		// bwSubtraction(normalizedMouse, normalizedCoords);
   }
 }
