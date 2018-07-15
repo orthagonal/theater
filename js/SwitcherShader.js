@@ -8,6 +8,7 @@ class SwitcherShader {
   constructor(videoController, gl, dimensions, devMode = true) {
     console.log('switcher dev mode is %s', devMode);
     this.gl = gl;
+    this.goUp = true;
     this.videoController = videoController;
     let vertexShaderSource;
     let pixelShaderSource;
@@ -168,7 +169,11 @@ class SwitcherShader {
     this.currentTime = new Date().getTime();
     const elapsedTime = this.currentTime - this.effectStartTime;
     this.gl.uniform1f(this.u_currentTime, this.currentTime);
-    this.gl.uniform1f(this.u_percentDone, elapsedTime / this.videoDuration);
+    if (this.goUp) {
+      this.gl.uniform1f(this.u_percentDone, elapsedTime / this.videoDuration);
+    } else {
+      this.gl.uniform1f(this.u_percentDone, 1.0 - (elapsedTime / this.videoDuration));
+    }
     gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
     this.videoController.theWindow.requestAnimationFrame(this.render.bind(this));
   }

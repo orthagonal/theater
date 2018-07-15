@@ -36,6 +36,10 @@ class CoreController {
     };
   }
 
+  goUp(val) {
+    this.videoController.goUp(val);
+  }
+
   // modules will take over the video controller here
   kickstart(gameId, userId) {
     this.module.controller = this;
@@ -56,7 +60,7 @@ class CoreController {
   branchTo(sourceVideo, destinationObjectName, transitionType) {
     this.branching = true;
     const destinationObject = this.gameObjects[destinationObjectName];
-    this.videoController.branchTo(sourceVideo, destinationObject);
+    this.videoController.branchTo(sourceVideo, destinationObject, transitionType);
   }
 
   deactivateEffect() {
@@ -64,8 +68,14 @@ class CoreController {
   }
 
   activateEffect(info) {
+    if (info.duration === 'remainingTime') {
+      // need to play remaining time plus some
+      // play the effect until the end of the video then transfer to next video
+      info.duration = 2000.0 + this.videoController.getRemainingTime();
+    }
     if (info.when === 'videoEnd') {
       info.when = this.videoController.getRemainingTime();
+      console.log(info.when);
     }
     if (info.when && info.callback) {
       setTimeout(info.callback.bind(this), info.when);

@@ -145,7 +145,7 @@ float fbm(vec2 p) {
   f += 0.1250*noise( p ); p*=m*2.01;
   f += 0.0625*noise( p );
   f /= 0.9375;
-  return f;
+  return f * 2.0;
 }
 
 void ripple(vec2 mouse, vec2 fragCoord) {
@@ -155,7 +155,7 @@ void ripple(vec2 mouse, vec2 fragCoord) {
 	if (u_percentDone > .5) {
 		radius = .25 - radius;
 	}
-	if (dist < radius + (fbm(fragCoord) * .15)) {
+	if (dist < radius + (fbm(fragCoord) * .005)) {
 		vec2 tc = mouse.xy;
 		vec2 cPos = -1.0 + 2.0 * mouse.xy;
 		vec2 uv = mouse.xy + (cPos/dist) * cos(dist*16.0-u_percentDone * 6.0)*.003;
@@ -194,18 +194,29 @@ void renderHitbox(out vec4 fragColor, vec2 normalizedCoords) {
 			radius = .25 - radius;
 		}
 		if (basicDist < radius + (fbm(fragCoord) * .15)) {
-		  vec2 center = mouse;
+			vec2 center = mouse;
 		  vec2 coord = fragCoord;
 		  vec2 centered_coord = 2.0 * fragCoord - 1.0;
-
 		  float shutter = 0.9;
 		  float texelDistance = distance(center, coord);
 		  float dist = 1.41*1.41*shutter - texelDistance;
-
 		  float ripples = 1.0- sin(texelDistance * 32.0 - 2.0 * (u_percentDone * 2.0));
 		  coord -= normalize(centered_coord-center)*clamp(ripples,0.0,1.0)*0.050;
 			vec4 color = texture2D(u_mainVideo, coord);
-		  return color.rgba;
+			// don't do this on the hitbox
+			if (u_percentDone > .25) {
+				vec2 center2 = mouse + vec2(.35, .12);
+			  vec2 coord2 = fragCoord;
+			  vec2 centered_coord2 = 2.0 * fragCoord - 1.0;
+			  float shutter2 = 0.9;
+			  float texelDistance2 = distance(center2, coord2);
+			  // float dist = 1.41*1.41*shutter2 - texelDistance2;
+			  float ripples2 = 1.0- sin(texelDistance2 * 32.0 - 2.0 * (u_percentDone * 3.0));
+			  coord2 -= normalize(centered_coord2-center2)*clamp(ripples2,0.0,1.0)*0.010;
+				vec4 color2 = texture2D(u_mainVideo, coord2);
+				return mix(color, color2, .5);
+			}
+			return color;
 		}
 		return fragColor;
 	}
@@ -230,9 +241,6 @@ void main() {
   }
 	// mouse miss:
   if (u_activeEffect == 2.0) {
-		// ripple(normalizedMouse, normalizedCoords);
 		gl_FragColor = ripple2(normalizedMouse, gl_FragColor, normalizedCoords);
-		// gl_FragColor -= blurRadius(normalizedMouse, normalizedCoords, vec2(-1.0, 1.0));
-		// bwSubtraction(normalizedMouse, normalizedCoords);
   }
 }

@@ -20,8 +20,15 @@ class VideoController extends EventEmitter {
     this.switcher = new SwitcherShader(this, gl, controller.dimensions, controller.devMode);
   }
 
+  goUp(val) {
+    this.switcher.goUp = val;
+  }
+
   // called when previous video is finished playing:
   previousEnd() {
+    if (this.branching) {
+      return this.branchEnd();
+    }
     // delete this.currentVideo.onended;
     this.currentVideo = this.activeObject.getNextVideo();
     this.switcher.connectVideo(this.currentVideo.element);
@@ -33,19 +40,41 @@ class VideoController extends EventEmitter {
     this.currentVideo.element.play();
   }
 
-  branchTo(sourceVideo, destinationObject) {
-    // when the video is done activate the new object:
-    sourceVideo.element.onended = () => {
-      destinationObject.activate(this);
-      this.controller.branching = false;
-    };
-    // play source video
-    if (this.currentVideo) {
-      this.currentVideo.element.onended = undefined;
-    }
-    this.currentVideo = sourceVideo;
+  branchEnd() {
+    // insert the branch
+    this.currentVideo = this.branching.sourceVideo;
     this.switcher.connectVideo(this.currentVideo.element);
+    const wrapper = () => {
+      this.branching.destinationObject.activate(this);
+      this.branching = false;
+      this.previousEnd();
+    };
+    this.currentVideo.element.onended = wrapper.bind(this);
     this.currentVideo.element.play();
+  }
+
+  branchTo(sourceVideo, destinationObject, type) {
+    // play source video
+    if (type === 'cut') {
+      // when the video is done activate the new object:
+      sourceVideo.element.onended = () => {
+        destinationObject.activate(this);
+        this.controller.branching = false;
+      };
+      if (this.currentVideo) {
+        this.currentVideo.element.onended = undefined;
+      }
+      this.currentVideo = sourceVideo;
+      this.switcher.connectVideo(this.currentVideo.element);
+      this.currentVideo.element.play();
+      return;
+    }
+    if (type === 'transition') {
+      this.branching = { sourceVideo, destinationObject };
+      // unset current handler:
+      this.currentVideo.element.onended = undefined;
+      this.currentVideo.element.onended = this.branchEnd.bind(this);
+    }
   }
 
   // Active object calls this:
@@ -66,8 +95,7 @@ class VideoController extends EventEmitter {
 
   // get time remaining in current video:
   getRemainingTime() {
-    const videoDuration = 3000.0;
-    return videoDuration;
+    return this.currentVideo.element.duration - this.currentVideo.element.currentTime;
   }
 }
 
