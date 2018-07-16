@@ -69,14 +69,105 @@ vec4 flareEffect(vec2 fragCoord ) {
 ////////////////////////////
 // B&W effect
 ////////////////////////////
-vec4 bwSubtraction(vec2 mouse, vec2 fragCoord) {
+void bwSubtraction(vec2 mouse, vec2 fragCoord) {
   float dist = distance(mouse, fragCoord);
-  float factor = .4 * u_percentDone;
-  if (u_percentDone > .5) {
-    factor = factor - (u_percentDone - .5);
-  }
+	if (dist > .25) {
+		return;
+	}
+  float factor = .02;// * u_percentDone;
+  // if (u_percentDone > .5) {
+  //   factor = factor - (u_percentDone - .5);
+  // }
   float val = smoothstep(factor, .1, dist);
-	return vec4(val, val, val, 0.0);
+	gl_FragColor -= vec4(val, val, val, 0.0);
+}
+
+vec4 blurRadius(vec2 mouse, vec2 fragCoord, vec2 dir) {
+	float dist = distance(mouse, fragCoord);
+	float radius = u_percentDone * .25;
+	if (u_percentDone > .5) {
+		radius = .25 - radius;
+	}
+	if (dist > radius) {
+		return vec4(0.0, 0.0, 0.0, 0.0);
+	}
+	vec4 sum = vec4(0.0, 0.0, 0.0, 0.0);
+	float blur = dist * u_percentDone;
+
+	//the direction of our blur
+	//(1.0, 0.0) -> x-axis blur
+	//(0.0, 1.0) -> y-axis blur
+	float hstep = dir.x;
+	float vstep = dir.y;
+
+	//apply blurring, using a 9-tap filter with predefined gaussian weights
+
+	sum += texture2D(u_mainVideo, vec2(fragCoord.x - 4.0*blur*hstep, fragCoord.y - 4.0*blur*vstep)) * 0.0162162162;
+	sum += texture2D(u_mainVideo, vec2(fragCoord.x - 3.0*blur*hstep, fragCoord.y - 3.0*blur*vstep)) * 0.0540540541;
+	sum += texture2D(u_mainVideo, vec2(fragCoord.x - 2.0*blur*hstep, fragCoord.y - 2.0*blur*vstep)) * 0.1216216216;
+	sum += texture2D(u_mainVideo, vec2(fragCoord.x - 1.0*blur*hstep, fragCoord.y - 1.0*blur*vstep)) * 0.1945945946;
+
+	sum += texture2D(u_mainVideo, vec2(fragCoord.x, fragCoord.y)) * 0.2270270270;
+
+	sum += texture2D(u_mainVideo, vec2(fragCoord.x + 1.0*blur*hstep, fragCoord.y + 1.0*blur*vstep)) * 0.1945945946;
+	sum += texture2D(u_mainVideo, vec2(fragCoord.x + 2.0*blur*hstep, fragCoord.y + 2.0*blur*vstep)) * 0.1216216216;
+	sum += texture2D(u_mainVideo, vec2(fragCoord.x + 3.0*blur*hstep, fragCoord.y + 3.0*blur*vstep)) * 0.0540540541;
+	sum += texture2D(u_mainVideo, vec2(fragCoord.x + 4.0*blur*hstep, fragCoord.y + 4.0*blur*vstep)) * 0.0162162162;
+
+	return gl_FragColor * vec4(sum.rgb, 1.0);
+}
+
+float hash( float n ){
+    return fract(sin(n)*43758.5453);
+}
+
+float noise( vec2 uv ) {
+  vec3 x = vec3(uv, 0);
+
+  vec3 p = floor(x);
+  vec3 f = fract(x);
+
+  f       = f*f*(3.0-2.0*f);
+  float n = p.x + p.y*57.0 + 113.0*p.z;
+
+  return mix(mix(mix( hash(n+0.0), hash(n+1.0),f.x),
+                 mix( hash(n+57.0), hash(n+58.0),f.x),f.y),
+             mix(mix( hash(n+113.0), hash(n+114.0),f.x),
+                 mix( hash(n+170.0), hash(n+171.0),f.x),f.y),f.z);
+}
+
+mat2 m = mat2(0.8,0.6,-0.6,0.8);
+
+float fbm(vec2 p) {
+  float f = 0.0;
+  f += 0.9000*noise( p ); p*=m*2.02;
+  f += 0.2500*noise( p ); p*=m*2.03;
+  f += 0.1250*noise( p ); p*=m*2.01;
+  f += 0.0625*noise( p );
+  f /= 0.9375;
+  return f * 2.0;
+}
+
+void ripple(vec2 mouse, vec2 fragCoord) {
+	float dist = distance(mouse, fragCoord);
+	// todo: make it irregular:
+	float radius = u_percentDone * .25;
+	if (u_percentDone > .5) {
+		radius = .25 - radius;
+	}
+	if (dist < radius + (fbm(fragCoord) * .005)) {
+		vec2 tc = mouse.xy;
+		vec2 cPos = -1.0 + 2.0 * mouse.xy;
+		vec2 uv = mouse.xy + (cPos/dist) * cos(dist*16.0-u_percentDone * 6.0)*.003;
+	  vec3 col = texture2D(u_mainVideo, uv).xyz;
+		vec3 hitboxPixel = texture2D(u_hitboxVideo, fragCoord).xyz;
+		float threshold = .5;
+		if (step(threshold, hitboxPixel.r) == 0.0) {
+			// todo: apply fire stuff
+			// retu	rn;
+		}
+			gl_FragColor = vec4(col,.50);
+	}
 }
 
 // returns pixel for partial 1:
@@ -94,6 +185,42 @@ void renderHitbox(out vec4 fragColor, vec2 normalizedCoords) {
 	}
 }
 
+#define PI 3.14159265
+
+	vec4 ripple2(vec2 mouse, out vec4 fragColor, in vec2 fragCoord ) {
+		float basicDist = distance(mouse, fragCoord);
+		float radius = u_percentDone * .25;
+		if (u_percentDone > .5) {
+			radius = .25 - radius;
+		}
+		if (basicDist < radius + (fbm(fragCoord) * .15)) {
+			vec2 center = mouse;
+		  vec2 coord = fragCoord;
+		  vec2 centered_coord = 2.0 * fragCoord - 1.0;
+		  float shutter = 0.9;
+		  float texelDistance = distance(center, coord);
+		  float dist = 1.41*1.41*shutter - texelDistance;
+		  float ripples = 1.0- sin(texelDistance * 32.0 - 2.0 * (u_percentDone * 2.0));
+		  coord -= normalize(centered_coord-center)*clamp(ripples,0.0,1.0)*0.050;
+			vec4 color = texture2D(u_mainVideo, coord);
+			// don't do this on the hitbox
+			if (u_percentDone > .25) {
+				vec2 center2 = mouse + vec2(.35, .12);
+			  vec2 coord2 = fragCoord;
+			  vec2 centered_coord2 = 2.0 * fragCoord - 1.0;
+			  float shutter2 = 0.9;
+			  float texelDistance2 = distance(center2, coord2);
+			  // float dist = 1.41*1.41*shutter2 - texelDistance2;
+			  float ripples2 = 1.0- sin(texelDistance2 * 32.0 - 2.0 * (u_percentDone * 3.0));
+			  coord2 -= normalize(centered_coord2-center2)*clamp(ripples2,0.0,1.0)*0.010;
+				vec4 color2 = texture2D(u_mainVideo, coord2);
+				return mix(color, color2, .5);
+			}
+			return color;
+		}
+		return fragColor;
+	}
+
 ///////////////////////
 // main
 ///////////////////////
@@ -107,13 +234,13 @@ void main() {
 		renderHitbox(gl_FragColor, normalizedCoords);
 	}
 
-  // mouse miss:
+  // mouse hit:
   if (u_activeEffect == 1.0) {
     vec4 flare = flareEffect(gl_FragCoord.xy);
     gl_FragColor = mix(flare, gl_FragColor, u_percentDone);
   }
+	// mouse miss:
   if (u_activeEffect == 2.0) {
-    vec4 bw = bwSubtraction(normalizedCoords, normalizedMouse);
-    gl_FragColor -= bw;
+		gl_FragColor = ripple2(normalizedMouse, gl_FragColor, normalizedCoords);
   }
 }

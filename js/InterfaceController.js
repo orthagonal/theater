@@ -29,6 +29,9 @@ class InterfaceController {
   }
 
   click(mouseEvent) {
+    if (this.controller.branching) {
+      return;
+    }
     // get the pixel from the hitbox video at the mouse x,y position:
     // todo: can i save time by only drawing the 1 pixel at the mouse xy?
     this.hitboxCanvasContext.drawImage(this.videoElement, 0, 0, this.dimensions.width, this.dimensions.height);
