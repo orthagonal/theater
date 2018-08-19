@@ -125,18 +125,23 @@ class SwitcherShader {
   }
 
   // set the video to input to the non-active channel:
-  connectVideo(element, onStart) {
+  connectVideo(element, waitForIt) {
     this.mainVideo = element;
-    this.mainVideoReady = false;
+    // wait for next video to be ready, use for 'normal' behavior
+    if (waitForIt) {
+      this.mainVideoReady = false;
+    }
     element.addEventListener('playing', () => {
       this.mainVideoReady = true;
     }, true);
   }
 
   // connect mask to shader:
-  connectMask(element) {
+  connectMask(element, waitForIt) {
     this.hitboxVideo = element;
-    this.hitboxVideoReady = false;
+    if (waitForIt) {
+      this.hitboxVideoReady = false;
+    }
     element.addEventListener('playing', () => {
       this.hitboxVideoReady = true;
     }, true);
