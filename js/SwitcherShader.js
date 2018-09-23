@@ -19,7 +19,6 @@ class SwitcherShader {
       vertexShaderSource = () => fs.readFileSync(path.join(__dirname, 'shaders', 'screen.vert'), 'utf-8').toString();
       pixelShaderSource = () => fs.readFileSync(path.join(__dirname, 'shaders', 'switcher.frag'), 'utf-8').toString();
     }
-    console.log(vertexShaderSource);
     // setup the video elements and textures:
     this.mainVideo = undefined;
     this.mainVideoReady = false;
@@ -30,6 +29,16 @@ class SwitcherShader {
     this.hitboxReady = false;
     this.hitboxVideoTexture = gl.createTexture();
     this.initTexture(this.hitboxVideoTexture);
+
+    this.textImage = undefined;
+    this.textReady = false;
+    this.textTexture = gl.createTexture();
+    this.initTexture(this.textTexture);
+
+    this.partialVideos = [undefined, undefined, undefined];
+    this.partialVideoReady = false;
+    this.partialVideoTextures = this.partialVideos.map(p => gl.createTexture());
+    this.partialVideoTextures.forEach(p => this.initTexture(p));
 
     // set up the shader
     const program = this.program = gl.createProgram();
@@ -58,6 +67,7 @@ class SwitcherShader {
     this.v_texCoord = gl.getUniformLocation(this.program, 'v_texCoord');
     this.u_mainVideo = gl.getUniformLocation(this.program, 'u_mainVideo');
     this.u_hitboxVideo = gl.getUniformLocation(this.program, 'u_hitboxVideo');
+    this.u_textTexture = gl.getUniformLocation(this.program, 'u_textTexture');
 
     // shader variables
     // todo: change this to UBOs so groups of related uniforms can be set with 1 gl call:
@@ -147,6 +157,28 @@ class SwitcherShader {
     }, true);
   }
 
+  // connect text to shader:
+  connectText(canvas, textEffect) {
+    // todo: set the text effect on the shader if specified
+    this.textImage = canvas;
+    this.textReady = true;
+  }
+
+  hideText() {
+    this.textReady = false;
+  }
+
+  // connect patial to shader:
+  connectPartial(element, index, waitForIt) {
+    this.partialVideos[index] = element;
+    if (waitForIt) {
+      this.partialVideoReady = false;
+    }
+    element.addEventListener('playing', () => {
+      this.partialVideoReady = true;
+    }, true);
+  }
+
   //////// event listeners:
   render(now) {
     const gl = this.gl;
@@ -170,6 +202,13 @@ class SwitcherShader {
       gl.activeTexture(gl.TEXTURE1);
       gl.bindTexture(gl.TEXTURE_2D, this.hitboxVideoTexture);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.hitboxVideo);
+    }
+    if (this.textReady) {
+      this.textUnit = gl.getUniformLocation(this.program, 'u_textTexture');
+      this.gl.uniform1i(this.textUnit, 2);
+      gl.activeTexture(gl.TEXTURE2);
+      gl.bindTexture(gl.TEXTURE_2D, this.textTexture);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.textImage);
     }
     this.currentTime = new Date().getTime();
     const elapsedTime = this.currentTime - this.effectStartTime;

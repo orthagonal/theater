@@ -16,9 +16,12 @@ class CoreController {
 
     this.hitboxCanvas = options.hitboxCanvas;
     this.finalDestinationCanvas = options.finalDestinationCanvas;
+    this.textCanvas = options.textCanvas;
+    this.textCanvas.width = this.finalDestinationCanvas.width;
+    this.textCanvas.height = this.finalDestinationCanvas.height;
 
     this.gl = this.finalDestinationCanvas.getContext('webgl');
-
+    this.textContext = this.textCanvas.getContext('2d');
     this.audioController = new AudioController(options.$);
     this.videoController = new VideoController(this, this.gl, options.theWindow);
     this.interfaceController = new InterfaceController(this);
@@ -38,6 +41,19 @@ class CoreController {
 
   goUp(val) {
     this.videoController.goUp(val);
+  }
+
+  drawText(msg, options = {}) {
+    this.textContext.fillStyle = options.fillStyle || '#FFFFFF'; 	// This determines the text colour, it can take a hex value or rgba value (e.g. rgba(255,0,0,0.5))
+    this.textContext.textAlign = options.textAlign || 'center';	// This determines the alignment of text, e.g. left, center, right
+    this.textContext.textBaseline = options.textBaseline || 'middle';	// This determines the baseline of the text, e.g. top, middle, bottom
+    this.textContext.font = options.font || '32px monospace';	// This determines the size of the text and the font family used
+    this.textContext.fillText(msg, options.x || 300, options.y || 300);
+    this.videoController.switcher.connectText(this.textCanvas, options.textEffect);
+  }
+
+  hideText() {
+    this.textContext.clearRect(0, 0, this.textCanvas.width, this.textCanvas.height);
   }
 
   // modules will take over the video controller here

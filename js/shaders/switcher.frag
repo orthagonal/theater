@@ -2,6 +2,7 @@ precision mediump float;
 uniform vec2 u_resolution; // incoming resolution
 uniform sampler2D u_mainVideo; // incoming video
 uniform sampler2D u_hitboxVideo; // hitbox/mask video
+uniform sampler2D u_textTexture; // text (font) texture
 uniform float u_debugMode; // 1.0 if using debug mode
 uniform float u_activeEffect; // index of the current effect
 uniform float u_videoDuration; // time current video will end (used by effects)
@@ -243,4 +244,12 @@ void main() {
   if (u_activeEffect == 2.0) {
 		gl_FragColor = ripple2(normalizedMouse, gl_FragColor, normalizedCoords);
   }
+	vec4 textColor = texture2D(u_textTexture, normalizedCoords);
+	if (textColor.r != 0.0) {
+		// vec4 flare = flareEffect(gl_FragCoord.xy);
+    // gl_FragColor = mix(flare, gl_FragColor, u_percentDone));
+		// gl_FragColor = ripple2(normalizedMouse, gl_FragColor, normalizedCoords);
+		// gl_FragColor = texture2D(u_textTexture, vec2(normalizedCoords.x + .1, normalizedCoords.y + .1));
+		gl_FragColor = texture2D(u_textTexture, normalizedCoords);
+	}
 }
