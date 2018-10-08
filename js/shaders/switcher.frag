@@ -1,15 +1,30 @@
 precision mediump float;
+// the texCoords passed in from the vertex shader.
+varying vec2 v_texCoord;
 uniform vec2 u_resolution; // incoming resolution
 uniform sampler2D u_mainVideo; // incoming video
 uniform sampler2D u_hitboxVideo; // hitbox/mask video
 uniform sampler2D u_textTexture; // text (font) texture
+
+uniform sampler2D u_partialTexture0; // partial texture
+uniform sampler2D u_partialTexture1; // partial texture
+uniform sampler2D u_partialTexture2; // partial texture
+
+uniform sampler2D u_inputTexture0; // input texture
+uniform sampler2D u_inputTexture1; // input texture
+uniform sampler2D u_inputTexture2; // input texture
+
+uniform int u_showMain; // 1.0 when rendering the main video frame
+uniform float u_showInput0;
+uniform float u_showInput1;
+uniform float u_showInput2;
+
 uniform float u_debugMode; // 1.0 if using debug mode
 uniform float u_activeEffect; // index of the current effect
 uniform float u_videoDuration; // time current video will end (used by effects)
 uniform float u_currentTime; // current time
 uniform vec2 u_mouse; // mouse
 uniform float u_percentDone; // screw it
-
 //////////////////////////
 // flare effect stuff:
 //////////////////////////
@@ -165,15 +180,10 @@ void ripple(vec2 mouse, vec2 fragCoord) {
 		float threshold = .5;
 		if (step(threshold, hitboxPixel.r) == 0.0) {
 			// todo: apply fire stuff
-			// retu	rn;
+			// return;
 		}
-			gl_FragColor = vec4(col,.50);
+		gl_FragColor = vec4(col,.50);
 	}
-}
-
-// returns pixel for partial 1:
-vec4 displayPartial(vec2 upperLeft, vec2 dimensions) {
-	return vec4(0.0, 0.0, 0.0, 0.0);
 }
 
 // used in development:
@@ -229,8 +239,10 @@ void main() {
   vec2 normalizedCoords = (gl_FragCoord.xy / u_resolution.xy);
   normalizedCoords.y = 1.0 - normalizedCoords.y;
   vec2 normalizedMouse = u_mouse.xy / u_resolution.xy;
-
+	// u_mainVideo is either the main video or a partial
+	// who's coordinates/dimensions have been set by the vertex shader already:
 	gl_FragColor = texture2D(u_mainVideo, normalizedCoords);
+	// render hitbox:
 	if (u_debugMode == 1.0) {
 		renderHitbox(gl_FragColor, normalizedCoords);
 	}
@@ -244,12 +256,17 @@ void main() {
   if (u_activeEffect == 2.0) {
 		gl_FragColor = ripple2(normalizedMouse, gl_FragColor, normalizedCoords);
   }
+	// when showing the main video call functions that use input effects:
+	if (u_showMain == 1) {
+		// if (u_showInput0 == 1.0) {
+			// vec2 coord = v_texCoord;
+			// vec4 color = texture2D(u_partialTexture0, coord);
+			// gl_FragColor = vec4(1.0, 0.0, 0.0, 0.5);
+		// }
+	}
+	// render over everything:
 	vec4 textColor = texture2D(u_textTexture, normalizedCoords);
 	if (textColor.r != 0.0) {
-		// vec4 flare = flareEffect(gl_FragCoord.xy);
-    // gl_FragColor = mix(flare, gl_FragColor, u_percentDone));
-		// gl_FragColor = ripple2(normalizedMouse, gl_FragColor, normalizedCoords);
-		// gl_FragColor = texture2D(u_textTexture, vec2(normalizedCoords.x + .1, normalizedCoords.y + .1));
-		gl_FragColor = texture2D(u_textTexture, normalizedCoords);
+		gl_FragColor = vec4(gl_FragColor.r, gl_FragColor.g, fbm(normalizedCoords), 1.0);
 	}
 }

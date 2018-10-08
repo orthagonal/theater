@@ -44,6 +44,7 @@ class CoreController {
   }
 
   drawText(msg, options = {}) {
+    this.textContext.clearRect(0, 0, this.textCanvas.width, this.textCanvas.height);
     this.textContext.fillStyle = options.fillStyle || '#FFFFFF'; 	// This determines the text colour, it can take a hex value or rgba value (e.g. rgba(255,0,0,0.5))
     this.textContext.textAlign = options.textAlign || 'center';	// This determines the alignment of text, e.g. left, center, right
     this.textContext.textBaseline = options.textBaseline || 'middle';	// This determines the baseline of the text, e.g. top, middle, bottom

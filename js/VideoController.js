@@ -145,6 +145,11 @@ class VideoController extends EventEmitter {
   getRemainingTime() {
     return this.currentVideo.element.duration - this.currentVideo.element.currentTime;
   }
+
+  showPartial(partial, index, callback) {
+    partial.element.play();
+    this.switcher.connectPartial.bind(this.switcher)(partial, index, callback);
+  }
 }
 
 module.exports = VideoController;
