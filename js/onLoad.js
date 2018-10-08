@@ -5,14 +5,22 @@ module.exports.startGame = function (options = {}) {
   // get window, main canvas, and hitbox canvas:
   var theWindow = window;
   options.theWindow = theWindow;
+  // set up final destination:
   var finalDestinationCanvas = document.getElementById("finalDestinationCanvas");
   options.finalDestinationCanvas = finalDestinationCanvas;
   finalDestinationCanvas.addEventListener("keypress", onClick, false );
   finalDestinationCanvas.width = theWindow.innerWidth;
   finalDestinationCanvas.height = theWindow.innerHeight;
+  // set up hitbox canvas:
   options.hitboxCanvas = document.getElementById("hitboxCanvas");
   options.hitboxCanvas.width = theWindow.innerWidth;
   options.hitboxCanvas.height = theWindow.innerHeight;
+  // set up textbox canvas:
+  var textCanvas = document.getElementById("textCanvas");
+  options.textCanvas = textCanvas;
+  textCanvas.addEventListener("keypress", onClick, false );
+  textCanvas.width = theWindow.innerWidth;
+  textCanvas.height = theWindow.innerHeight;
   options.dimensions = {
     width: finalDestinationCanvas.width,
     height: finalDestinationCanvas.height,

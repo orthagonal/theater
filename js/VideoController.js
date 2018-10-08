@@ -1,9 +1,10 @@
 const EventEmitter = require('events');
 const SwitcherShader = require('./SwitcherShader');
 
-global.NO_EFFECT = 0.0;
-global.MOUSE_FLARE_EFFECT = 1.0;
-global.MOUSE_BW_EFFECT = 2.0;
+global.NO_EFFECT = 0.0; // just show the video!
+global.MOUSE_FLARE_EFFECT = 1.0; // lens flare at the mouse point
+global.MOUSE_BW_EFFECT = 2.0; // a melty hole at the mouse point
+global.TEXT_MELT_EFFECT = 3.0; // show the text as melty
 
 class VideoController extends EventEmitter {
   constructor(controller, gl, theWindow) {
@@ -143,6 +144,11 @@ class VideoController extends EventEmitter {
   // get time remaining in current video:
   getRemainingTime() {
     return this.currentVideo.element.duration - this.currentVideo.element.currentTime;
+  }
+
+  showPartial(partial, index, callback) {
+    partial.element.play();
+    this.switcher.connectPartial.bind(this.switcher)(partial, index, callback);
   }
 }
 
