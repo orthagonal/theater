@@ -102,6 +102,7 @@ class SwitcherShader {
       u_resolution: { setter: 'uniform2fv', default: [dimensions.width, dimensions.height] },
       u_scale: { setter: 'uniform2fv', default: [1.0, 1.0] },
       u_currentTime: { setter: 'uniform1f' },
+      u_currentTimeV: { setter: 'uniform1f' },
       u_startTime: { setter: 'uniform1f' },
       u_percentDone: { setter: 'uniform1f' },
       u_activeEffect: { setter: 'uniform1f', default: global.NO_EFFECT },
@@ -241,13 +242,9 @@ class SwitcherShader {
   //////// event listeners:
   render(now) {
     const gl = this.gl;
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);  // Clear to black, fully opaque
-    gl.clearDepth(1.0);                 // Clear everything
+    // gl.clearColor(0.0, 0.0, 0.0, 1.0);  // Clear to black, fully opaque
+    // gl.clearDepth(1.0);                 // Clear everything
     gl.enable(gl.DEPTH_TEST);           // Enable depth testing
-    // gl.depthFunc(gl.LEQUAL);            // Near things obscure far things
-    // Clear the canvas before we start drawing on it.
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    // draw partial video 1 (todo: support additional partials):
     // may need to do something here
     if (this.partialVideoReady[0]) {
       // you can set u_partialTextureNNN here to blend with existing frame:
@@ -286,7 +283,6 @@ class SwitcherShader {
       this.drawFrame(this.mainVideo, this.vertexBuffer, 'u_mainVideo', 0, this.mainVideoTexture, { scale: 1.0 });
       gl.uniform1i(this.u_showMain, 0);
     }
-
     this.videoController.theWindow.requestAnimationFrame(this.render.bind(this));
   }
 
