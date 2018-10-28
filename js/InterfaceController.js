@@ -29,18 +29,23 @@ class InterfaceController {
   }
 
   click(mouseEvent) {
+    // skip if branching:
     if (this.controller.branching) {
       return;
     }
-    // get the pixel from the hitbox video at the mouse x,y position:
-    // todo: can i save time by only drawing the 1 pixel at the mouse xy?
-    this.hitboxCanvasContext.drawImage(this.videoElement, 0, 0, this.dimensions.width, this.dimensions.height);
-    // The active game object can process the pixel code however it wants.
-    // By convention if pixel[0] has a value of 255 it is considered a miss,
-    // and any other value means the click occurred inside a coded region of the video:
-    this.controller.activeObject.query(mouseEvent,
-      this.hitboxCanvasContext.getImageData(mouseEvent.x, mouseEvent.y, 1, 1).data
-    );
+    try {
+      // get the pixel from the hitbox video at the mouse x,y position:
+      // todo: can i save time by only drawing the 1 pixel at the mouse xy?
+      this.hitboxCanvasContext.drawImage(this.videoElement, 0, 0, this.dimensions.width, this.dimensions.height);
+      // The active game object can process the pixel code however it wants.
+      // By convention if pixel[0] has a value of 255 it is considered a miss,
+      // and any other value means the click occurred inside a coded region of the video:
+      this.controller.activeObject.query(mouseEvent,
+        this.hitboxCanvasContext.getImageData(mouseEvent.x, mouseEvent.y, 1, 1).data
+      );
+    } catch (e) {
+      this.controller.activeObject.query(mouseEvent);
+    }
   }
 }
 
