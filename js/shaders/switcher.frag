@@ -15,6 +15,7 @@ uniform sampler2D u_inputTexture1; // input texture
 uniform sampler2D u_inputTexture2; // input texture
 
 uniform int u_showMain; // 1.0 when rendering the main video frame
+uniform int u_showText; // 1.0 to show current text and 0.0 to hide it
 uniform float u_showInput0;
 uniform float u_showInput1;
 uniform float u_showInput2;
@@ -25,6 +26,7 @@ uniform float u_videoDuration; // time current video will end (used by effects)
 uniform float u_currentTime; // current time
 uniform vec2 u_mouse; // mouse
 uniform float u_percentDone; // screw it
+
 //////////////////////////
 // flare effect stuff:
 //////////////////////////
@@ -264,9 +266,11 @@ void main() {
 			// gl_FragColor = vec4(1.0, 0.0, 0.0, 0.5);
 		// }
 	}
-	// render over everything:
-	vec4 textColor = texture2D(u_textTexture, normalizedCoords);
-	if (textColor.r != 0.0) {
-		gl_FragColor = vec4(gl_FragColor.r, gl_FragColor.g, fbm(normalizedCoords), 1.0);
+	if (u_showText == 1) {
+		// render over everything:
+		vec4 textColor = texture2D(u_textTexture, normalizedCoords);
+		if (textColor.r != 0.0) {
+			gl_FragColor = vec4(gl_FragColor.r, gl_FragColor.g, fbm(normalizedCoords), 1.0);
+		}
 	}
 }
