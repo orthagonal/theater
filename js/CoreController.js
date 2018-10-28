@@ -73,10 +73,11 @@ class CoreController {
     // todo: this.audiController.setActiveObject(gameObject);
   }
 
+  // branch to a new Game Object:
   // todo: this will eventually need to dynamically load
   branchTo(sourceVideo, destinationObjectName, transitionType) {
-    this.branching = true;
     const destinationObject = this.gameObjects[destinationObjectName];
+    this.branching = { sourceVideo, destinationObject };
     this.videoController.branchTo(sourceVideo, destinationObject, transitionType);
   }
 
