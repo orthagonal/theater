@@ -27,6 +27,11 @@ class VideoController extends EventEmitter {
     this.switcher.goUp = val;
   }
 
+  previousEndPartial(info) {
+    console.log('previousEndPartial the info is:');
+    console.log(info);
+  }
+
   // called when previous video is finished playing, continuously:
   previousEnd() {
     if (this.branching) {
@@ -146,9 +151,14 @@ class VideoController extends EventEmitter {
     return this.currentVideo.element.duration - this.currentVideo.element.currentTime;
   }
 
-  showPartial(partial, index, callback) {
+  showPartial(partial, index, waitForIt, onEnd) {
+    if (partial.callback) {
+      partial.element.onended = partial.callback;
+    } else {
+      partial.element.onended = this.previousEndPartial.bind(this);
+    }
     partial.element.play();
-    this.switcher.connectPartial.bind(this.switcher)(partial, index, callback);
+    this.switcher.connectPartial.bind(this.switcher)(partial, index, waitForIt);
   }
 }
 

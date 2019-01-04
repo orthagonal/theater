@@ -10,7 +10,7 @@ class SwitcherShader {
     this.gl = gl;
     this.goUp = true;
     this.videoController = videoController;
-    this.partials = [undefined, undefined, undefined];
+    this.partials = [undefined, undefined, undefined, undefined, undefined];
     let vertexShaderSource;
     let pixelShaderSource;
     if (devMode) {
@@ -37,8 +37,8 @@ class SwitcherShader {
     this.textTexture = gl.createTexture();
     this.initTexture(this.textTexture);
 
-    this.partialVideos = [undefined, undefined, undefined];
-    this.partialVideoReady = [false, false, false];
+    this.partialVideos = [undefined, undefined, undefined, undefined, undefined];
+    this.partialVideoReady = [false, false, false, false, false];
     this.partialVideoTextures = this.partialVideos.map(p => gl.createTexture());
     this.partialVideoTextures.forEach(p => this.initTexture(p));
 
@@ -69,7 +69,6 @@ class SwitcherShader {
     this.vertexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.defaultScreenCoordinates), gl.DYNAMIC_DRAW);
-
     this.partialVertexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.defaultScreenCoordinates), gl.DYNAMIC_DRAW);
@@ -86,6 +85,8 @@ class SwitcherShader {
     this.u_textTexture = gl.getUniformLocation(this.program, 'u_textTexture');
     this.u_scaleLoc = gl.getUniformLocation(this.program, 'u_scaleF');
     this.u_transLoc = gl.getUniformLocation(this.program, 'u_translation');
+    this.u_alpha = gl.getUniformLocation(this.program, 'u_alpha');
+    this.u_isPartial = gl.getUniformLocation(this.program, 'u_isPartial');
 
     // shader variables
     // todo: change this to UBOs so groups of related uniforms can be set with 1 gl call:
@@ -94,11 +95,19 @@ class SwitcherShader {
       u_mouse: { setter: 'uniform2fv' },
       u_partialCoords0: { setter: 'uniform2fv' },
       u_partialDims0: { setter: 'uniform2fv' },
-      // u_partialCoords1: { setter: 'uniform4fv' },
-      // u_partialCoords2: { setter: 'uniform4fv' },
+      u_partialCoords1: { setter: 'uniform2fv' },
+      u_partialDims1: { setter: 'uniform2fv' },
+      u_partialCoords2: { setter: 'uniform2fv' },
+      u_partialDims2: { setter: 'uniform2fv' },
+      u_partialCoords3: { setter: 'uniform2fv' },
+      u_partialDims3: { setter: 'uniform2fv' },
+      u_partialCoords4: { setter: 'uniform2fv' },
+      u_partialDims4: { setter: 'uniform2fv' },
       u_showPartial0: { setter: 'uniform1f' },
       u_showPartial1: { setter: 'uniform1f' },
       u_showPartial2: { setter: 'uniform1f' },
+      u_showPartial3: { setter: 'uniform1f' },
+      u_showPartial4: { setter: 'uniform1f' },
       u_resolution: { setter: 'uniform2fv', default: [dimensions.width, dimensions.height] },
       u_scale: { setter: 'uniform2fv', default: [1.0, 1.0] },
       u_currentTime: { setter: 'uniform1f' },
@@ -196,11 +205,12 @@ class SwitcherShader {
   }
 
   // connect partial video to shader, partials are small videos
-  // that lay over parts of the main video:
-  connectPartial(partial, index, waitForIt) {
-    this.partials[0] = partial;
+  // that lay over all or part of the main video:
+  connectPartial(partial, index, callbacks, partialIndex) {
+    // this.partials[partialIndex || 0] = partial;
+    this.partials[index] = partial;
     this.partialVideos[index] = partial.element;
-    if (waitForIt) {
+    if (callbacks) {
       this.partialVideoReady[index] = false;
     }
     partial.element.addEventListener('playing', () => {
@@ -234,22 +244,25 @@ class SwitcherShader {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, videoSource);
     const scale = coords.scale || 1.0;
     const translation = coords.translation || [0.0, 0.0];
+    const alpha = coords.alpha || [0.0, 0.0, 0.0, 1.0];
     this.gl.uniform2fv(this.u_transLoc, translation);
     this.gl.uniform1f(this.u_scaleLoc, scale);
+    this.gl.uniform1f(this.u_alpha, alpha);
+    this.gl.uniform1f(this.u_isPartial, 1.0);
     gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+    this.gl.uniform1f(this.u_isPartial, 0.0);
   }
 
   //////// event listeners:
   render(now) {
     const gl = this.gl;
-    // gl.clearColor(0.0, 0.0, 0.0, 1.0);  // Clear to black, fully opaque
+    // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    // gl.clearColor(0.0, 1.0, 0.0, 0.0);  // Clear to black, fully opaque
     // gl.clearDepth(1.0);                 // Clear everything
-    gl.enable(gl.DEPTH_TEST);           // Enable depth testing
-    // may need to do something here
-    if (this.partialVideoReady[0]) {
-      // you can set u_partialTextureNNN here to blend with existing frame:
-      this.drawFrame(this.partialVideos[0], this.partialVertexBuffer, 'u_mainVideo', 3, this.partialVideoTextures[0], this.partials[0]);
-    }
+    // gl.enable(gl.DEPTH_TEST);           // Enable depth testing
+    // todo: figure out blend, maybe enable only after main is rendered
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     this.currentTime = new Date().getTime();
     const elapsedTime = this.currentTime - this.effectStartTime;
     this.gl.uniform1f(this.u_currentTime, this.currentTime);
@@ -282,6 +295,27 @@ class SwitcherShader {
       gl.uniform1i(this.u_showMain, 1);
       this.drawFrame(this.mainVideo, this.vertexBuffer, 'u_mainVideo', 0, this.mainVideoTexture, { scale: 1.0 });
       gl.uniform1i(this.u_showMain, 0);
+    }
+    // may need to do something here
+    if (this.partialVideoReady[0]) {
+      // you can set u_partialTextureNNN here to blend with existing frame:
+      this.drawFrame(this.partialVideos[0], this.partialVertexBuffer, 'u_mainVideo', 3, this.partialVideoTextures[0], this.partials[0]);
+    }
+    if (this.partialVideoReady[1]) {
+      // you can set u_partialTextureNNN here to blend with existing frame:
+      this.drawFrame(this.partialVideos[1], this.partialVertexBuffer, 'u_mainVideo', 4, this.partialVideoTextures[1], this.partials[1]);
+    }
+    if (this.partialVideoReady[2]) {
+      // you can set u_partialTextureNNN here to blend with existing frame:
+      this.drawFrame(this.partialVideos[2], this.partialVertexBuffer, 'u_mainVideo', 5, this.partialVideoTextures[2], this.partials[2]);
+    }
+    if (this.partialVideoReady[3]) {
+      // you can set u_partialTextureNNN here to blend with existing frame:
+      this.drawFrame(this.partialVideos[3], this.partialVertexBuffer, 'u_mainVideo', 6, this.partialVideoTextures[3], this.partials[3]);
+    }
+    if (this.partialVideoReady[4]) {
+      // you can set u_partialTextureNNN here to blend with existing frame:
+      this.drawFrame(this.partialVideos[4], this.partialVertexBuffer, 'u_mainVideo', 7, this.partialVideoTextures[4], this.partials[4]);
     }
     this.videoController.theWindow.requestAnimationFrame(this.render.bind(this));
   }

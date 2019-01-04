@@ -19,6 +19,8 @@
   "author": "chris harris",
   "license": "ISC",
   "dependencies": {
+    "aequery": "^0.6.0",
+    "after-effects": "^0.4.15",
     "async": "^2.0.0-rc.6",
     "browserify-shader": "^0.1.2",
     "jquery": "^3.1.0",
@@ -37,7 +39,7 @@
     "eslint-config-firstandthird": "^3.2.0",
     "eslint-plugin-import": "^2.1.0",
     "jquery": "^3.0.0",
-    "jsdom": "^9.4.0",
+    "jsdom": "^9.12.0",
     "mocha": "^2.5.3",
     "mocha-jsdom": "^1.1.0",
     "mocha-sinon": "^1.1.5",
