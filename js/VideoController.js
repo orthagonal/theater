@@ -152,13 +152,11 @@ class VideoController extends EventEmitter {
   }
 
   showPartial(partial, index, waitForIt, onEnd) {
-    if (partial.callback) {
-      partial.element.onended = partial.callback;
-    } else {
+    if (!partial.element.onended) {
       partial.element.onended = this.previousEndPartial.bind(this);
     }
-    partial.element.play();
     this.switcher.connectPartial.bind(this.switcher)(partial, index, waitForIt);
+    partial.element.play();
   }
 }
 
