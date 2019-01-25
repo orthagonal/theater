@@ -207,15 +207,13 @@ class SwitcherShader {
   // connect partial video to shader, partials are small videos
   // that lay over all or part of the main video:
   connectPartial(partial, index, callbacks, partialIndex) {
-    // this.partials[partialIndex || 0] = partial;
+    this.partialVideoReady[index] = false;
     this.partials[index] = partial;
     this.partialVideos[index] = partial.element;
-    if (callbacks) {
-      this.partialVideoReady[index] = false;
-    }
     partial.element.addEventListener('playing', () => {
       this.partialVideoReady[index] = true;
     }, true);
+    partial.element.play();
   }
 
   // add an input video to the mainVideo.  this will be used by
@@ -248,9 +246,7 @@ class SwitcherShader {
     this.gl.uniform2fv(this.u_transLoc, translation);
     this.gl.uniform1f(this.u_scaleLoc, scale);
     this.gl.uniform1f(this.u_alpha, alpha);
-    this.gl.uniform1f(this.u_isPartial, 1.0);
     gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
-    this.gl.uniform1f(this.u_isPartial, 0.0);
   }
 
   //////// event listeners:
