@@ -179,7 +179,7 @@ class SwitcherShader {
     }
     element.addEventListener('playing', () => {
       this.mainVideoReady = true;
-    }, true);
+    });
   }
 
   // connect mask to shader:
