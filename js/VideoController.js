@@ -45,10 +45,11 @@ class VideoController extends EventEmitter {
       this.switcher.connectMask(this.controller.interfaceController.connectMask(this.currentVideo.maskPath));
     }
     this.currentVideo.element.onended = this.previousEnd.bind(this);
-    this.currentVideo.element.addEventListener('canplay', () => {
-      this.currentVideo.element.play();
-    });
-    this.currentVideo.element.load();
+    this.currentVideo.element.play();
+    // this.currentVideo.element.addEventListener('canplay', () => {
+    //   this.currentVideo.element.play();
+    // });
+    // this.currentVideo.element.load();
   }
 
   branchEnd() {
@@ -141,6 +142,9 @@ class VideoController extends EventEmitter {
     }
     this.sceneDescription = scene;
     this.currentVideo = this.activeObject.getNextVideo();
+    this.switcher.connectVideo(this.currentVideo.element, true);
+    this.currentVideo.element.onended = this.previousEnd.bind(this);
+    // this.currentVideo.element.play();
     this.currentVideo.element.onended = this.previousEnd.bind(this);
     this.switcher.connectVideo(this.currentVideo.element, true);
     this.currentVideo.element.addEventListener('canplay', () => {

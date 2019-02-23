@@ -253,6 +253,7 @@ void main() {
 	// 		return;
 	// 	}
 	// }
+	// multiply by partial1:
 	gl_FragColor = color;
 	// render hitbox:
 	if (u_debugMode == 1.0) {
