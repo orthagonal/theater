@@ -247,14 +247,24 @@ void main() {
   vec2 normalizedMouse = u_mouse.xy / u_resolution.xy;
 	// u_mainVideo is either the main video or a partial
 	// who's coordinates/dimensions have been set by the vertex shader already:
+	vec4 partialColor0 = texture2D(u_partialTexture0, normalizedCoords);
+	vec4 partialColor1 = texture2D(u_partialTexture1, normalizedCoords);
+	vec4 partialColor2 = texture2D(u_partialTexture2, normalizedCoords);
+	vec4 partialColor3 = texture2D(u_partialTexture3, normalizedCoords);
+	vec4 partialColor4 = texture2D(u_partialTexture4, normalizedCoords);
+
 	vec4 color = texture2D(u_mainVideo, normalizedCoords);
-	// if (u_isPartial == 1.0) {
-	// 	if (color.g < 0.1) {
-	// 		return;
-	// 	}
-	// }
-	// multiply by partial1:
-	gl_FragColor = color;
+
+	if (color.a > 0.5) {
+		gl_FragColor = color;
+	}
+	// FASTER:
+	gl_FragColor = gl_FragColor + (partialColor0.a * (partialColor0 - gl_FragColor));
+	gl_FragColor = gl_FragColor + (partialColor1.a * (partialColor1 - gl_FragColor));
+	gl_FragColor = gl_FragColor + (partialColor2.a * (partialColor2 - gl_FragColor));
+	gl_FragColor = gl_FragColor + (partialColor3.a * (partialColor3 - gl_FragColor));
+	gl_FragColor = gl_FragColor + (partialColor4.a * (partialColor4 - gl_FragColor));
+
 	// render hitbox:
 	if (u_debugMode == 1.0) {
 		renderHitbox(gl_FragColor, normalizedCoords);

@@ -213,11 +213,11 @@ class SwitcherShader {
     partial.element.addEventListener('playing', () => {
       this.partialVideoReady[index] = true;
     }, true);
-    partial.element.play();
-    // partial.element.addEventListener('canplay', () => {
-    //   partial.element.play();
-    // }, true);
-    // partial.element.load();
+    // partial.element.play();
+    partial.element.addEventListener('canplay', () => {
+      partial.element.play();
+    }, true);
+    partial.element.load();
   }
 
   // add an input video to the mainVideo.  this will be used by
@@ -293,38 +293,23 @@ class SwitcherShader {
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.hitboxVideo);
       }
       if (this.partialVideoReady[0]) {
-        // todo: see if we can comopose the transparency here:
-        // copy video to texture
-      //   // you can set u_partialTextureNNN here to blend with existing frame:
-        this.drawFrame(this.partialVideos[0], this.partialVertexBuffer, 'u_mainVideo', 3, this.partialVideoTextures[0], this.partials[0], true);
+        this.drawFrame(this.partialVideos[0], this.partialVertexBuffer, 'u_partialTexture0', 3, this.partialVideoTextures[0], this.partials[0], false);
       }
-      // future: can load additional video stream in this run of the program to use as data for effects,
-      // just load and set
-      // gl.uniform1i(this.u_showMain, 1);
+      if (this.partialVideoReady[1]) {
+        this.drawFrame(this.partialVideos[1], this.partialVertexBuffer, 'u_partialTexture1', 4, this.partialVideoTextures[1], this.partials[1], false);
+      }
+      if (this.partialVideoReady[2]) {
+        this.drawFrame(this.partialVideos[2], this.partialVertexBuffer, 'u_partialTexture2', 5, this.partialVideoTextures[2], this.partials[2], false);
+      }
+      if (this.partialVideoReady[3]) {
+        this.drawFrame(this.partialVideos[3], this.partialVertexBuffer, 'u_partialTexture3', 6, this.partialVideoTextures[3], this.partials[3], false);
+      }
+      if (this.partialVideoReady[4]) {
+        this.drawFrame(this.partialVideos[4], this.partialVertexBuffer, 'u_partialTexture4', 7, this.partialVideoTextures[4], this.partials[4], false);
+      }
       this.drawFrame(this.mainVideo, this.vertexBuffer, 'u_mainVideo', 0, this.mainVideoTexture, { scale: 1.0 }, true);
-      // gl.uniform1i(this.u_showMain, 0);
     }
     // may need to do something here
-    // if (this.partialVideoReady[0]) {
-    //   // you can set u_partialTextureNNN here to blend with existing frame:
-    //   this.drawFrame(this.partialVideos[0], this.partialVertexBuffer, 'u_mainVideo', 3, this.partialVideoTextures[0], this.partials[0]);
-    // }
-    // if (this.partialVideoReady[1]) {
-    //   // you can set u_partialTextureNNN here to blend with existing frame:
-    //   this.drawFrame(this.partialVideos[1], this.partialVertexBuffer, 'u_mainVideo', 4, this.partialVideoTextures[1], this.partials[1]);
-    // }
-    // if (this.partialVideoReady[2]) {
-    //   // you can set u_partialTextureNNN here to blend with existing frame:
-    //   this.drawFrame(this.partialVideos[2], this.partialVertexBuffer, 'u_mainVideo', 5, this.partialVideoTextures[2], this.partials[2]);
-    // }
-    // if (this.partialVideoReady[3]) {
-    //   // you can set u_partialTextureNNN here to blend with existing frame:
-    //   this.drawFrame(this.partialVideos[3], this.partialVertexBuffer, 'u_mainVideo', 6, this.partialVideoTextures[3], this.partials[3]);
-    // }
-    // if (this.partialVideoReady[4]) {
-    //   // you can set u_partialTextureNNN here to blend with existing frame:
-    //   this.drawFrame(this.partialVideos[4], this.partialVertexBuffer, 'u_mainVideo', 7, this.partialVideoTextures[4], this.partials[4]);
-    // }
     this.videoController.theWindow.requestAnimationFrame(this.render.bind(this));
   }
 
