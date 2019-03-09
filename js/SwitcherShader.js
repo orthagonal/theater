@@ -247,27 +247,12 @@ class SwitcherShader {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, videoSource);
   }
 
-  copyVideoFrameToGPU(videoSource, vertexBuffer, videoName, textureIndex, videoTexture, coords, drawIt) {
-    const gl = this.gl;
-    gl.useProgram(this.program);
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-    const videoUnit = gl.getUniformLocation(this.program, videoName);
-    gl.uniform1i(videoUnit, textureIndex);
-    // is string compose too slow?
-    gl.activeTexture(gl[`TEXTURE${textureIndex}`]);
-    gl.bindTexture(gl.TEXTURE_2D, videoTexture);
-    gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, videoSource);
-    if (drawIt) {
-      gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
-    }
-  }
-
   //////// event listeners:
   render(now) {
     const gl = this.gl;
-    this.currentTime = new Date().getTime();
-    const elapsedTime = this.currentTime - this.effectStartTime;
-    this.gl.uniform1f(this.u_currentTime, this.currentTime);
+    // this.currentTime = new Date().getTime();
+    // const elapsedTime = this.currentTime - this.effectStartTime;
+    // this.gl.uniform1f(this.u_currentTime, this.currentTime);
     // if (this.goUp) {
     //   this.gl.uniform1f(this.u_percentDone, elapsedTime / this.videoDuration);
     // } else {
@@ -327,13 +312,12 @@ class SwitcherShader {
         gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[4]);
         gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[4]);
       }
-      // gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-      // gl.uniform1i(gl.getUniformLocation(this.program, 'u_mainVideo'), 0);
-      // gl.activeTexture(gl.TEXTURE0);
-      // gl.bindTexture(gl.TEXTURE_2D, this.mainVideoTexture);
-      // can use sub-image if it's already been initialized with the correct size by texImage2d:
-      // gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.mainVideo);
-      this.copyVideoFrameToGPU(this.mainVideo, this.vertexBuffer, 'u_mainVideo', 0, this.mainVideoTexture, { scale: 1.0 }, true);
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+      gl.uniform1i(gl.getUniformLocation(this.program, 'u_mainVideo'), 0);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, this.mainVideoTexture);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.mainVideo);
+      gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
     }
     // may need to do something here
     this.videoController.theWindow.requestAnimationFrame(this.render.bind(this));
