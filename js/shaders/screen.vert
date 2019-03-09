@@ -5,9 +5,9 @@ uniform float u_scaleF;
 uniform vec2 u_translation;
 varying vec2 u_resolution;
 
+
 void main() {
-  // multiple u_scale is 0.5 then this works as expected:
-  vec2 position = (a_position * u_scaleF) + u_translation;
+  vec2 position = (a_position * 1.0) + vec2(0.0, 0.0);
   // flip it right-side up:
   position.y = 1.0 - position.y;
   // pass the texCoord to the fragment shader

@@ -83,10 +83,13 @@ class SwitcherShader {
     this.u_mainVideo = gl.getUniformLocation(this.program, 'u_mainVideo');
     this.u_hitboxVideo = gl.getUniformLocation(this.program, 'u_hitboxVideo');
     this.u_textTexture = gl.getUniformLocation(this.program, 'u_textTexture');
-    this.u_scaleLoc = gl.getUniformLocation(this.program, 'u_scaleF');
-    this.u_transLoc = gl.getUniformLocation(this.program, 'u_translation');
-    this.u_alpha = gl.getUniformLocation(this.program, 'u_alpha');
+    // this.u_scaleLoc = gl.getUniformLocation(this.program, 'u_scaleF');
+    // this.u_transLoc = gl.getUniformLocation(this.program, 'u_translation');
+    // this.u_alpha = gl.getUniformLocation(this.program, 'u_alpha');
     this.u_isPartial = gl.getUniformLocation(this.program, 'u_isPartial');
+
+    // this.gl.uniform2fv(this.u_transLoc, [0.0, 0.0]);
+    // this.gl.uniform1f(this.u_scaleLoc, 1.0);
 
     // shader variables
     // todo: change this to UBOs so groups of related uniforms can be set with 1 gl call:
@@ -132,6 +135,9 @@ class SwitcherShader {
     gl.enableVertexAttribArray(this.a_texCoord);
     gl.vertexAttribPointer(this.a_texCoord, 2, gl.FLOAT, false, 0, 0);
     gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.useProgram(this.program);
     this.videoController.theWindow.requestAnimationFrame(this.render.bind(this));
   }
 
@@ -160,8 +166,12 @@ class SwitcherShader {
   initTexture(texture) {
     const gl = this.gl;
     gl.bindTexture(gl.TEXTURE_2D, texture);
-    const pixel = new Uint8Array([0, 0, 255, 255]);  // opaque blue
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
+    // this needs to be set to correct dimensions:
+    const pixel = new Uint8Array(1920 * 4 * 1080 * 4);//[255, 0, 0, 255]);  // opaque red
+    console.log('doing the red');
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1920, 1080, 0, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
+    // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
+    console.log('done red');
     // Turn off mips and set  wrapping to clamp to edge so it
     // will work regardless of the dimensions of the video.
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -179,7 +189,7 @@ class SwitcherShader {
     }
     element.addEventListener('playing', () => {
       this.mainVideoReady = true;
-    });
+    }, true);
   }
 
   // connect mask to shader:
@@ -211,12 +221,15 @@ class SwitcherShader {
     this.partials[index] = partial;
     this.partialVideos[index] = partial.element;
     partial.element.addEventListener('playing', () => {
+      console.log(`connect ${index}`);
       this.partialVideoReady[index] = true;
     }, true);
-    partial.element.addEventListener('canplay', () => {
-      partial.element.play();
-    }, true);
-    partial.element.load();
+    partial.element.play();
+    // partial.element.addEventListener('canplay', () => {
+    //   partial.element.play();
+    // }, true);
+    // console.log('partial loading');
+    // partial.element.load();
   }
 
   // add an input video to the mainVideo.  this will be used by
@@ -234,42 +247,17 @@ class SwitcherShader {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, videoSource);
   }
 
-  drawFrame(videoSource, vertexBuffer, videoName, textureIndex, videoTexture, coords) {
-    const gl = this.gl;
-    gl.useProgram(this.program);
-    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-    const videoUnit = gl.getUniformLocation(this.program, videoName);
-    gl.uniform1i(videoUnit, textureIndex);
-    gl.activeTexture(gl[`TEXTURE${textureIndex}`]);
-    gl.bindTexture(gl.TEXTURE_2D, videoTexture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, videoSource);
-    const scale = coords.scale || 1.0;
-    const translation = coords.translation || [0.0, 0.0];
-    const alpha = coords.alpha || [0.0, 0.0, 0.0, 1.0];
-    this.gl.uniform2fv(this.u_transLoc, translation);
-    this.gl.uniform1f(this.u_scaleLoc, scale);
-    this.gl.uniform1f(this.u_alpha, alpha);
-    gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
-  }
-
   //////// event listeners:
   render(now) {
     const gl = this.gl;
-    // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    // gl.clearColor(0.0, 1.0, 0.0, 0.0);  // Clear to black, fully opaque
-    // gl.clearDepth(1.0);                 // Clear everything
-    // gl.enable(gl.DEPTH_TEST);           // Enable depth testing
-    // todo: figure out blend, maybe enable only after main is rendered
-    gl.enable(gl.BLEND);
-    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    this.currentTime = new Date().getTime();
-    const elapsedTime = this.currentTime - this.effectStartTime;
-    this.gl.uniform1f(this.u_currentTime, this.currentTime);
-    if (this.goUp) {
-      this.gl.uniform1f(this.u_percentDone, elapsedTime / this.videoDuration);
-    } else {
-      this.gl.uniform1f(this.u_percentDone, 1.0 - (elapsedTime / this.videoDuration));
-    }
+    // this.currentTime = new Date().getTime();
+    // const elapsedTime = this.currentTime - this.effectStartTime;
+    // this.gl.uniform1f(this.u_currentTime, this.currentTime);
+    // if (this.goUp) {
+    //   this.gl.uniform1f(this.u_percentDone, elapsedTime / this.videoDuration);
+    // } else {
+    //   this.gl.uniform1f(this.u_percentDone, 1.0 - (elapsedTime / this.videoDuration));
+    // }
     // draw the main video frame last:
     if (this.mainVideoReady) {
       // add any text data:
@@ -279,7 +267,7 @@ class SwitcherShader {
         this.gl.uniform1i(this.textUnit, 2);
         gl.activeTexture(gl.TEXTURE2);
         gl.bindTexture(gl.TEXTURE_2D, this.textTexture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.textImage);
+        gl.texSubImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.textImage);
       }
       // add the hitbox data stream, can be used for hitbox effects:
       if (this.hitboxVideoReady) {
@@ -287,35 +275,51 @@ class SwitcherShader {
         this.gl.uniform1i(this.hitboxVideoUnit, 1);
         gl.activeTexture(gl.TEXTURE1);
         gl.bindTexture(gl.TEXTURE_2D, this.hitboxVideoTexture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.hitboxVideo);
+        gl.texSubImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.hitboxVideo);
       }
-      // future: can load additional video stream in this run of the program to use as data for effects,
-      // just load and set
-      gl.uniform1i(this.u_showMain, 1);
-      this.drawFrame(this.mainVideo, this.vertexBuffer, 'u_mainVideo', 0, this.mainVideoTexture, { scale: 1.0 });
-      gl.uniform1i(this.u_showMain, 0);
+      if (this.partialVideoReady[0]) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
+        gl.uniform1i(gl.getUniformLocation(this.program, 'u_partialTexture0'), 3);
+        gl.activeTexture(gl.TEXTURE3);
+        gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[0]);
+        gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[0]);
+      }
+      if (this.partialVideoReady[1]) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
+        gl.uniform1i(gl.getUniformLocation(this.program, 'u_partialTexture1'), 4);
+        gl.activeTexture(gl.TEXTURE4);
+        gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[1]);
+        gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[1]);
+      }
+      if (this.partialVideoReady[2]) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
+        gl.uniform1i(gl.getUniformLocation(this.program, 'u_partialTexture2'), 5);
+        gl.activeTexture(gl.TEXTURE5);
+        gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[2]);
+        gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[2]);
+      }
+      if (this.partialVideoReady[3]) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
+        gl.uniform1i(gl.getUniformLocation(this.program, 'u_partialTexture3'), 6);
+        gl.activeTexture(gl.TEXTURE6);
+        gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[3]);
+        gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[3]);
+      }
+      if (this.partialVideoReady[4]) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
+        gl.uniform1i(gl.getUniformLocation(this.program, 'u_partialTexture4'), 7);
+        gl.activeTexture(gl.TEXTURE7);
+        gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[4]);
+        gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[4]);
+      }
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+      gl.uniform1i(gl.getUniformLocation(this.program, 'u_mainVideo'), 0);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, this.mainVideoTexture);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.mainVideo);
+      gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
     }
     // may need to do something here
-    if (this.partialVideoReady[0]) {
-      // you can set u_partialTextureNNN here to blend with existing frame:
-      this.drawFrame(this.partialVideos[0], this.partialVertexBuffer, 'u_mainVideo', 3, this.partialVideoTextures[0], this.partials[0]);
-    }
-    if (this.partialVideoReady[1]) {
-      // you can set u_partialTextureNNN here to blend with existing frame:
-      this.drawFrame(this.partialVideos[1], this.partialVertexBuffer, 'u_mainVideo', 4, this.partialVideoTextures[1], this.partials[1]);
-    }
-    if (this.partialVideoReady[2]) {
-      // you can set u_partialTextureNNN here to blend with existing frame:
-      this.drawFrame(this.partialVideos[2], this.partialVertexBuffer, 'u_mainVideo', 5, this.partialVideoTextures[2], this.partials[2]);
-    }
-    if (this.partialVideoReady[3]) {
-      // you can set u_partialTextureNNN here to blend with existing frame:
-      this.drawFrame(this.partialVideos[3], this.partialVertexBuffer, 'u_mainVideo', 6, this.partialVideoTextures[3], this.partials[3]);
-    }
-    if (this.partialVideoReady[4]) {
-      // you can set u_partialTextureNNN here to blend with existing frame:
-      this.drawFrame(this.partialVideos[4], this.partialVertexBuffer, 'u_mainVideo', 7, this.partialVideoTextures[4], this.partials[4]);
-    }
     this.videoController.theWindow.requestAnimationFrame(this.render.bind(this));
   }
 
