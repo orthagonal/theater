@@ -256,9 +256,6 @@ class SwitcherShader {
     // is string compose too slow?
     gl.activeTexture(gl[`TEXTURE${textureIndex}`]);
     gl.bindTexture(gl.TEXTURE_2D, videoTexture);
-    // gl.texSubImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, videoSource);
-    // can use sub-image if it's already been initialized with the correct size by texImage2d:
-    // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, videoSource);
     gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, videoSource);
     if (drawIt) {
       gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
@@ -268,12 +265,6 @@ class SwitcherShader {
   //////// event listeners:
   render(now) {
     const gl = this.gl;
-    // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    // gl.clearColor(0.0, 1.0, 0.0, 0.0);  // Clear to black, fully opaque
-    // gl.clearDepth(1.0);                 // Clear everything
-    // gl.enable(gl.DEPTH_TEST);           // Enable depth testing
-    // todo: figure out blend, maybe enable only after main is rendered
-
     this.currentTime = new Date().getTime();
     const elapsedTime = this.currentTime - this.effectStartTime;
     this.gl.uniform1f(this.u_currentTime, this.currentTime);
@@ -301,26 +292,47 @@ class SwitcherShader {
         gl.bindTexture(gl.TEXTURE_2D, this.hitboxVideoTexture);
         gl.texSubImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.hitboxVideo);
       }
+      if (this.partialVideoReady[0]) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
+        gl.uniform1i(gl.getUniformLocation(this.program, 'u_partialTexture0'), 3);
+        gl.activeTexture(gl.TEXTURE3);
+        gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[0]);
+        gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[0]);
+      }
       if (this.partialVideoReady[1]) {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
         gl.uniform1i(gl.getUniformLocation(this.program, 'u_partialTexture1'), 4);
         gl.activeTexture(gl.TEXTURE4);
         gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[1]);
-        // can use sub-image if it's already been initialized with the correct size by texImage2d:
         gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[1]);
       }
-      // if (this.partialVideoReady[1]) {
-      //   this.copyVideoFrameToGPU(this.partialVideos[1], this.partialVertexBuffer, 'u_partialTexture1', 4, this.partialVideoTextures[1], this.partials[1], false);
-      // }
-      // if (this.partialVideoReady[2]) {
-      //   this.copyVideoFrameToGPU(this.partialVideos[2], this.partialVertexBuffer, 'u_partialTexture2', 5, this.partialVideoTextures[2], this.partials[2], false);
-      // }
-      // if (this.partialVideoReady[3]) {
-      //   this.copyVideoFrameToGPU(this.partialVideos[3], this.partialVertexBuffer, 'u_partialTexture3', 6, this.partialVideoTextures[3], this.partials[3], false);
-      // }
-      // if (this.partialVideoReady[4]) {
-      //   this.copyVideoFrameToGPU(this.partialVideos[4], this.partialVertexBuffer, 'u_partialTexture4', 7, this.partialVideoTextures[4], this.partials[4], false);
-      // }
+      if (this.partialVideoReady[2]) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
+        gl.uniform1i(gl.getUniformLocation(this.program, 'u_partialTexture2'), 5);
+        gl.activeTexture(gl.TEXTURE5);
+        gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[2]);
+        gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[2]);
+      }
+      if (this.partialVideoReady[3]) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
+        gl.uniform1i(gl.getUniformLocation(this.program, 'u_partialTexture3'), 6);
+        gl.activeTexture(gl.TEXTURE6);
+        gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[3]);
+        gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[3]);
+      }
+      if (this.partialVideoReady[4]) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
+        gl.uniform1i(gl.getUniformLocation(this.program, 'u_partialTexture4'), 7);
+        gl.activeTexture(gl.TEXTURE7);
+        gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[4]);
+        gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[4]);
+      }
+      // gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+      // gl.uniform1i(gl.getUniformLocation(this.program, 'u_mainVideo'), 0);
+      // gl.activeTexture(gl.TEXTURE0);
+      // gl.bindTexture(gl.TEXTURE_2D, this.mainVideoTexture);
+      // can use sub-image if it's already been initialized with the correct size by texImage2d:
+      // gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.mainVideo);
       this.copyVideoFrameToGPU(this.mainVideo, this.vertexBuffer, 'u_mainVideo', 0, this.mainVideoTexture, { scale: 1.0 }, true);
     }
     // may need to do something here

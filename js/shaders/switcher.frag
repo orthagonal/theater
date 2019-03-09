@@ -252,18 +252,17 @@ void main() {
 	vec4 partialColor2 = texture2D(u_partialTexture2, normalizedCoords);
 	vec4 partialColor3 = texture2D(u_partialTexture3, normalizedCoords);
 	vec4 partialColor4 = texture2D(u_partialTexture4, normalizedCoords);
-
 	vec4 color = texture2D(u_mainVideo, normalizedCoords);
 
 	if (color.a > 0.5) {
 		gl_FragColor = color;
 	}
 	// FASTER:
-	gl_FragColor = gl_FragColor + (partialColor0.a * (partialColor0 - gl_FragColor));
-	gl_FragColor = gl_FragColor + (partialColor1.a * (partialColor1 - gl_FragColor));
-	gl_FragColor = gl_FragColor + (partialColor2.a * (partialColor2 - gl_FragColor));
-	gl_FragColor = gl_FragColor + (partialColor3.a * (partialColor3 - gl_FragColor));
-	gl_FragColor = gl_FragColor + (partialColor4.a * (partialColor4 - gl_FragColor));
+	gl_FragColor.rgb = gl_FragColor.rgb + (partialColor0.a * (partialColor0.rgb - gl_FragColor.rgb));
+	gl_FragColor.rgb = gl_FragColor.rgb + (partialColor1.a * (partialColor1.rgb - gl_FragColor.rgb));
+	gl_FragColor.rgb = gl_FragColor.rgb + (partialColor2.a * (partialColor2.rgb - gl_FragColor.rgb));
+	gl_FragColor.rgb = gl_FragColor.rgb + (partialColor3.a * (partialColor3.rgb - gl_FragColor.rgb));
+	gl_FragColor.rgb = gl_FragColor.rgb + (partialColor4.a * (partialColor4.rgb - gl_FragColor.rgb));
 
 	// render hitbox:
 	if (u_debugMode == 1.0) {
@@ -279,14 +278,6 @@ void main() {
   if (u_activeEffect == 2.0) {
 		gl_FragColor = ripple2(normalizedMouse, gl_FragColor, normalizedCoords);
   }
-	// when showing the main video call functions that use input effects:
-	if (u_showMain == 1) {
-		// if (u_showInput0 == 1.0) {
-			// vec2 coord = v_texCoord;
-			// vec4 color = texture2D(u_partialTexture0, coord);
-			// gl_FragColor = vec4(1.0, 0.0, 0.0, 0.5);
-		// }
-	}
 	if (u_showText == 1) {
 		// render over everything:
 		vec4 textColor = texture2D(u_textTexture, normalizedCoords);
