@@ -217,16 +217,10 @@ class SwitcherShader {
     this.partialVideoReady[index] = false;
     this.partials[index] = partial;
     this.partialVideos[index] = partial.element;
-    partial.element.addEventListener('playing', () => {
-      console.log(`connect ${index}`);
+    partial.element.onplaying = () => {
       this.partialVideoReady[index] = true;
-    }, true);
+    };
     partial.element.play();
-    // partial.element.addEventListener('canplay', () => {
-    //   partial.element.play();
-    // }, true);
-    // console.log('partial loading');
-    // partial.element.load();
   }
 
   // add an input video to the mainVideo.  this will be used by
