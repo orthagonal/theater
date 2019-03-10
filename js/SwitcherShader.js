@@ -217,12 +217,24 @@ class SwitcherShader {
   // connect partial video to shader, partials are small videos
   // that lay over all or part of the main video:
   connectPartial(partial, index, callbacks, partialIndex) {
+    const gpuName = `u_partialTexture${index}`;
+    const gpuIndex = index + 3;
+    const gpuTexture = this.gl[`TEXTURE${gpuIndex}`];
     this.partialVideoReady[index] = false;
     this.partials[index] = partial;
     this.partialVideos[index] = partial.element;
     partial.element.addEventListener('playing', () => {
-      console.log(`connect ${index}`);
       this.partialVideoReady[index] = true;
+      setInterval(() => {
+        if (this.partialVideoReady[index]) {
+          // do the copy here
+          this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.partialVertexBuffer);
+          this.gl.uniform1i(this.gl.getUniformLocation(this.program, gpuName), index, gpuIndex);
+          this.gl.activeTexture(gpuTexture);
+          this.gl.bindTexture(this.gl.TEXTURE_2D, this.partialVideoTextures[index]);
+          this.gl.texSubImage2D(this.gl.TEXTURE_2D, 0, 0, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.partialVideos[index]);
+        }
+      }, Math.floor(1000 / 24));
     }, true);
     partial.element.play();
     // partial.element.addEventListener('canplay', () => {
@@ -231,6 +243,7 @@ class SwitcherShader {
     // console.log('partial loading');
     // partial.element.load();
   }
+
 
   // add an input video to the mainVideo.  this will be used by
   // the main shader
