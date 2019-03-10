@@ -1,9 +1,8 @@
 /*
 partials thread needs to:
 -set up initial GL texture stuff
--set render to true once video starts playing
--set render to false once video stops playing
-b) render any other time
+- respond to calls from requestAnimationFrame to draw the array
+-
 */
 let glWorker;
 class GLWorker {
@@ -17,8 +16,12 @@ class GLWorker {
     this.initTexture(this.mainVideoTexture);
   }
 
-  render(image, now, fireShader) {
-}
+  render(now) {
+  }
+
+  loadTexture(image, now) {
+
+  }
 
 const onmessage = function (e) {
   // render:
