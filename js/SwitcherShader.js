@@ -225,7 +225,7 @@ class SwitcherShader {
     this.partialVideos[index] = partial.element;
     partial.element.addEventListener('playing', () => {
       this.partialVideoReady[index] = true;
-      setInterval(() => {
+      partial.element.ontimeupdate = () => {
         if (this.partialVideoReady[index]) {
           // do the copy here
           this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.partialVertexBuffer);
@@ -234,7 +234,7 @@ class SwitcherShader {
           this.gl.bindTexture(this.gl.TEXTURE_2D, this.partialVideoTextures[index]);
           this.gl.texSubImage2D(this.gl.TEXTURE_2D, 0, 0, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.partialVideos[index]);
         }
-      }, Math.floor(1000 / 24));
+      };
     }, true);
     partial.element.play();
     // partial.element.addEventListener('canplay', () => {
