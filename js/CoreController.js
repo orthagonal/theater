@@ -20,10 +20,9 @@ class CoreController {
     this.textCanvas.width = this.finalDestinationCanvas.width;
     this.textCanvas.height = this.finalDestinationCanvas.height;
 
-    this.gl = this.finalDestinationCanvas.getContext('webgl');
     this.textContext = this.textCanvas.getContext('2d');
     this.audioController = new AudioController(options.$);
-    this.videoController = new VideoController(this, this.gl, options.theWindow);
+    this.videoController = new VideoController(this, options.theWindow);
     this.interfaceController = new InterfaceController(this);
 
     // this loads any module:

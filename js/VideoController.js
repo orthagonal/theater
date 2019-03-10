@@ -7,7 +7,7 @@ global.MOUSE_BW_EFFECT = 2.0; // a melty hole at the mouse point
 global.TEXT_MELT_EFFECT = 3.0; // show the text as melty
 
 class VideoController extends EventEmitter {
-  constructor(controller, gl, theWindow) {
+  constructor(controller, theWindow) {
     super();
     this.sceneDescription = false;
     this.controller = controller;
@@ -20,7 +20,7 @@ class VideoController extends EventEmitter {
     this.nextVideo = false;
     this.videoFetcher = false;
     this.activeObject = false;
-    this.switcher = new SwitcherShader(this, gl, controller.dimensions, controller.devMode);
+    this.switcher = new SwitcherShader(this, controller.dimensions, controller.devMode);
   }
 
   goUp(val) {

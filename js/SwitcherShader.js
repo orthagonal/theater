@@ -5,12 +5,21 @@ const fs = require('fs');
 const path = require('path');
 
 class SwitcherShader {
-  constructor(videoController, gl, dimensions, devMode = true) {
+  constructor(videoController, dimensions, devMode = true) {
     console.log('switcher dev mode is %s', devMode);
-    this.gl = gl;
-    this.goUp = true;
+    // will become:
+    // todo: I think there is only one worker with one gl context:
     this.videoController = videoController;
-    this.partials = [undefined, undefined, undefined, undefined, undefined];
+    this.offscreenCanvas1 = videoController.controller.finalDestinationCanvas.transferControlToOffscreen();
+    this.partialVideos = [];
+    this.partialVideoReady = [];
+    for (let i = 0; i < 5; i++) {
+      this.partialVideoWorkers.push(new videoController.controller.theWindow.Worker('./js/PartialsShader.js'));
+      this.partialVideoReady.push(false);
+      this.partialVideoWorkers[i].postMessage({ bitmap: false, init: true, canvas: this.offscreenCanvas1, index: i });
+      this.partials.push(undefined);
+    }
+    this.goUp = true;
     let vertexShaderSource;
     let pixelShaderSource;
     if (devMode) {
@@ -22,30 +31,22 @@ class SwitcherShader {
     }
     this.defaultScreenCoordinates = [-1, 1, -1, -1, 1, -1, 1, 1];
     // setup the video elements and textures:
-    this.mainVideo = undefined;
     this.mainVideoReady = false;
-    this.mainVideoTexture = gl.createTexture();
-    this.initTexture(this.mainVideoTexture);
 
-    this.hitboxVideo = undefined;
-    this.hitboxReady = false;
-    this.hitboxVideoTexture = gl.createTexture();
-    this.initTexture(this.hitboxVideoTexture);
+    // this.hitboxVideo = undefined;
+    // this.hitboxReady = false;
+    // this.hitboxVideoTexture = gl.createTexture();
+    // this.initTexture(this.hitboxVideoTexture);
 
-    this.textImage = undefined;
-    this.textReady = false;
-    this.textTexture = gl.createTexture();
-    this.initTexture(this.textTexture);
+    // this.textImage = undefined;
+    // this.textReady = false;
+    // this.textTexture = gl.createTexture();
+    // this.initTexture(this.textTexture);
 
-    this.partialVideos = [undefined, undefined, undefined, undefined, undefined];
-    this.partialVideoReady = [false, false, false, false, false];
-    this.partialVideoTextures = this.partialVideos.map(p => gl.createTexture());
-    this.partialVideoTextures.forEach(p => this.initTexture(p));
-
-    this.inputVideos = [undefined, undefined, undefined];
-    this.inputVideoReady = [false, false, false];
-    this.inputVideoTextures = this.inputVideos.map(p => gl.createTexture());
-    this.inputVideoTextures.forEach(p => this.initTexture(p));
+    // this.inputVideos = [undefined, undefined, undefined];
+    // this.inputVideoReady = [false, false, false];
+    // this.inputVideoTextures = this.inputVideos.map(p => gl.createTexture());
+    // this.inputVideoTextures.forEach(p => this.initTexture(p));
 
     // set up the shader
     const program = this.program = gl.createProgram();
@@ -83,13 +84,7 @@ class SwitcherShader {
     this.u_mainVideo = gl.getUniformLocation(this.program, 'u_mainVideo');
     this.u_hitboxVideo = gl.getUniformLocation(this.program, 'u_hitboxVideo');
     this.u_textTexture = gl.getUniformLocation(this.program, 'u_textTexture');
-    // this.u_scaleLoc = gl.getUniformLocation(this.program, 'u_scaleF');
-    // this.u_transLoc = gl.getUniformLocation(this.program, 'u_translation');
-    // this.u_alpha = gl.getUniformLocation(this.program, 'u_alpha');
     this.u_isPartial = gl.getUniformLocation(this.program, 'u_isPartial');
-
-    // this.gl.uniform2fv(this.u_transLoc, [0.0, 0.0]);
-    // this.gl.uniform1f(this.u_scaleLoc, 1.0);
 
     // shader variables
     // todo: change this to UBOs so groups of related uniforms can be set with 1 gl call:
@@ -217,6 +212,8 @@ class SwitcherShader {
   // connect partial video to shader, partials are small videos
   // that lay over all or part of the main video:
   connectPartial(partial, index, callbacks, partialIndex) {
+    console.log(partial);
+    // this.partialWorker1.postMessage({ partial, index, partialIndex });
     this.partialVideoReady[index] = false;
     this.partials[index] = partial;
     this.partialVideos[index] = partial.element;
@@ -249,6 +246,18 @@ class SwitcherShader {
 
   //////// event listeners:
   render(now) {
+    // new loop (still actually single-threaded)
+    // THIS IS THE FIRST THING TO TRY MAYBE STASH THIS BRANCH and try with a clean branch in master:
+    // requestAnimationFrame fires, copies main texture and calls drawArrays
+    // independent setIntervals regularly get the partial video data and copy it to the GPU
+    // we want to avoid copying every video texture every single time requestAnimationFrame is called
+    // if that works we can parallelize that with workers later if still needed
+
+    // other options:
+        // new main thread render loop is:
+    // call .postMessage/transferToImageBitmap for each partial worker/partialVideo, include texture index info
+    // call .postMessage/transferToImageBitmap for main video worker/mainVideo, dedicated texture index info and fires shader
+
     const gl = this.gl;
     // this.currentTime = new Date().getTime();
     // const elapsedTime = this.currentTime - this.effectStartTime;
@@ -319,6 +328,7 @@ class SwitcherShader {
       gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.mainVideo);
       gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
     }
+    this.partialWorker1.postMessage({ bitmap: this.offscreenCanvas1.transferToImageBitmap(), now, runShader: true });
     // may need to do something here
     this.videoController.theWindow.requestAnimationFrame(this.render.bind(this));
   }
