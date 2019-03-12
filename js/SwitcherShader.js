@@ -58,12 +58,14 @@ class SwitcherShader {
     this.initTexture(this.textTexture);
 
     this.gpuVars = [];
+    this.gpuTextures = [];
     this.partialVideos = [undefined, undefined, undefined, undefined, undefined];
     this.partialVideoReady = [false, false, false, false, false];
     this.partialVideoTextures = this.partialVideos.map(p => gl.createTexture());
     this.partialVideoTextures.forEach((p, index) => {
       this.initTexture(p);
       this.gpuVars.push(this.gl.getUniformLocation(this.program, `u_partialTexture${index}`));
+      this.gpuTextures.push(this.gl[`TEXTURE${index + 3}`]);
     });
 
     this.inputVideos = [undefined, undefined, undefined];
@@ -232,14 +234,13 @@ class SwitcherShader {
   // that lay over all or part of the main video:
   connectPartial(partial, index, callbacks, partialIndex) {
     const gpuIndex = index + 3;
-    const gpuTexture = this.gl[`TEXTURE${gpuIndex}`];
     this.partials[index] = partial;
     this.partialVideos[index] = partial.element;
     partial.element.ontimeupdate = () => {
       // do the copy here
       this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.partialVertexBuffer);
       this.gl.uniform1i(this.gpuVars[index], gpuIndex);
-      this.gl.activeTexture(gpuTexture);
+      this.gl.activeTexture(this.gpuTextures[index]);
       this.gl.bindTexture(this.gl.TEXTURE_2D, this.partialVideoTextures[index]);
       this.gl.texSubImage2D(this.gl.TEXTURE_2D, 0, 0, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.partialVideos[index]);
     };
