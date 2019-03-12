@@ -247,17 +247,17 @@ void main() {
   vec2 normalizedMouse = u_mouse.xy / u_resolution.xy;
 	// u_mainVideo is either the main video or a partial
 	// who's coordinates/dimensions have been set by the vertex shader already:
-	vec4 partialColor0 = texture2D(u_partialTexture0, normalizedCoords);
-	vec4 partialColor1 = texture2D(u_partialTexture1, normalizedCoords);
-	vec4 partialColor2 = texture2D(u_partialTexture2, normalizedCoords);
-	vec4 partialColor3 = texture2D(u_partialTexture3, normalizedCoords);
-	vec4 partialColor4 = texture2D(u_partialTexture4, normalizedCoords);
 	vec4 color = texture2D(u_mainVideo, normalizedCoords);
 
 	if (color.a > 0.5) {
 		gl_FragColor = color;
 	}
 	// FASTER:
+	vec4 partialColor0 = texture2D(u_partialTexture0, normalizedCoords);
+	vec4 partialColor1 = texture2D(u_partialTexture1, normalizedCoords);
+	vec4 partialColor2 = texture2D(u_partialTexture2, normalizedCoords);
+	vec4 partialColor3 = texture2D(u_partialTexture3, normalizedCoords);
+	vec4 partialColor4 = texture2D(u_partialTexture4, normalizedCoords);
 	gl_FragColor.rgb = gl_FragColor.rgb + (partialColor0.a * (partialColor0.rgb - gl_FragColor.rgb));
 	gl_FragColor.rgb = gl_FragColor.rgb + (partialColor1.a * (partialColor1.rgb - gl_FragColor.rgb));
 	gl_FragColor.rgb = gl_FragColor.rgb + (partialColor2.a * (partialColor2.rgb - gl_FragColor.rgb));
