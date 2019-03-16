@@ -25,6 +25,9 @@ class SwitcherShader {
     this.videoController = videoController;
     this.offscreenCanvas1 = videoController.controller.finalDestinationCanvas.transferControlToOffscreen();
     // todo: make more workers???
+    // one draws main
+    // one draws partial1
+    // one draws partial2 etc
     this.glWorker = new videoController.controller.theWindow.Worker('./js/PartialsShader.js');
     this.glWorker.postMessage({ canvas: this.offscreenCanvas1, init: true, devMode, vertexShaderSource, pixelShaderSource, dimensions }, [this.offscreenCanvas1]);
     // should this be delayed?
@@ -58,14 +61,14 @@ class SwitcherShader {
     if (waitForIt) {
       this.mainVideoReady = false;
     }
-    element.addEventListener('playing', () => {
-      element.ontimeupdate = () => {
-        this.videoController.theWindow.createImageBitmap(element, 0, 0, 1920, 1080).then(image => {
-          this.glWorker.postMessage({ image, main: true }, [image]);
-        });
-      };
-      this.mainVideoReady = true;
-    }, true);
+    // element.addEventListener('playing', () => {
+    //   element.ontimeupdate = () => {
+        // this.videoController.theWindow.createImageBitmap(element, 0, 0, 1920, 1080).then(image => {
+        //   this.glWorker.postMessage({ image, main: true }, [image]);
+        // });
+    //   };
+    //   this.mainVideoReady = true;
+    // }, true);
   }
 
   // connect mask to shader:
@@ -112,12 +115,11 @@ class SwitcherShader {
     const gpuIndex = index + 3;
     this.partials[index] = partial;
     this.partialVideos[index] = partial.element;
-    partial.element.ontimeupdate = () => {
-      this.videoController.theWindow.createImageBitmap(partial.element, 0, 0, 1920, 1080).then(image => {
-        this.glWorker.postMessage({ image, partial: true }, [image]);
-      });
-      this.glWorker.postMessage({ partial: true, index, gpuIndex,  });
-    };
+    // partial.element.ontimeupdate = () => {
+    //   this.videoController.theWindow.createImageBitmap(partial.element, 0, 0, 1920, 1080).then(image => {
+    //     this.glWorker.postMessage({ image, partial: true, index, gpuIndex }, [image]);
+    //   });
+    // };
     partial.element.play();
   }
 
@@ -128,6 +130,16 @@ class SwitcherShader {
     // if (this.frameCount % 24 === 0) {
     //   console.log(`${this.frameCount} / ${now / 1000} = ${this.frameCount / (now / 1000)}`);
     // }
+    if (this.partialVideoReady[0]) {
+      // this.videoController.theWindow.createImageBitmap(this.partialVideos[0], 0, 0, 1920, 1080).then(image => {
+      //   this.glWorker.postMessage({ image, partial: true, 0, 3 }, [image]);
+      // });
+    }
+    if (this.mainVideoReady) {
+      this.videoController.theWindow.createImageBitmap(this.mainVideo, 0, 0, 1920, 1080).then(image => {
+        this.glWorker.postMessage({ image, main: true }, [image]);
+      });
+    }
     this.glWorker.postMessage({ render: now });
     // may need to do something here
     this.videoController.theWindow.requestAnimationFrame(this.render.bind(this));

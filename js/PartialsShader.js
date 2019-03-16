@@ -168,7 +168,7 @@ class GLWorker {
       this.gl.uniform1i(this.textUnit, 2);
       gl.activeTexture(gl.TEXTURE2);
       gl.bindTexture(gl.TEXTURE_2D, this.textTexture);
-      // gl.texSubImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.textImage);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.textImage);
     }
     // add the hitbox data stream, can be used for hitbox effects:
     if (this.hitboxVideoReady) {
