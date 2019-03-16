@@ -61,14 +61,14 @@ class SwitcherShader {
     if (waitForIt) {
       this.mainVideoReady = false;
     }
-    // element.addEventListener('playing', () => {
+    element.onplaying = () => {
     //   element.ontimeupdate = () => {
         // this.videoController.theWindow.createImageBitmap(element, 0, 0, 1920, 1080).then(image => {
         //   this.glWorker.postMessage({ image, main: true }, [image]);
         // });
     //   };
-    //   this.mainVideoReady = true;
-    // }, true);
+      this.mainVideoReady = true;
+    };
   }
 
   // connect mask to shader:
@@ -115,6 +115,10 @@ class SwitcherShader {
     const gpuIndex = index + 3;
     this.partials[index] = partial;
     this.partialVideos[index] = partial.element;
+    this.partialVideoReady[index] = false;
+    partial.element.onplaying = () => {
+      this.partialVideoReady[index] = true;
+    };
     // partial.element.ontimeupdate = () => {
     //   this.videoController.theWindow.createImageBitmap(partial.element, 0, 0, 1920, 1080).then(image => {
     //     this.glWorker.postMessage({ image, partial: true, index, gpuIndex }, [image]);
@@ -125,23 +129,21 @@ class SwitcherShader {
 
   //////// event listeners:
   render(now) {
-    const gl = this.gl;
     // this.frameCount++;
     // if (this.frameCount % 24 === 0) {
     //   console.log(`${this.frameCount} / ${now / 1000} = ${this.frameCount / (now / 1000)}`);
     // }
     if (this.partialVideoReady[0]) {
-      // this.videoController.theWindow.createImageBitmap(this.partialVideos[0], 0, 0, 1920, 1080).then(image => {
-      //   this.glWorker.postMessage({ image, partial: true, 0, 3 }, [image]);
-      // });
+      this.videoController.theWindow.createImageBitmap(this.partialVideos[0], 0, 0, 1920, 1080).then(image => {
+        this.glWorker.postMessage({ image, partial: true, index: 0, gpuIndex: 3 }, [image]);
+      });
     }
     if (this.mainVideoReady) {
       this.videoController.theWindow.createImageBitmap(this.mainVideo, 0, 0, 1920, 1080).then(image => {
         this.glWorker.postMessage({ image, main: true }, [image]);
       });
     }
-    this.glWorker.postMessage({ render: now });
-    // may need to do something here
+    // this.glWorker.postMessage({ render: now });
     this.videoController.theWindow.requestAnimationFrame(this.render.bind(this));
   }
 

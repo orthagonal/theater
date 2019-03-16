@@ -150,13 +150,13 @@ class GLWorker {
 
   // render event responders:
   drawPartial(data) {
+    const gl = this.gl;
     console.log('draw partial');
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.partialVertexBuffer);
-    this.gl.uniform1i(this.gpuVars[data.index], data.gpuIndex);
-    this.gl.activeTexture(this.gpuTextures[data.index]);
-    this.gl.bindTexture(this.gl.TEXTURE_2D, this.partialVideoTextures[data.index]);
-    this.gl.texSubImage2D(this.gl.TEXTURE_2D, 0, 0, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, data.image);
-    // this.gl.texSubImage2D(this.gl.TEXTURE_2D, 0, 0, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, data.image);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
+    gl.uniform1i(this.gpuVars[data.index], data.gpuIndex);
+    gl.activeTexture(this.gpuTextures[data.index]);
+    gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[data.index]);
+    gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, data.image);
   }
 
   drawMain(data) {
@@ -183,6 +183,7 @@ class GLWorker {
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.mainVideoTexture);
     gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, data.image);
+    this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, 4);
   }
 
   render(now) {
