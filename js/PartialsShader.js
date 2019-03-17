@@ -136,10 +136,8 @@ class GLWorker {
     gl.bindTexture(gl.TEXTURE_2D, texture);
     // this needs to be set to correct data.dimensions:
     const pixel = new Uint8Array(1920 * 4 * 1080 * 4);//[255, 0, 0, 255]);  // opaque red
-    console.log('doing the red');
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1920, 1080, 0, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
     // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
-    console.log('done red');
     // Turn off mips and set  wrapping to clamp to edge so it
     // will work regardless of the data.dimensions of the video.
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -151,7 +149,6 @@ class GLWorker {
   // render event responders:
   drawPartial(data) {
     const gl = this.gl;
-    console.log('draw partial');
     gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
     gl.uniform1i(this.gpuVars[data.index], data.gpuIndex);
     gl.activeTexture(this.gpuTextures[data.index]);

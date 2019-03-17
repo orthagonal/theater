@@ -24,10 +24,6 @@ class SwitcherShader {
     this.goUp = true;
     this.videoController = videoController;
     this.offscreenCanvas1 = videoController.controller.finalDestinationCanvas.transferControlToOffscreen();
-    // todo: make more workers???
-    // one draws main
-    // one draws partial1
-    // one draws partial2 etc
     this.glWorker = new videoController.controller.theWindow.Worker('./js/PartialsShader.js');
     this.glWorker.postMessage({ canvas: this.offscreenCanvas1, init: true, devMode, vertexShaderSource, pixelShaderSource, dimensions }, [this.offscreenCanvas1]);
     // should this be delayed?
@@ -129,15 +125,36 @@ class SwitcherShader {
 
   //////// event listeners:
   render(now) {
-    // this.frameCount++;
+    this.frameCount++;
     // if (this.frameCount % 24 === 0) {
     //   console.log(`${this.frameCount} / ${now / 1000} = ${this.frameCount / (now / 1000)}`);
     // }
-    if (this.partialVideoReady[0]) {
+    if (this.partialVideoReady[0] && this.frameCount % 5 === 0) {
       this.videoController.theWindow.createImageBitmap(this.partialVideos[0], 0, 0, 1920, 1080).then(image => {
         this.glWorker.postMessage({ image, partial: true, index: 0, gpuIndex: 3 }, [image]);
       });
     }
+    if (this.partialVideoReady[1] && this.frameCount % 6 === 0) {
+      this.videoController.theWindow.createImageBitmap(this.partialVideos[1], 0, 0, 1920, 1080).then(image => {
+        this.glWorker.postMessage({ image, partial: true, index: 1, gpuIndex: 4 }, [image]);
+      });
+    }
+    if (this.partialVideoReady[2] && this.frameCount % 7 === 0) {
+      this.videoController.theWindow.createImageBitmap(this.partialVideos[2], 0, 0, 1920, 1080).then(image => {
+        this.glWorker.postMessage({ image, partial: true, index: 2, gpuIndex: 5 }, [image]);
+      });
+    }
+    if (this.partialVideoReady[3] && this.frameCount % 8 === 0) {
+      this.videoController.theWindow.createImageBitmap(this.partialVideos[3], 0, 0, 1920, 1080).then(image => {
+        this.glWorker.postMessage({ image, partial: true, index: 3, gpuIndex: 6 }, [image]);
+      });
+    }
+    if (this.partialVideoReady[4] && this.frameCount % 9 === 0) {
+      this.videoController.theWindow.createImageBitmap(this.partialVideos[4], 0, 0, 1920, 1080).then(image => {
+        this.glWorker.postMessage({ image, partial: true, index: 4, gpuIndex: 7 }, [image]);
+      });
+    }
+
     if (this.mainVideoReady) {
       this.videoController.theWindow.createImageBitmap(this.mainVideo, 0, 0, 1920, 1080).then(image => {
         this.glWorker.postMessage({ image, main: true }, [image]);
