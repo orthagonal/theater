@@ -26,8 +26,10 @@ class SwitcherShader {
     this.offscreenCanvas1 = videoController.controller.finalDestinationCanvas.transferControlToOffscreen();
     this.glWorker = new videoController.controller.theWindow.Worker('./js/PartialsShader.js');
     this.glWorker.postMessage({ canvas: this.offscreenCanvas1, init: true, devMode, vertexShaderSource, pixelShaderSource, dimensions }, [this.offscreenCanvas1]);
-    // should this be delayed?
-    this.videoController.theWindow.requestAnimationFrame(this.render.bind(this));
+    this.requestAnimationFrame = this.videoController.theWindow.requestAnimationFrame.bind(this.videoController.theWindow);
+    setTimeout(() => {
+      this.videoController.theWindow.requestAnimationFrame(this.render.bind(this));
+    }, 2500);
   }
 
   deactivateEffect() {
@@ -58,11 +60,6 @@ class SwitcherShader {
       this.mainVideoReady = false;
     }
     element.onplaying = () => {
-    //   element.ontimeupdate = () => {
-        // this.videoController.theWindow.createImageBitmap(element, 0, 0, 1920, 1080).then(image => {
-        //   this.glWorker.postMessage({ image, main: true }, [image]);
-        // });
-    //   };
       this.mainVideoReady = true;
     };
   }
@@ -115,53 +112,23 @@ class SwitcherShader {
     partial.element.onplaying = () => {
       this.partialVideoReady[index] = true;
     };
-    // partial.element.ontimeupdate = () => {
-    //   this.videoController.theWindow.createImageBitmap(partial.element, 0, 0, 1920, 1080).then(image => {
-    //     this.glWorker.postMessage({ image, partial: true, index, gpuIndex }, [image]);
-    //   });
-    // };
     partial.element.play();
   }
 
   //////// event listeners:
   render(now) {
-    this.frameCount++;
-    // if (this.frameCount % 24 === 0) {
-    //   console.log(`${this.frameCount} / ${now / 1000} = ${this.frameCount / (now / 1000)}`);
-    // }
-    if (this.partialVideoReady[0] && this.frameCount % 5 === 0) {
-      this.videoController.theWindow.createImageBitmap(this.partialVideos[0], 0, 0, 1920, 1080).then(image => {
-        this.glWorker.postMessage({ image, partial: true, index: 0, gpuIndex: 3 }, [image]);
+    this.frameCount = (this.frameCount + 1) % 6;
+    if (this.partialVideoReady[this.frameCount]) {
+      this.videoController.theWindow.createImageBitmap(this.partialVideos[this.frameCount], 0, 0, 1920, 1080).then(image => {
+        this.glWorker.postMessage({ image, partial: true, index: this.frameCount, gpuIndex: this.frameCount + 3 }, [image]);
       });
     }
-    if (this.partialVideoReady[1] && this.frameCount % 6 === 0) {
-      this.videoController.theWindow.createImageBitmap(this.partialVideos[1], 0, 0, 1920, 1080).then(image => {
-        this.glWorker.postMessage({ image, partial: true, index: 1, gpuIndex: 4 }, [image]);
-      });
-    }
-    if (this.partialVideoReady[2] && this.frameCount % 7 === 0) {
-      this.videoController.theWindow.createImageBitmap(this.partialVideos[2], 0, 0, 1920, 1080).then(image => {
-        this.glWorker.postMessage({ image, partial: true, index: 2, gpuIndex: 5 }, [image]);
-      });
-    }
-    if (this.partialVideoReady[3] && this.frameCount % 8 === 0) {
-      this.videoController.theWindow.createImageBitmap(this.partialVideos[3], 0, 0, 1920, 1080).then(image => {
-        this.glWorker.postMessage({ image, partial: true, index: 3, gpuIndex: 6 }, [image]);
-      });
-    }
-    if (this.partialVideoReady[4] && this.frameCount % 9 === 0) {
-      this.videoController.theWindow.createImageBitmap(this.partialVideos[4], 0, 0, 1920, 1080).then(image => {
-        this.glWorker.postMessage({ image, partial: true, index: 4, gpuIndex: 7 }, [image]);
-      });
-    }
-
     if (this.mainVideoReady) {
       this.videoController.theWindow.createImageBitmap(this.mainVideo, 0, 0, 1920, 1080).then(image => {
         this.glWorker.postMessage({ image, main: true }, [image]);
       });
     }
-    // this.glWorker.postMessage({ render: now });
-    this.videoController.theWindow.requestAnimationFrame(this.render.bind(this));
+    this.requestAnimationFrame(this.render.bind(this));
   }
 
   // effects:
