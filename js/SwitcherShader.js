@@ -12,6 +12,7 @@ class SwitcherShader {
     this.partials = [undefined, undefined, undefined, undefined, undefined];
     this.partialVideos = [undefined, undefined, undefined, undefined, undefined];
     this.partialVideoReady = [false, false, false, false, false];
+    this.partialVideoTransitioning = [false, false, false, false, false];
     let vertexShaderSource;
     let pixelShaderSource;
     if (devMode) {
@@ -86,39 +87,43 @@ class SwitcherShader {
     this.textReady = false;
   }
 
-  // is this still here?
-  // add an input video to the mainVideo.  this will be used by
-  // the main shader
-  // addInput(videoSource, name, textureIndex, coords) {
-  //   const gl = this.gl;
-  //   const inputVertexBuffer = gl.createBuffer();
-  //   gl.bindBuffer(gl.ARRAY_BUFFER, inputVertexBuffer);
-  //   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(coords), gl.DYNAMIC_DRAW);
-  //   const videoUnit = gl.getUniformLocation(this.program, name);
-  //   gl.uniform1i(videoUnit, textureIndex);
-  //   const inputTexture = gl.createTexture();
-  //   gl.activeTexture(gl[`TEXTURE${textureIndex}`]);
-  //   gl.bindTexture(gl.TEXTURE_2D, inputTexture);
-  //   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, videoSource);
-  // }
-
   // connect partial video to shader, partials are small videos
   // that lay over all or part of the main video:
-  connectPartial(partial, index, callbacks, partialIndex) {
+  connectPartial(partial, index, isFirst) {
+    // only update partial frames if the partial is transitioning,
+    // so ready=true when onplaying a transitioning partial
+    // then ready = false after first frame of the *next* video
     const gpuIndex = index + 3;
     this.partials[index] = partial;
     this.partialVideos[index] = partial.element;
     this.partialVideoReady[index] = false;
-    partial.element.onplaying = () => {
-      this.partialVideoReady[index] = true;
-    };
+    this.partialVideoTransitioning[index] = false;
+    if (isFirst) {
+      partial.element.onplaying = () => {
+        this.partialVideoTransitioning[index] = true;
+      };
+    } else {
+      partial.element.onplaying = () => {
+        this.partialVideoReady[index] = true;
+      };
+    }
     partial.element.play();
   }
 
   //////// event listeners:
   render(now) {
+    // transitioning ones update every single frame
+    // the others only update 1/6 calls
     this.frameCount = (this.frameCount + 1) % 6;
-    if (this.partialVideoReady[this.frameCount]) {
+    for (let i = 0; i < this.partialVideoTransitioning.length; i++) {
+      if (this.partialVideoTransitioning[i]) {
+        this.videoController.theWindow.createImageBitmap(this.partialVideos[i], 0, 0, 1920, 1080).then(image => {
+          this.glWorker.postMessage({ image, partial: true, index: this.frameCount, gpuIndex: i + 3 }, [image]);
+        });
+      }
+    }
+    // others only updte once per 6
+    if (this.partialVideoReady[this.frameCount] && !this.partialVideoTransitioning[this.frameCount]) {
       this.videoController.theWindow.createImageBitmap(this.partialVideos[this.frameCount], 0, 0, 1920, 1080).then(image => {
         this.glWorker.postMessage({ image, partial: true, index: this.frameCount, gpuIndex: this.frameCount + 3 }, [image]);
       });
@@ -147,3 +152,19 @@ class SwitcherShader {
 }
 
 module.exports = SwitcherShader;
+
+// is this still here?
+// add an input video to the mainVideo.  this will be used by
+// the main shader
+// addInput(videoSource, name, textureIndex, coords) {
+//   const gl = this.gl;
+//   const inputVertexBuffer = gl.createBuffer();
+//   gl.bindBuffer(gl.ARRAY_BUFFER, inputVertexBuffer);
+//   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(coords), gl.DYNAMIC_DRAW);
+//   const videoUnit = gl.getUniformLocation(this.program, name);
+//   gl.uniform1i(videoUnit, textureIndex);
+//   const inputTexture = gl.createTexture();
+//   gl.activeTexture(gl[`TEXTURE${textureIndex}`]);
+//   gl.bindTexture(gl.TEXTURE_2D, inputTexture);
+//   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, videoSource);
+// }
