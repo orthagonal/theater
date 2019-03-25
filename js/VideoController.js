@@ -23,6 +23,10 @@ class VideoController extends EventEmitter {
     this.switcher = new SwitcherShader(this, controller.dimensions, controller.devMode);
   }
 
+  noShow(val) {
+    this.switcher.noShow = val;
+  }
+
   goUp(val) {
     this.switcher.goUp = val;
   }
@@ -165,6 +169,7 @@ class VideoController extends EventEmitter {
     if (!partial.element.onended) {
       partial.element.onended = this.previousEndPartial.bind(this);
     }
+    this.switcher.allStarting = true;
     this.switcher.connectPartial.bind(this.switcher)(partial, index, isTransition);
   }
 }

@@ -198,6 +198,9 @@ self.onmessage = function (e) {
     return glWorker.drawPartial(e.data);
   }
   if (e.data.main) {
+    if (e.data.noShow) {
+      return;
+    }
     return glWorker.drawMain(e.data);
   }
   if (e.data.render) {

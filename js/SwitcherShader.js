@@ -6,6 +6,7 @@ const path = require('path');
 
 class SwitcherShader {
   constructor(videoController, dimensions, devMode = true) {
+    this.noShow = true;
     this.frameCount = 0;
     this.dimensions = dimensions;
     console.log('switcher dev mode is %s', devMode);
@@ -113,24 +114,58 @@ class SwitcherShader {
   //////// event listeners:
   render(now) {
     // transitioning ones update every single frame
-    // the others only update 1/6 calls
     this.frameCount = (this.frameCount + 1) % 6;
-    for (let i = 0; i < this.partialVideoTransitioning.length; i++) {
-      if (this.partialVideoTransitioning[i]) {
-        this.videoController.theWindow.createImageBitmap(this.partialVideos[i], 0, 0, 1920, 1080).then(image => {
-          this.glWorker.postMessage({ image, partial: true, index: this.frameCount, gpuIndex: i + 3 }, [image]);
-        });
-      }
+    if (this.partialVideoTransitioning[0]) {
+      this.videoController.theWindow.createImageBitmap(this.partialVideos[0], { resizeWidth: 1920, resizeHeight: 1080, resizeQuality: 'high' }).then(image => {
+        this.glWorker.postMessage({ image, partial: true, index: this.frameCount, gpuIndex: 3 }, [image]);
+      });
     }
-    // others only updte once per 6
+    if (this.partialVideoTransitioning[1]) {
+      this.videoController.theWindow.createImageBitmap(this.partialVideos[1], { resizeWidth: 1920, resizeHeight: 1080, resizeQuality: 'high' }).then(image => {
+        this.glWorker.postMessage({ image, partial: true, index: this.frameCount, gpuIndex: 4 }, [image]);
+      });
+    }
+    if (this.partialVideoTransitioning[2]) {
+      this.videoController.theWindow.createImageBitmap(this.partialVideos[2], { resizeWidth: 1920, resizeHeight: 1080, resizeQuality: 'high' }).then(image => {
+        this.glWorker.postMessage({ image, partial: true, index: this.frameCount, gpuIndex: 5 }, [image]);
+      });
+    }
+    if (this.partialVideoTransitioning[3]) {
+      this.videoController.theWindow.createImageBitmap(this.partialVideos[3], { resizeWidth: 1920, resizeHeight: 1080, resizeQuality: 'high' }).then(image => {
+        this.glWorker.postMessage({ image, partial: true, index: this.frameCount, gpuIndex: 6 }, [image]);
+      });
+    }
+    if (this.partialVideoTransitioning[4]) {
+      this.videoController.theWindow.createImageBitmap(this.partialVideos[4], { resizeWidth: 1920, resizeHeight: 1080, resizeQuality: 'high' }).then(image => {
+        this.glWorker.postMessage({ image, partial: true, index: this.frameCount, gpuIndex: 7 }, [image]);
+      });
+    }
+    if (this.partialVideoTransitioning[5]) {
+      this.videoController.theWindow.createImageBitmap(this.partialVideos[5], { resizeWidth: 1920, resizeHeight: 1080, resizeQuality: 'high' }).then(image => {
+        this.glWorker.postMessage({ image, partial: true, index: this.frameCount, gpuIndex: 8 }, [image]);
+      });
+    }
+    // on first go-through do all of them:
+    // if (this.allStarting) {
+    //   for (let i = 0; i < 6; i++) {
+    //     if (this.partialVideoReady[i]) {
+    //       this.videoController.theWindow.createImageBitmap(this.partialVideos[i], { resizeWidth: 1920, resizeHeight: 1080, resizeQuality: 'high' }).then(image => {
+    //         this.glWorker.postMessage({ image, partial: true, index: i, gpuIndex: i + 3 }, [image]);
+    //       });
+    //     }
+    //   }
+    // } else {
+    // others only update once per 6
     if (this.partialVideoReady[this.frameCount] && !this.partialVideoTransitioning[this.frameCount]) {
-      this.videoController.theWindow.createImageBitmap(this.partialVideos[this.frameCount], 0, 0, 1920, 1080).then(image => {
+      this.videoController.theWindow.createImageBitmap(this.partialVideos[this.frameCount], { resizeWidth: 1920, resizeHeight: 1080, resizeQuality: 'high' }).then(image => {
         this.glWorker.postMessage({ image, partial: true, index: this.frameCount, gpuIndex: this.frameCount + 3 }, [image]);
       });
     }
     if (this.mainVideoReady) {
-      this.videoController.theWindow.createImageBitmap(this.mainVideo, 0, 0, 1920, 1080).then(image => {
-        this.glWorker.postMessage({ image, main: true }, [image]);
+      this.videoController.theWindow.createImageBitmap(this.mainVideo,
+        { resizeWidth: 1920, resizeHeight: 1080, resizeQuality: 'high' }
+      ).then(image => {
+        this.glWorker.postMessage({ image, main: true, noShow: this.noShow }, [image]);
       });
     }
     this.requestAnimationFrame(this.render.bind(this));
