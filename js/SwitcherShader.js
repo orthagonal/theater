@@ -113,6 +113,7 @@ class SwitcherShader {
 
   //////// event listeners:
   render(now) {
+    const t1 = new Date();
     // transitioning ones update every single frame
     this.frameCount = (this.frameCount + 1) % 6;
     if (this.partialVideoTransitioning[0]) {
@@ -168,6 +169,8 @@ class SwitcherShader {
         this.glWorker.postMessage({ image, main: true, noShow: this.noShow }, [image]);
       });
     }
+    const t2 = new Date();
+    console.log(`time: ${t2 - t1}`);
     this.requestAnimationFrame(this.render.bind(this));
   }
 
