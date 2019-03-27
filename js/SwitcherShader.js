@@ -259,6 +259,7 @@ class SwitcherShader {
 
   //////// event listeners:
   render(now) {
+    const t1 = new Date();
     // transitioning ones update every single frame
     this.frameCount = (this.frameCount + 1) % 6;
     if (this.partialVideoTransitioning[0]) {
@@ -302,6 +303,8 @@ class SwitcherShader {
       gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.mainVideo);
       this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, 4);
     }
+    const t2 = new Date();
+    console.log(`time: ${t2 - t1}`);
     this.requestAnimationFrame(this.render.bind(this));
   }
 
