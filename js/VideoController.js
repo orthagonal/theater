@@ -41,19 +41,24 @@ class VideoController extends EventEmitter {
     if (this.branching) {
       return this.branchEnd();
     }
-    // delete this.currentVideo.onended;
-    this.currentVideo = this.activeObject.getNextVideo();
-    this.switcher.connectVideo(this.currentVideo.element, true);
+    this.currentVideo.element.pause();
+    // todo:
+    this.currentVideo = this.nextVideo;
+    this.switcher.connectVideo(this.currentVideo.element);
+    this.currentVideo.element.onended = this.previousEnd.bind(this);
+    const t1 = new Date();
+    this.currentVideo.element.onplaying = () => {
+      console.log(`onplaying took ${new Date() - t1}`);
+      this.switcher.mainVideoReady = true;
+    };
+    this.currentVideo.element.currentTime = 0;
+    this.currentVideo.element.play();
+    this.nextVideo = this.activeObject.getNextVideo();
+    this.nextVideo.element.load(); // so it's ready immediately
     if (this.currentVideo.hasMask) {
       // play mask video for interface controller and as input to the switcher:
       this.switcher.connectMask(this.controller.interfaceController.connectMask(this.currentVideo.maskPath));
     }
-    this.currentVideo.element.onended = this.previousEnd.bind(this);
-    // this.currentVideo.element.play();
-    this.currentVideo.element.addEventListener('canplay', () => {
-      this.currentVideo.element.play();
-    });
-    this.currentVideo.element.load();
   }
 
   branchEnd() {
@@ -146,14 +151,15 @@ class VideoController extends EventEmitter {
     }
     this.sceneDescription = scene;
     this.currentVideo = this.activeObject.getNextVideo();
+    this.nextVideo = this.activeObject.getNextVideo();
+    this.nextVideo.element.load();
     this.switcher.connectVideo(this.currentVideo.element, true);
     this.currentVideo.element.onended = this.previousEnd.bind(this);
-    // this.currentVideo.element.play();
     this.currentVideo.element.onended = this.previousEnd.bind(this);
     this.switcher.connectVideo(this.currentVideo.element, true);
-    this.currentVideo.element.addEventListener('canplay', () => {
+    this.currentVideo.element.oncanplay = () => {
       this.currentVideo.element.play();
-    });
+    };
     this.currentVideo.element.load();
     if (this.currentVideo.hasMask) {
       this.switcher.connectMask(this.controller.interfaceController.connectMask(this.currentVideo.maskPath));

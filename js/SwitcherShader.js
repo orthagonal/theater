@@ -196,9 +196,10 @@ class SwitcherShader {
   connectVideo(element, waitForIt) {
     this.mainVideo = element;
     // wait for next video to be ready, use for 'normal' behavior
-    if (waitForIt) {
-      this.mainVideoReady = false;
-    }
+    // if (waitForIt) {
+    //   this.mainVideoReady = false;
+    // }
+    const t1 = new Date();
     element.onplaying = () => {
       this.mainVideoReady = true;
     };
@@ -260,19 +261,10 @@ class SwitcherShader {
 
   //////// event listeners:
   render(now) {
-    const t1 = new Date();
+    // const t1 = new Date();
     // transitioning ones update every single frame
     this.frameCount = (this.frameCount + 1) % 6;
     const gl = this.gl;
-    if (this.mainVideoReady) {
-      const gl = this.gl;
-      gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-      gl.uniform1i(this.u_mainVideo, 0);
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, this.mainVideoTexture);
-      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.mainVideo);
-      this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, 4);
-    }
     if (this.partialVideoTransitioning[0]) {
       gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
       gl.uniform1i(this.gpuVars[0], 3);
@@ -333,7 +325,17 @@ class SwitcherShader {
       gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[nextFrame]);
       this.started = true;
     }
-    const t2 = new Date();
+    if (this.mainVideoReady) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+      gl.uniform1i(this.u_mainVideo, 0);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, this.mainVideoTexture);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.mainVideo);
+      this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, 4);
+    } else {
+      console.log('main not ready?');
+    }
+    // const t2 = new Date();
 //     console.log(`time: ${t2 - t1}`);
     this.requestAnimationFrame(this.render.bind(this));
   }
