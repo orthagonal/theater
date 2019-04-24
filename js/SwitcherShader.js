@@ -7,10 +7,13 @@ const path = require('path');
 class SwitcherShader {
   constructor(videoController, dimensions, devMode = true) {
     this.started = false;
-    this.noShow = true;
+    this.noShow = false;
     this.frameCount = 0;
     this.dimensions = dimensions;
     console.log('switcher dev mode is %s', devMode);
+    console.log('dims:');
+    console.log(this.dimensions);
+
     this.partials = [undefined, undefined, undefined, undefined, undefined];
     this.partialVideos = [undefined, undefined, undefined, undefined, undefined];
     this.partialVideoReady = [false, false, false, false, false];
@@ -309,6 +312,7 @@ class SwitcherShader {
     }
     // others only update once per 6
     if (this.partialVideoReady[this.frameCount] && !this.partialVideoTransitioning[this.frameCount]) {
+      console.log('draw fra,ecpimt %s', this.frameCount);
       gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
       gl.uniform1i(this.gpuVars[this.frameCount], this.frameCount + 3);
       gl.activeTexture(this.gpuTextures[this.frameCount]);
@@ -317,14 +321,15 @@ class SwitcherShader {
       this.started = true;
     }
     const nextFrame = (this.frameCount + 1) % 6;
-    if (this.partialVideoReady[nextFrame] && !this.partialVideoTransitioning[nextFrame]) {
-      gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
-      gl.uniform1i(this.gpuVars[nextFrame], nextFrame + 3);
-      gl.activeTexture(this.gpuTextures[nextFrame]);
-      gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[nextFrame]);
-      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[nextFrame]);
-      this.started = true;
-    }
+    // console.log('here %s nexxt is %s', this.frameCount, nextFrame);
+    // if (this.partialVideoReady[nextFrame] && !this.partialVideoTransitioning[nextFrame]) {
+    //   gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
+    //   gl.uniform1i(this.gpuVars[nextFrame], nextFrame + 3);
+    //   gl.activeTexture(this.gpuTextures[nextFrame]);
+    //   gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[nextFrame]);
+    //   gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[nextFrame]);
+    //   this.started = true;
+    // }
     if (this.mainVideoReady) {
       gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
       gl.uniform1i(this.u_mainVideo, 0);

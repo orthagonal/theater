@@ -47,8 +47,10 @@ class VideoController extends EventEmitter {
     this.switcher.connectVideo(this.currentVideo.element);
     this.currentVideo.element.onended = this.previousEnd.bind(this);
     const t1 = new Date();
+    console.log(this.currentVideo.element.videoWidth);
+    console.log(this.currentVideo.element.videoHeight);
     this.currentVideo.element.onplaying = () => {
-      console.log(`onplaying took ${new Date() - t1}`);
+      // console.log(`onplaying took ${new Date() - t1}`);
       this.switcher.mainVideoReady = true;
     };
     this.currentVideo.element.currentTime = 0;

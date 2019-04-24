@@ -258,11 +258,13 @@ void main() {
 	vec4 partialColor2 = texture2D(u_partialTexture2, normalizedCoords);
 	vec4 partialColor3 = texture2D(u_partialTexture3, normalizedCoords);
 	vec4 partialColor4 = texture2D(u_partialTexture4, normalizedCoords);
-	gl_FragColor.rgb = gl_FragColor.rgb + (partialColor0.a * (partialColor0.rgb - gl_FragColor.rgb));
-	gl_FragColor.rgb = gl_FragColor.rgb + (partialColor1.a * (partialColor1.rgb - gl_FragColor.rgb));
-	gl_FragColor.rgb = gl_FragColor.rgb + (partialColor2.a * (partialColor2.rgb - gl_FragColor.rgb));
-	gl_FragColor.rgb = gl_FragColor.rgb + (partialColor3.a * (partialColor3.rgb - gl_FragColor.rgb));
-	gl_FragColor.rgb = gl_FragColor.rgb + (partialColor4.a * (partialColor4.rgb - gl_FragColor.rgb));
+	gl_FragColor = partialColor0;
+
+	// gl_FragColor.rgb = gl_FragColor.rgb + (partialColor0.a * (partialColor0.rgb - gl_FragColor.rgb));
+	// gl_FragColor.rgb = gl_FragColor.rgb + (partialColor1.a * (partialColor1.rgb - gl_FragColor.rgb));
+	// gl_FragColor.rgb = gl_FragColor.rgb + (partialColor2.a * (partialColor2.rgb - gl_FragColor.rgb));
+	// gl_FragColor.rgb = gl_FragColor.rgb + (partialColor3.a * (partialColor3.rgb - gl_FragColor.rgb));
+	// gl_FragColor.rgb = gl_FragColor.rgb + (partialColor4.a * (partialColor4.rgb - gl_FragColor.rgb));
 
 	// render hitbox:
 	if (u_debugMode == 1.0) {
