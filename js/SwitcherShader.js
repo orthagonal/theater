@@ -114,6 +114,12 @@ class SwitcherShader {
     this.shaderVariables = {
       u_debugMode: { setter: 'uniform1f', default: 0.0 },
       u_mouse: { setter: 'uniform2fv' },
+      u_showPartial0: { setter: 'uniform1i' },
+      u_showPartial1: { setter: 'uniform1i' },
+      u_showPartial2: { setter: 'uniform1i' },
+      u_showPartial3: { setter: 'uniform1i' },
+      u_showPartial4: { setter: 'uniform1i' },
+      u_showPartial5: { setter: 'uniform1i' },
       u_partialCoords0: { setter: 'uniform2fv' },
       u_partialDims0: { setter: 'uniform2fv' },
       u_partialCoords1: { setter: 'uniform2fv' },
@@ -177,6 +183,18 @@ class SwitcherShader {
     this.setShaderVariable('u_activeEffect', global.NO_EFFECT);
   }
 
+  setPartialChannels(count) {
+    for (var i = 0; i < 6; i++) {
+      if (i < count) {
+        console.log(`set ${i} to true`);
+        this.setShaderVariable(`u_showPartial${i}`, 1);
+      } else {
+        this.setShaderVariable(`u_showPartial${i}`, 0);
+        console.log(`set ${i} to false`);
+      }
+    }
+  }
+
   setShaderVariable(varName, value) {
     const shaderVarInfo = this.shaderVariables[varName];
     this.gl[shaderVarInfo.setter](this[varName], value || shaderVarInfo.default);
@@ -199,13 +217,14 @@ class SwitcherShader {
   connectVideo(element, waitForIt) {
     this.mainVideo = element;
     // wait for next video to be ready, use for 'normal' behavior
-    // if (waitForIt) {
-    //   this.mainVideoReady = false;
-    // }
-    const t1 = new Date();
-    element.onplaying = () => {
+    if (waitForIt) {
+      this.mainVideoReady = false;
+    }
+    // element.onplaying = () => {
+    element.addEventListener('playing', () => {
+      console.log('main video ready');
       this.mainVideoReady = true;
-    };
+    });
   }
 
   // connect mask to shader:
@@ -232,7 +251,7 @@ class SwitcherShader {
 
   // connect partial video to shader, partials are small videos
   // that lay over all or part of the main video:
-  connectPartial(partial, index, isFirst) {
+  connectPartial(partial, index, isTransition) {
     // only update partial frames if the partial is transitioning,
     // so ready=true when onplaying a transitioning partial
     // then ready = false after first frame of the *next* video
@@ -241,14 +260,16 @@ class SwitcherShader {
     this.partialVideos[index] = partial.element;
     this.partialVideoReady[index] = false;
     this.partialVideoTransitioning[index] = false;
-    if (isFirst) {
-      partial.element.onplaying = () => {
+    if (isTransition) {
+      partial.element.addEventListener('playing', () => {
+        console.log('transition pla');
         this.partialVideoTransitioning[index] = true;
-      };
+      });
     } else {
-      partial.element.onplaying = () => {
+      partial.element.addEventListener('playing', () => {
+        console.log('static onplaying?');
         this.partialVideoReady[index] = true;
-      };
+      });
     }
     partial.element.play();
   }
@@ -264,10 +285,9 @@ class SwitcherShader {
 
   //////// event listeners:
   render(now) {
-    // const t1 = new Date();
-    // transitioning ones update every single frame
-    this.frameCount = (this.frameCount + 1) % 6;
     const gl = this.gl;
+    this.frameCount ++;
+    // draw each trransitioning partial each frame:
     if (this.partialVideoTransitioning[0]) {
       gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
       gl.uniform1i(this.gpuVars[0], 3);
@@ -282,45 +302,47 @@ class SwitcherShader {
       gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[1]);
       gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[1]);
     }
-    if (this.partialVideoTransitioning[2]) {
+    // if (this.partialVideoTransitioning[2]) {
+    //   gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
+    //   gl.uniform1i(this.gpuVars[2], 5);
+    //   gl.activeTexture(this.gpuTextures[2]);
+    //   gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[2]);
+    //   gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[2]);
+    // }
+    // if (this.partialVideoTransitioning[3]) {
+    //   gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
+    //   gl.uniform1i(this.gpuVars[3], 6);
+    //   gl.activeTexture(this.gpuTextures[3]);
+    //   gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[3]);
+    //   gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[3]);
+    // }
+    // if (this.partialVideoTransitioning[4]) {
+    //   gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
+    //   gl.uniform1i(this.gpuVars[4], 7);
+    //   gl.activeTexture(this.gpuTextures[4]);
+    //   gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[4]);
+    //   gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[4]);
+    // }
+    // if (this.partialVideoTransitioning[5]) {
+    //   gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
+    //   gl.uniform1i(this.gpuVars[5], 8);
+    //   gl.activeTexture(this.gpuTextures[5]);
+    //   gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[5]);
+    //   gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[5]);
+    // }
+    // others only update once per 6 frames
+    // todo: make it update once every n frames when using fewer partials
+    // transitioning ones update every single frame
+    const nextFrame = this.frameCount % 6;
+    if (this.partialVideoReady[nextFrame] && !this.partialVideoTransitioning[nextFrame]) {
+      console.log('draw fra,ecpimt %s', nextFrame);
       gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
-      gl.uniform1i(this.gpuVars[2], 5);
-      gl.activeTexture(this.gpuTextures[2]);
-      gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[2]);
-      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[2]);
-    }
-    if (this.partialVideoTransitioning[3]) {
-      gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
-      gl.uniform1i(this.gpuVars[3], 6);
-      gl.activeTexture(this.gpuTextures[3]);
-      gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[3]);
-      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[3]);
-    }
-    if (this.partialVideoTransitioning[4]) {
-      gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
-      gl.uniform1i(this.gpuVars[4], 7);
-      gl.activeTexture(this.gpuTextures[4]);
-      gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[4]);
-      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[4]);
-    }
-    if (this.partialVideoTransitioning[5]) {
-      gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
-      gl.uniform1i(this.gpuVars[5], 8);
-      gl.activeTexture(this.gpuTextures[5]);
-      gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[5]);
-      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[5]);
-    }
-    // others only update once per 6
-    if (this.partialVideoReady[this.frameCount] && !this.partialVideoTransitioning[this.frameCount]) {
-      console.log('draw fra,ecpimt %s', this.frameCount);
-      gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
-      gl.uniform1i(this.gpuVars[this.frameCount], this.frameCount + 3);
-      gl.activeTexture(this.gpuTextures[this.frameCount]);
-      gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[this.frameCount]);
-      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[this.frameCount]);
+      gl.uniform1i(this.gpuVars[nextFrame], nextFrame + 3);
+      gl.activeTexture(this.gpuTextures[nextFrame]);
+      gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[nextFrame]);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[nextFrame]);
       this.started = true;
     }
-    const nextFrame = (this.frameCount + 1) % 6;
     // console.log('here %s nexxt is %s', this.frameCount, nextFrame);
     // if (this.partialVideoReady[nextFrame] && !this.partialVideoTransitioning[nextFrame]) {
     //   gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
@@ -330,18 +352,16 @@ class SwitcherShader {
     //   gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[nextFrame]);
     //   this.started = true;
     // }
-    if (this.mainVideoReady) {
+    // if (this.mainVideoReady) {
       gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
       gl.uniform1i(this.u_mainVideo, 0);
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, this.mainVideoTexture);
       gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.mainVideo);
-      this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, 4);
-    } else {
-      console.log('main not ready?');
-    }
-    // const t2 = new Date();
-//     console.log(`time: ${t2 - t1}`);
+    // } else {
+    //   console.log('main not ready?');
+    // }
+    this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, 4);
     this.requestAnimationFrame(this.render.bind(this));
   }
 

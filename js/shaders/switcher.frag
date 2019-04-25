@@ -12,6 +12,13 @@ uniform sampler2D u_partialTexture2; // partial texture
 uniform sampler2D u_partialTexture3; // partial texture
 uniform sampler2D u_partialTexture4; // partial texture
 
+uniform int u_showPartial0;
+uniform int u_showPartial1;
+uniform int u_showPartial2;
+uniform int u_showPartial3;
+uniform int u_showPartial4;
+uniform int u_showPartial5;
+
 uniform sampler2D u_inputTexture0; // input texture
 uniform sampler2D u_inputTexture1; // input texture
 uniform sampler2D u_inputTexture2; // input texture
@@ -252,19 +259,29 @@ void main() {
 	if (color.a > 0.5) {
 		gl_FragColor = color;
 	}
-	// FASTER:
-	vec4 partialColor0 = texture2D(u_partialTexture0, normalizedCoords);
-	vec4 partialColor1 = texture2D(u_partialTexture1, normalizedCoords);
-	vec4 partialColor2 = texture2D(u_partialTexture2, normalizedCoords);
-	vec4 partialColor3 = texture2D(u_partialTexture3, normalizedCoords);
-	vec4 partialColor4 = texture2D(u_partialTexture4, normalizedCoords);
-	gl_FragColor = partialColor0;
 
-	// gl_FragColor.rgb = gl_FragColor.rgb + (partialColor0.a * (partialColor0.rgb - gl_FragColor.rgb));
-	// gl_FragColor.rgb = gl_FragColor.rgb + (partialColor1.a * (partialColor1.rgb - gl_FragColor.rgb));
-	// gl_FragColor.rgb = gl_FragColor.rgb + (partialColor2.a * (partialColor2.rgb - gl_FragColor.rgb));
-	// gl_FragColor.rgb = gl_FragColor.rgb + (partialColor3.a * (partialColor3.rgb - gl_FragColor.rgb));
-	// gl_FragColor.rgb = gl_FragColor.rgb + (partialColor4.a * (partialColor4.rgb - gl_FragColor.rgb));
+	// all partials should be auto-set when first entering the game object
+	// game object can override if needed
+	if (u_showPartial0 == 1) {
+		vec4 partialColor0 = texture2D(u_partialTexture0, normalizedCoords);
+		gl_FragColor.rgb = gl_FragColor.rgb + (partialColor0.a * (partialColor0.rgb - gl_FragColor.rgb));
+	}
+	if (u_showPartial1 == 1) {
+		vec4 partialColor1 = texture2D(u_partialTexture1, normalizedCoords);
+		gl_FragColor.rgb = gl_FragColor.rgb + (partialColor1.a * (partialColor1.rgb - gl_FragColor.rgb));
+	}
+	if (u_showPartial2 == 1) {
+		vec4 partialColor2 = texture2D(u_partialTexture2, normalizedCoords);
+		gl_FragColor.rgb = gl_FragColor.rgb + (partialColor2.a * (partialColor2.rgb - gl_FragColor.rgb));
+	}
+	if (u_showPartial3 == 1) {
+		vec4 partialColor3 = texture2D(u_partialTexture3, normalizedCoords);
+		gl_FragColor.rgb = gl_FragColor.rgb + (partialColor3.a * (partialColor3.rgb - gl_FragColor.rgb));
+	}
+	if (u_showPartial4 == 1) {
+		vec4 partialColor4 = texture2D(u_partialTexture4, normalizedCoords);
+		gl_FragColor.rgb = gl_FragColor.rgb + (partialColor4.a * (partialColor4.rgb - gl_FragColor.rgb));
+	}
 
 	// render hitbox:
 	if (u_debugMode == 1.0) {
