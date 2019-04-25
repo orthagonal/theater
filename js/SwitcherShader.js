@@ -261,15 +261,17 @@ class SwitcherShader {
     this.partialVideoReady[index] = false;
     this.partialVideoTransitioning[index] = false;
     if (isTransition) {
-      partial.element.addEventListener('playing', () => {
+      // partial.element.addEventListener('playing', () => {
+      partial.element.onplaying = () => {
         console.log('transition pla');
         this.partialVideoTransitioning[index] = true;
-      });
+      };
     } else {
-      partial.element.addEventListener('playing', () => {
+      // partial.element.addEventListener('playing', () => {
+      partial.element.onplaying = () => {
         console.log('static onplaying?');
         this.partialVideoReady[index] = true;
-      });
+      };
     }
     partial.element.play();
   }
