@@ -220,11 +220,11 @@ class SwitcherShader {
     if (waitForIt) {
       this.mainVideoReady = false;
     }
-    // element.onplaying = () => {
-    element.addEventListener('playing', () => {
+    element.onplaying = () => {
+    // element.addEventListener('playing', () => {
       console.log('main video ready');
       this.mainVideoReady = true;
-    });
+    };
   }
 
   // connect mask to shader:
@@ -263,13 +263,11 @@ class SwitcherShader {
     if (isTransition) {
       // partial.element.addEventListener('playing', () => {
       partial.element.onplaying = () => {
-        console.log('transition pla');
         this.partialVideoTransitioning[index] = true;
       };
     } else {
       // partial.element.addEventListener('playing', () => {
       partial.element.onplaying = () => {
-        console.log('static onplaying?');
         this.partialVideoReady[index] = true;
       };
     }
@@ -304,13 +302,13 @@ class SwitcherShader {
       gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[1]);
       gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[1]);
     }
-    // if (this.partialVideoTransitioning[2]) {
-    //   gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
-    //   gl.uniform1i(this.gpuVars[2], 5);
-    //   gl.activeTexture(this.gpuTextures[2]);
-    //   gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[2]);
-    //   gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[2]);
-    // }
+    if (this.partialVideoTransitioning[2]) {
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
+      gl.uniform1i(this.gpuVars[2], 5);
+      gl.activeTexture(this.gpuTextures[2]);
+      gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[2]);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[2]);
+    }
     // if (this.partialVideoTransitioning[3]) {
     //   gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
     //   gl.uniform1i(this.gpuVars[3], 6);
@@ -354,15 +352,15 @@ class SwitcherShader {
     //   gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partialVideos[nextFrame]);
     //   this.started = true;
     // }
-    // if (this.mainVideoReady) {
+    if (this.mainVideoReady) {
       gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
       gl.uniform1i(this.u_mainVideo, 0);
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, this.mainVideoTexture);
       gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.mainVideo);
-    // } else {
-    //   console.log('main not ready?');
-    // }
+    } else {
+      console.log('main not ready?');
+    }
     this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, 4);
     this.requestAnimationFrame(this.render.bind(this));
   }
