@@ -46,9 +46,6 @@ class VideoController extends EventEmitter {
     this.currentVideo = this.nextVideo;
     this.switcher.connectVideo(this.currentVideo.element);
     this.currentVideo.element.onended = this.previousEnd.bind(this);
-    const t1 = new Date();
-    console.log(this.currentVideo.element.videoWidth);
-    console.log(this.currentVideo.element.videoHeight);
     this.currentVideo.element.onplaying = () => {
       // console.log(`onplaying took ${new Date() - t1}`);
       this.switcher.mainVideoReady = true;
@@ -157,8 +154,6 @@ class VideoController extends EventEmitter {
     this.nextVideo.element.load();
     this.switcher.connectVideo(this.currentVideo.element, true);
     this.currentVideo.element.onended = this.previousEnd.bind(this);
-    this.currentVideo.element.onended = this.previousEnd.bind(this);
-    this.switcher.connectVideo(this.currentVideo.element, true);
     this.currentVideo.element.oncanplay = () => {
       this.currentVideo.element.play();
     };
@@ -174,6 +169,7 @@ class VideoController extends EventEmitter {
   }
 
   showPartial(partial, index, isTransition) {
+    partial.started = false;
     if (!partial.element.onended) {
       partial.element.onended = this.previousEndPartial.bind(this);
     }
