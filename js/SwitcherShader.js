@@ -258,27 +258,25 @@ class SwitcherShader {
     // only update partial frames if the partial is transitioning,
     // so ready=true when onplaying a transitioning partial
     // then ready = false after first frame of the *next* video
+    partial.element.play();
+    if (this.partials[index]) {
+      clearInterval(this.partials[index].interval);
+    }
     this.partials[index] = partial;
     this.partialVideos[index] = partial.element;
     this.partialVideoReady[index] = false;
     this.partialVideoTransitioning[index] = false;
-    if (partial.interval) {
-      clearInterval(partial.interval);
-    }
-    // partial.element.onplaying = function playTransition() {
-      // wake up 24 frames per second
-      partial.interval = setInterval(() => {
-        this.partialVideoReady[index] = true;
-        const gl = this.gl;
-        // draw each transitioning partial each frame:
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffers[index]);
-        gl.uniform1i(this.gpuVars[index], index + 3);
-        gl.activeTexture(this.gpuTextures[index]);
-        gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[index]);
-        gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, partial.element);
-      }, 20);
-    // }.bind(this);
-    partial.element.play();
+    partial.interval = setInterval(() => {
+      console.log('interval %s', index);
+      this.partialVideoReady[index] = true;
+      const gl = this.gl;
+      // draw each transitioning partial each frame:
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffers[index]);
+      gl.uniform1i(this.gpuVars[index], index + 3);
+      gl.activeTexture(this.gpuTextures[index]);
+      gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[index]);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, partial.element);
+    }, 100);
   }
 
   drawPartial(data) {
