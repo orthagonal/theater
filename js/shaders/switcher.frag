@@ -256,9 +256,9 @@ void main() {
 	// who's coordinates/dimensions have been set by the vertex shader already:
 	vec4 color = texture2D(u_mainVideo, normalizedCoords);
 
-	if (color.a > 0.5) {
+	// if (color.a > 0.5) {
 		gl_FragColor = color;
-	}
+	// }
 
 	// all partials should be auto-set when first entering the game object
 	// game object can override if needed
@@ -284,24 +284,24 @@ void main() {
 	}
 
 	// render hitbox:
-	if (u_debugMode == 1.0) {
-		renderHitbox(gl_FragColor, normalizedCoords);
-	}
+	// if (u_debugMode == 1.0) {
+	// 	renderHitbox(gl_FragColor, normalizedCoords);
+	// }
 
   // mouse hit:
-  if (u_activeEffect == 1.0) {
-    vec4 flare = flareEffect(gl_FragCoord.xy);
-    gl_FragColor = mix(flare, gl_FragColor, u_percentDone);
-  }
-	// mouse miss:
-  if (u_activeEffect == 2.0) {
-		gl_FragColor = ripple2(normalizedMouse, gl_FragColor, normalizedCoords);
-  }
-	if (u_showText == 1) {
-		// render over everything:
-		vec4 textColor = texture2D(u_textTexture, normalizedCoords);
-		if (textColor.r != 0.0) {
-			gl_FragColor = vec4(gl_FragColor.r, gl_FragColor.g, fbm(normalizedCoords), 1.0);
-		}
-	}
+  // if (u_activeEffect == 1.0) {
+  //   vec4 flare = flareEffect(gl_FragCoord.xy);
+  //   gl_FragColor = mix(flare, gl_FragColor, u_percentDone);
+  // }
+	// // mouse miss:
+  // if (u_activeEffect == 2.0) {
+	// 	gl_FragColor = ripple2(normalizedMouse, gl_FragColor, normalizedCoords);
+  // }
+	// if (u_showText == 1) {
+	// 	// render over everything:
+	// 	vec4 textColor = texture2D(u_textTexture, normalizedCoords);
+	// 	if (textColor.r != 0.0) {
+	// 		gl_FragColor = vec4(gl_FragColor.r, gl_FragColor.g, fbm(normalizedCoords), 1.0);
+	// 	}
+	// }
 }

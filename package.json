@@ -22,7 +22,7 @@
     "aequery": "^0.6.0",
     "after-effects": "^0.4.15",
     "async": "^2.0.0-rc.6",
-    "browserify-shader": "^0.1.2",
+    "browserify": "^16.2.3",
     "jquery": "^3.1.0",
     "json-fs-store": "^1.0.0",
     "lodash": "^4.17.4",
@@ -30,6 +30,7 @@
     "parse-dir": "^1.0.0",
     "underscore": "^1.8.3",
     "videocontext": "^0.33.0",
+    "watchify": "^3.11.1",
     "yamljs": "^0.2.8"
   },
   "devDependencies": {
