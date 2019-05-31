@@ -162,8 +162,8 @@ class SwitcherShader {
     // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     // gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
     gl.useProgram(this.program);
-    // this.glWorker.postMessage({ canvas: this.offscreenCanvas1, init: true, devMode, vertexShaderSource, pixelShaderSource, dimensions }, [this.offscreenCanvas1]);
     this.requestAnimationFrame = this.videoController.theWindow.requestAnimationFrame.bind(this.videoController.theWindow);
+    // this.glWorker.postMessage({ canvas: this.offscreenCanvas1, init: true, devMode, vertexShaderSource, pixelShaderSource, dimensions }, [this.offscreenCanvas1]);
     // setTimeout(() => {
     //   this.videoController.theWindow.requestAnimationFrame(this.render.bind(this));
     // }, 2500);
@@ -222,22 +222,24 @@ class SwitcherShader {
   connectVideo(element, waitForIt) {
     this.mainVideo = element;
     // wait for next video to be ready, use for 'normal' behavior
-    if (waitForIt) {
-      this.mainVideoReady = false;
-    }
+    this.mainVideoReady = false;
     function p() {
+      console.log('onplaying!!');
+      if (!this.started) {
+          this.requestAnimationFrame(this.render.bind(this));
+      }
       this.mainVideoReady = true;
     }
     element.onplaying = p.bind(this);
     // the element will start playing here:
-    if (element.interval) {
-      // clearInterval(element.interval);
-    }
+    // if (element.interval) {
+    //   clearInterval(element.interval);
+    // }
+    const num = Math.random();
+    console.log(element);
     // element.interval = setInterval(() => {
     //   this.mainVideoReady = true;
     //   const gl = this.gl;
-    //   gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-    //   gl.uniform1i(this.u_mainVideo, 0);
     //   gl.activeTexture(gl.TEXTURE0);
     //   gl.bindTexture(gl.TEXTURE_2D, this.mainVideoTexture);
     //   gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.mainVideo);
@@ -272,43 +274,28 @@ class SwitcherShader {
   connectPartial(partial, index, isTransition) {
     // transition will be a video:
     if (isTransition) {
+      console.log('is transition');
       partial.element.ontimeupdate = () => {
-        this.gl.uniform1i(this.gpuVars[index], index + 3);
-        this.gl.activeTexture(this.gpuTextures[index]);
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.partialVideoTextures[index]);
-        this.gl.texSubImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.FLOAT, this.partials[index].element);
-        this.requestAnimationFrame(this.render.bind(this));
+        this.partials[index] = partial;
+        this.partialVideoReady[index] = true;
+        delete partial.element.ontimeupdate;
       };
-      if (this.partials[index] && this.partials[index].element.pause) {
-        this.partials[index].element.pause();
-      }
       partial.element.currentTime = 0;
       partial.element.oncanplay = () => {
         partial.element.play();
       };
-      this.partials[index] = partial;
+      this.partialVideoReady[index] = false;
+      partial.element.load();
     } else {
-      console.log('loading the thing');
-      console.log('loading the thing');
-      console.log(partial.element);
       // static will be a single png with alpha
       this.partials[index] = partial;
       this.gl.uniform1i(this.gpuVars[index], index + 3);
       this.gl.activeTexture(this.gpuTextures[index]);
       this.gl.bindTexture(this.gl.TEXTURE_2D, this.partialVideoTextures[index]);
       this.gl.texSubImage2D(this.gl.TEXTURE_2D, 0, 0, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.partials[index].element);
+      this.partialVideoReady[index] = false;
       this.requestAnimationFrame(this.render.bind(this));
-      // console.log(partial.element);
-      // partial.element.load();
     }
-    // this.partialVideos[index] = partial.element;
-    // this.partialVideoReady[index] = false;
-    // this.partialVideoTransitioning[index] = false;
-    // delete partial.element.onplaying;
-    // call back when finished:
-    // const duration = partial.element.duration - partial.element.currentTime - .1;
-    // setTimeout(partial.onended, duration);
-    // try to update approximately every frame:
   }
 
   drawPartial(data) {
@@ -321,14 +308,44 @@ class SwitcherShader {
   }
 
   render(now) {
-    // for (let index = 0; index < 5; index++) {
-    //   this.gl.uniform1i(this.gpuVars[index], index + 3);
-    //   this.gl.activeTexture(this.gpuTextures[index]);
-    //   this.gl.bindTexture(this.gl.TEXTURE_2D, this.partialVideoTextures[index]);
-    //   this.gl.texSubImage2D(this.gl.TEXTURE_2D, 0, 0, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.partials[index].element);
-    // }
+    const gl = this.gl;
+    const t1 = new Date();
+    if (this.mainVideoReady) {
+      if (this.partialVideoReady[0]) {
+         gl.activeTexture(gl.TEXTURE3);
+         gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[0]);
+         gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partials[0].element);
+       }
+       if (this.partialVideoReady[1]) {
+         gl.activeTexture(gl.TEXTURE4);
+         gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[1]);
+         gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partials[1].element);
+       }
+       if (this.partialVideoReady[2]) {
+         gl.activeTexture(gl.TEXTURE5);
+         gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[2]);
+         gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partials[2].element);
+       }
+       if (this.partialVideoReady[3]) {
+         gl.activeTexture(gl.TEXTURE6);
+         gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[3]);
+         gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partials[3].element);
+       }
+       if (this.partialVideoReady[4]) {
+         gl.activeTexture(gl.TEXTURE7);
+         gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[4]);
+         gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partials[4].element);
+       }
+      console.log('rendermain');
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, this.mainVideoTexture);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.mainVideo);
+    }
     // draw each transitioning partial each frame:
     this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, 4);
+    const t2 = new Date();
+    console.log(t2 - t1);
+    this.requestAnimationFrame(this.render.bind(this));
   }
 
   // effects:
