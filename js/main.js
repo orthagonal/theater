@@ -19,7 +19,7 @@ exports.query = (evt) => {
     lastTime = new Date().getTime();
     // if it's the dev key turn on dev mode:
     if (evt.code === 'KeyD') {
-      coreController.toggleDevMode();
+      // coreController.toggleDevMode();
     }
     // pass to the module object
     coreController.module.query(evt);
