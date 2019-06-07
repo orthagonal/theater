@@ -75,6 +75,7 @@ class VideoController extends EventEmitter {
 
   branchTo(sourceVideo, destinationObject, type) {
     // play source video
+    // todo: this needs work i think?
     if (type === 'cut') {
       // when the video is done activate the new object:
       sourceVideo.element.onended = () => {
@@ -85,7 +86,7 @@ class VideoController extends EventEmitter {
         this.currentVideo.element.onended = undefined;
       }
       this.currentVideo = sourceVideo;
-      this.switcher.connectVideo(this.currentVideo.element, true);
+      this.switcher.connectVideo(this.currentVideo.element, false);
       this.currentVideo.element.play();
       return;
     }

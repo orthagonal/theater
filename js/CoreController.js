@@ -77,6 +77,7 @@ class CoreController {
   branchTo(sourceVideo, destinationObjectName, transitionType) {
     const destinationObject = this.gameObjects[destinationObjectName];
     this.branching = { sourceVideo, destinationObject };
+    this.activeObject = destinationObject;
     this.videoController.branchTo(sourceVideo, destinationObject, transitionType);
   }
 

@@ -6,7 +6,6 @@ const path = require('path');
 
 class SwitcherShader {
   constructor(videoController, dimensions, devMode = true) {
-    this.started = false;
     this.noShow = false;
     this.frameCount = 0;
     this.dimensions = dimensions;
@@ -251,7 +250,6 @@ class SwitcherShader {
   // connect partial video to shader, partials are small videos
   // that lay over all or part of the main video:
   connectPartial(partial, index, isTransition) {
-    console.log('is transition');
     // transition will be a video:
     if (isTransition) {
       partial.element.ontimeupdate = () => {
