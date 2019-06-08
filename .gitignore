@@ -1,5 +1,6 @@
 node_modules
 movies
+savedGames
 placeholders
 build
 saves.json
