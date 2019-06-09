@@ -183,7 +183,7 @@ class SwitcherShader {
   }
 
   setPartialChannels(count) {
-    for (var i = 0; i < 6; i++) {
+    for (let i = 0; i < 6; i++) {
       if (i < count) {
         console.log(`set ${i} to true`);
         this.setShaderVariable(`u_showPartial${i}`, 1);

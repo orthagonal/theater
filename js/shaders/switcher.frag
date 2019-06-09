@@ -260,17 +260,6 @@ void main() {
 		gl_FragColor = color;
 	}
 
-	// vec4 partialColor0 = texture2D(u_partialTexture0, normalizedCoords);
-	// gl_FragColor.rgb = gl_FragColor.rgb + (partialColor0.a * (partialColor0.rgb - gl_FragColor.rgb));
-	// vec4 partialColor1 = texture2D(u_partialTexture1, normalizedCoords);
-	// gl_FragColor.rgb = gl_FragColor.rgb + (partialColor1.a * (partialColor1.rgb - gl_FragColor.rgb));
-	// vec4 partialColor2 = texture2D(u_partialTexture2, normalizedCoords);
-	// gl_FragColor.rgb = gl_FragColor.rgb + (partialColor2.a * (partialColor2.rgb - gl_FragColor.rgb));
-	// vec4 partialColor3 = texture2D(u_partialTexture3, normalizedCoords);
-	// gl_FragColor.rgb = gl_FragColor.rgb + (partialColor3.a * (partialColor3.rgb - gl_FragColor.rgb));
-	// vec4 partialColor4 = texture2D(u_partialTexture4, normalizedCoords);
-	// gl_FragColor.rgb = gl_FragColor.rgb + (partialColor4.a * (partialColor4.rgb - gl_FragColor.rgb));
-
 	// all partials should be auto-set when first entering the game object
 	// game object can override if needed
 	if (u_showPartial0 == 1) {
