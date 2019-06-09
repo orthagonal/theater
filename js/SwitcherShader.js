@@ -216,13 +216,13 @@ class SwitcherShader {
   connectVideo(element, waitForIt) {
     this.mainVideo = element;
     // wait for next video to be ready, use for 'normal' behavior
-    if (waitForIt) {
-      this.mainVideoReady = false;
-    }
+    this.mainVideoReady = false;
     function p() {
       this.mainVideoReady = true;
+      delete element.ontimeupdate;
+      element.ontimeupdate = undefined;
     }
-    element.addEventListener('playing', p);
+    element.ontimeupdate = p;
   }
 
   // connect mask to shader:
