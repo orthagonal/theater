@@ -297,11 +297,4 @@ void main() {
   if (u_activeEffect == 2.0) {
 		gl_FragColor = ripple2(normalizedMouse, gl_FragColor, normalizedCoords);
   }
-	if (u_showText == 1) {
-		// render over everything:
-		vec4 textColor = texture2D(u_textTexture, normalizedCoords);
-		if (textColor.r != 0.0) {
-			gl_FragColor = vec4(gl_FragColor.r, gl_FragColor.g, fbm(normalizedCoords), 1.0);
-		}
-	}
 }
