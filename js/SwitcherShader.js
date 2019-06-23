@@ -250,25 +250,35 @@ class SwitcherShader {
   // connect partial video to shader, partials are small videos
   // that lay over all or part of the main video:
   connectPartial(partial, index, isTransition) {
-    // transition will be a video:
+    // transition will be a video or 2d canvas context:
     if (isTransition) {
-      partial.element.ontimeupdate = () => {
-        this.partials[index] = partial;
-        this.partialVideoReady[index] = true;
-        delete partial.element.ontimeupdate;
-      };
+      // if its a video:
+      if (partial.element.load) {
+        partial.element.ontimeupdate = () => {
+          this.partials[index] = partial;
+          this.partialVideoReady[index] = true;
+          delete partial.element.ontimeupdate;
+        };
+        partial.element.currentTime = 0;
+        partial.element.oncanplay = () => {
+          partial.element.play();
+        };
+        this.partialVideoReady[index] = false;
+        partial.element.load();
+        return;
+      }
+      this.partials[index] = partial;
+      this.partialVideoReady[index] = true;
       partial.element.currentTime = 0;
-      partial.element.oncanplay = () => {
-        partial.element.play();
-      };
       this.partialVideoReady[index] = false;
-      partial.element.load();
     } else {
       // static will be a single png with alpha
       this.partials[index] = partial;
       this.gl.uniform1i(this.gpuVars[index], index + 3);
       this.gl.activeTexture(this.gpuTextures[index]);
       this.gl.bindTexture(this.gl.TEXTURE_2D, this.partialVideoTextures[index]);
+      console.log('connecting');
+      console.log(this.partials[index]);
       this.gl.texSubImage2D(this.gl.TEXTURE_2D, 0, 0, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.partials[index].element);
       this.partialVideoReady[index] = false;
     }
@@ -287,8 +297,6 @@ class SwitcherShader {
   render(now) {
     const gl = this.gl;
     this.frameCount ++;
-    // others only update once per 6 frames
-    // todo: make it update once every n frames when using fewer partials
     // transitioning ones update every single frame
     for (let nextFrame = 0; nextFrame < 5; nextFrame++) {
       if (this.partialVideoReady[nextFrame]) {

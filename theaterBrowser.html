@@ -43,11 +43,13 @@
   </style>
 </head>
 <body onmousedown="onClick(event);" onkeyup="onClick(event)">
-  <canvas id="finalDestinationCanvas">
-  </canvas>
-  <canvas id="hitboxCanvas" hidden>
-  </canvas>
-  <canvas id="textCanvas" hidden>
-  </canvas>
+  <div style="position: relative;">
+    <canvas id="finalDestinationCanvas" width="100" height="100"
+        style="position: absolute; left: 0; top: 0; z-index: 0;"></canvas>
+    <canvas id="hitboxCanvas" width="100" height="100"
+        style="position: absolute; left: 0; top: 0; z-index: 0;"></canvas>
+     <canvas id="textCanvas" width="100" height="100"
+         style="position: absolute; left: 0; top: 0; z-index: 1;"></canvas>
+  </div>
 </body>
 </html>
