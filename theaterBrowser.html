@@ -5,6 +5,9 @@
   <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
   <script src="windowBundle.js"></script>
   <script>
+  document.addEventListener('DOMContentLoaded', (event) => {
+    start();
+  });
   var main;
   var launched;
   function start() {
@@ -13,7 +16,6 @@
       launched = true;
     }
   }
-  setTimeout(start, 2000);
   function onClick(evt) {
     if (iris && launched) {
       iris.query(evt);

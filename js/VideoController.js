@@ -53,7 +53,6 @@ class VideoController extends EventEmitter {
     this.currentVideo.element.currentTime = 0;
     this.currentVideo.element.play();
     this.nextVideo = this.activeObject.getNextVideo();
-    this.nextVideo.element.load(); // so it's ready immediately
     if (this.currentVideo.hasMask) {
       // play mask video for interface controller and as input to the switcher:
       this.switcher.connectMask(this.controller.interfaceController.connectMask(this.currentVideo.maskPath));
