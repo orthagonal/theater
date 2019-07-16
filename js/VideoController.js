@@ -53,7 +53,7 @@ class VideoController extends EventEmitter {
     this.currentVideo.element.currentTime = 0;
     this.currentVideo.element.play();
     this.nextVideo = this.activeObject.getNextVideo();
-    if (this.currentVideo.hasMask) {
+    if (this.currentVideo.maskPath) {
       // play mask video for interface controller and as input to the switcher:
       this.switcher.connectMask(this.controller.interfaceController.connectMask(this.currentVideo.maskPath));
     }
@@ -105,7 +105,7 @@ class VideoController extends EventEmitter {
     this.currentVideo.muted = 'true';
     this.currentVideo.element.play();
     this.backgroundVideo.element.play();
-    // if (this.currentVideo.hasMask) {
+    // if (this.currentVideo.maskPath) {
     //   this.switcher.connectMask(this.controller.interfaceController.connectMask(this.currentVideo.maskPath));
     // }
     setTimeout(() => {
@@ -134,7 +134,7 @@ class VideoController extends EventEmitter {
     setTimeout(() => {
       this.previousEndSyncSwitch.bind(this)();
     }, 2000);// Math.max(scene.behavior.minCutLength, Math.floor(Math.random() * Math.floor(scene.behavior.maxCutLength))));
-    if (this.currentVideo.hasMask) {
+    if (this.currentVideo.maskPath) {
       this.switcher.connectMask(this.controller.interfaceController.connectMask(this.currentVideo.maskPath));
     }
   }
@@ -158,7 +158,7 @@ class VideoController extends EventEmitter {
       this.currentVideo.element.play();
     };
     this.currentVideo.element.load();
-    if (this.currentVideo.hasMask) {
+    if (this.currentVideo.maskPath) {
       this.switcher.connectMask(this.controller.interfaceController.connectMask(this.currentVideo.maskPath));
     }
   }
