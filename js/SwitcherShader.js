@@ -227,12 +227,17 @@ class SwitcherShader {
     element.ontimeupdate = p.bind(this);
   }
 
+  disconnectMask() {
+    if (this.hitboxVideo) {
+      this.hitboxVideo.stop();
+    }
+    this.hitboxVideoReady = false;
+  }
+
   // connect mask to shader:
   connectMask(element, waitForIt) {
     this.hitboxVideo = element;
-    if (waitForIt) {
-      this.hitboxVideoReady = false;
-    }
+    this.hitboxVideoReady = false;
     element.addEventListener('playing', () => {
       this.hitboxVideoReady = true;
     }, true);

@@ -56,6 +56,8 @@ class VideoController extends EventEmitter {
     if (this.currentVideo.maskPath) {
       // play mask video for interface controller and as input to the switcher:
       this.switcher.connectMask(this.controller.interfaceController.connectMask(this.currentVideo.maskPath));
+    } else {
+      this.switcher.disconnectMask();
     }
   }
 
