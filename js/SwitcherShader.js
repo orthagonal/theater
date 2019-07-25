@@ -230,6 +230,7 @@ class SwitcherShader {
   disconnectMask() {
     if (this.hitboxVideo) {
       this.hitboxVideo.stop();
+      this.hitboxVideo = false;
     }
     this.hitboxVideoReady = false;
   }
