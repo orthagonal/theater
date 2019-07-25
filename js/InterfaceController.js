@@ -9,6 +9,10 @@ class InterfaceController {
     this.checkRate = 50;
   }
 
+  disconnectMask() {
+    this.videoElement.stop();
+  }
+
   connectMask(maskPath) {
     this.videoElement = this.controller.$('<video />', {
       src: maskPath,

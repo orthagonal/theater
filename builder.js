@@ -10,13 +10,12 @@ var b = browserify({
   plugin: [watchify],
   standalone: 'iris'
 });
-
 b.on('update', bundle);
 bundle();
 
 function bundle() {
   b.bundle()
     .on('error', console.error)
-    .pipe(fs.createWriteStream('windowBundle.js'))
-  ;
+    .pipe(fs.createWriteStream('windowBundle.js'));
+  console.log('rebuilt!\n');
 }

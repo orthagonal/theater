@@ -3,8 +3,12 @@
 <head>
   <meta charset="utf-8">
   <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="/Users/snake/Documents/GitHub/theater/fabric.min.js"></script>
   <script src="windowBundle.js"></script>
   <script>
+  document.addEventListener('DOMContentLoaded', (event) => {
+    start();
+  });
   var main;
   var launched;
   function start() {
@@ -13,7 +17,6 @@
       launched = true;
     }
   }
-  setTimeout(start, 2000);
   function onClick(evt) {
     if (iris && launched) {
       iris.query(evt);
@@ -42,12 +45,14 @@
   }
   </style>
 </head>
-<body onmousedown="onClick(event);" onkeypress="onClick(event)">
-  <canvas id="finalDestinationCanvas">
-  </canvas>
-  <canvas id="hitboxCanvas" hidden>
-  </canvas>
-  <canvas id="textCanvas" hidden>
-  </canvas>
+<body onmousedown="onClick(event);" onkeyup="onClick(event)">
+  <div style="position: relative;">
+    <canvas id="finalDestinationCanvas" width="100" height="100"
+        style="position: absolute; left: 0; top: 0; z-index: 0;"></canvas>
+    <canvas id="hitboxCanvas" width="100" height="100"
+        style="position: absolute; left: 0; top: 0; z-index: 0;" hidden></canvas>
+     <canvas id="textCanvas" width="100" height="100"
+         style="position: absolute; left: 0; top: 0; z-index: 1;"></canvas>
+  </div>
 </body>
 </html>

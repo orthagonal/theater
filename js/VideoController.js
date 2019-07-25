@@ -7,7 +7,7 @@ global.MOUSE_BW_EFFECT = 2.0; // a melty hole at the mouse point
 global.TEXT_MELT_EFFECT = 3.0; // show the text as melty
 
 class VideoController extends EventEmitter {
-  constructor(controller, gl, theWindow) {
+  constructor(controller, theWindow) {
     super();
     this.sceneDescription = false;
     this.controller = controller;
@@ -20,38 +20,45 @@ class VideoController extends EventEmitter {
     this.nextVideo = false;
     this.videoFetcher = false;
     this.activeObject = false;
-    this.switcher = new SwitcherShader(this, gl, controller.dimensions, controller.devMode);
+    this.switcher = new SwitcherShader(this, controller.dimensions, controller.devMode);
+  }
+
+  noShow(val) {
+    this.switcher.noShow = val;
   }
 
   goUp(val) {
     this.switcher.goUp = val;
   }
 
-  previousEndPartial(info) {
-    console.log('previousEndPartial the info is:');
-    console.log(info);
-  }
-
-  // called when previous video is finished playing, continuously:
+  // in normal mode we play an entire video clip from start to finish
+  // and call the current active game object to get the next video
+  // and play it immediately with no break:
   previousEnd() {
     if (this.branching) {
       return this.branchEnd();
     }
-    // delete this.currentVideo.onended;
-    this.currentVideo = this.activeObject.getNextVideo();
-    this.switcher.connectVideo(this.currentVideo.element, true);
-    if (this.currentVideo.hasMask) {
+    this.currentVideo.element.pause();
+    // todo:
+    this.currentVideo = this.nextVideo;
+    this.switcher.connectVideo(this.currentVideo.element);
+    this.currentVideo.element.onended = this.previousEnd.bind(this);
+    this.currentVideo.element.onplaying = () => {
+      // console.log(`onplaying took ${new Date() - t1}`);
+      this.switcher.mainVideoReady = true;
+    };
+    this.currentVideo.element.currentTime = 0;
+    this.currentVideo.element.play();
+    this.nextVideo = this.activeObject.getNextVideo();
+    if (this.currentVideo.maskPath) {
       // play mask video for interface controller and as input to the switcher:
       this.switcher.connectMask(this.controller.interfaceController.connectMask(this.currentVideo.maskPath));
+    } else {
+      this.switcher.disconnectMask();
     }
-    this.currentVideo.element.onended = this.previousEnd.bind(this);
-    // this.currentVideo.element.play();
-    this.currentVideo.element.addEventListener('canplay', () => {
-      this.currentVideo.element.play();
-    });
-    this.currentVideo.element.load();
   }
 
+  // when the branch to the new game object ends this will transition control to the new object:
   branchEnd() {
     // insert the branch
     this.currentVideo = this.branching.sourceVideo;
@@ -65,8 +72,10 @@ class VideoController extends EventEmitter {
     this.currentVideo.element.play();
   }
 
+  // call to branch control to a new game object:
   branchTo(sourceVideo, destinationObject, type) {
     // play source video
+    // todo: this needs work i think?
     if (type === 'cut') {
       // when the video is done activate the new object:
       sourceVideo.element.onended = () => {
@@ -77,7 +86,7 @@ class VideoController extends EventEmitter {
         this.currentVideo.element.onended = undefined;
       }
       this.currentVideo = sourceVideo;
-      this.switcher.connectVideo(this.currentVideo.element, true);
+      this.switcher.connectVideo(this.currentVideo.element, false);
       this.currentVideo.element.play();
       return;
     }
@@ -89,6 +98,8 @@ class VideoController extends EventEmitter {
     }
   }
 
+  // in syncSwitch mode we cut to a new video at random intervals
+  // or any time the current video ends:
   previousEndSyncSwitch() {
     const temp = this.backgroundVideo;
     this.backgroundVideo = this.currentVideo;
@@ -97,7 +108,8 @@ class VideoController extends EventEmitter {
     this.currentVideo.muted = 'true';
     this.currentVideo.element.play();
     this.backgroundVideo.element.play();
-    // if (this.currentVideo.hasMask) {
+    // todo: make sure this still works:
+    // if (this.currentVideo.maskPath) {
     //   this.switcher.connectMask(this.controller.interfaceController.connectMask(this.currentVideo.maskPath));
     // }
     setTimeout(() => {
@@ -105,6 +117,7 @@ class VideoController extends EventEmitter {
     }, 3000);//Math.max(this.sceneDescription.behavior.minCutLength, Math.floor(Math.random() * Math.floor(scene.behavior.maxCutLength))));
   }
 
+  // called by object to initiate syncswitch
   startSyncSwitch(scene) {
     // remove previous element.eventHandler
     if (this.currentVideo) {
@@ -126,12 +139,12 @@ class VideoController extends EventEmitter {
     setTimeout(() => {
       this.previousEndSyncSwitch.bind(this)();
     }, 2000);// Math.max(scene.behavior.minCutLength, Math.floor(Math.random() * Math.floor(scene.behavior.maxCutLength))));
-    if (this.currentVideo.hasMask) {
+    if (this.currentVideo.maskPath) {
       this.switcher.connectMask(this.controller.interfaceController.connectMask(this.currentVideo.maskPath));
     }
   }
 
-  // Active object calls this:
+  // Active object will call this:
   startScene(scene) {
     if (scene.behavior.behavior_type === 'syncSwitch') {
       return this.startSyncSwitch(scene);
@@ -142,16 +155,15 @@ class VideoController extends EventEmitter {
     }
     this.sceneDescription = scene;
     this.currentVideo = this.activeObject.getNextVideo();
+    this.nextVideo = this.activeObject.getNextVideo();
+    this.nextVideo.element.load();
     this.switcher.connectVideo(this.currentVideo.element, true);
     this.currentVideo.element.onended = this.previousEnd.bind(this);
-    // this.currentVideo.element.play();
-    this.currentVideo.element.onended = this.previousEnd.bind(this);
-    this.switcher.connectVideo(this.currentVideo.element, true);
-    this.currentVideo.element.addEventListener('canplay', () => {
+    this.currentVideo.element.oncanplay = () => {
       this.currentVideo.element.play();
-    });
+    };
     this.currentVideo.element.load();
-    if (this.currentVideo.hasMask) {
+    if (this.currentVideo.maskPath) {
       this.switcher.connectMask(this.controller.interfaceController.connectMask(this.currentVideo.maskPath));
     }
   }
@@ -161,11 +173,10 @@ class VideoController extends EventEmitter {
     return this.currentVideo.element.duration - this.currentVideo.element.currentTime;
   }
 
-  showPartial(partial, index, waitForIt, onEnd) {
-    if (!partial.element.onended) {
-      partial.element.onended = this.previousEndPartial.bind(this);
-    }
-    this.switcher.connectPartial.bind(this.switcher)(partial, index, waitForIt);
+  showPartial(partial, index, isTransition) {
+    partial.started = false;
+    this.switcher.allStarting = true;
+    this.switcher.connectPartial.bind(this.switcher)(partial, index, isTransition);
   }
 }
 
