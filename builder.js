@@ -10,6 +10,7 @@ var b = browserify({
   plugin: [watchify],
   standalone: 'iris'
 });
+
 b.on('update', bundle);
 bundle();
 
