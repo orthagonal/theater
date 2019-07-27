@@ -228,9 +228,9 @@ class SwitcherShader {
   }
 
   disconnectMask() {
-    if (this.hitboxVideo) {
+    if (this.hitboxVideo && this.hitboxVideo.stop) {
       this.hitboxVideo.stop();
-      this.hitboxVideo = false;
+      // this.hitboxVideo = false;
     }
     this.hitboxVideoReady = false;
   }
@@ -239,9 +239,9 @@ class SwitcherShader {
   connectMask(element, waitForIt) {
     this.hitboxVideo = element;
     this.hitboxVideoReady = false;
-    element.addEventListener('playing', () => {
+    element.onplaying = () => {
       this.hitboxVideoReady = true;
-    }, true);
+    };
   }
 
   // connect text to shader:

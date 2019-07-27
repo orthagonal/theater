@@ -74,6 +74,8 @@ class VideoController extends EventEmitter {
 
   // call to branch control to a new game object:
   branchTo(sourceVideo, destinationObject, type) {
+    // make sure mask is disco
+    this.switcher.disconnectMask();
     // play source video
     // todo: this needs work i think?
     if (type === 'cut') {
