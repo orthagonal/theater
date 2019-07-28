@@ -9,9 +9,6 @@ class SwitcherShader {
     this.noShow = false;
     this.frameCount = 0;
     this.dimensions = dimensions;
-    console.log('switcher dev mode is %s', devMode);
-    console.log('dims:');
-    // console.log(this.dimensions);
 
     this.partials = [undefined, undefined, undefined, undefined, undefined];
     this.partialVideos = [undefined, undefined, undefined, undefined, undefined];
@@ -185,11 +182,9 @@ class SwitcherShader {
   setPartialChannels(count) {
     for (let i = 0; i < 6; i++) {
       if (i < count) {
-        console.log(`set ${i} to true`);
         this.setShaderVariable(`u_showPartial${i}`, 1);
       } else {
         this.setShaderVariable(`u_showPartial${i}`, 0);
-        console.log(`set ${i} to false`);
       }
     }
   }
@@ -285,8 +280,6 @@ class SwitcherShader {
       this.gl.uniform1i(this.gpuVars[index], index + 3);
       this.gl.activeTexture(this.gpuTextures[index]);
       this.gl.bindTexture(this.gl.TEXTURE_2D, this.partialVideoTextures[index]);
-      console.log('connecting');
-      console.log(this.partials[index]);
       this.gl.texSubImage2D(this.gl.TEXTURE_2D, 0, 0, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.partials[index].element);
       this.partialVideoReady[index] = false;
     }

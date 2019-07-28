@@ -34,6 +34,15 @@ class CoreController {
         started: false
       }
     };
+    this.fabric = this.theWindow.fabric;
+    this.drawCanvas = new this.fabric.Canvas('textCanvas');
+  }
+
+  //  to show/hide cursor, string to show a specific icon
+  cursor(cursorValue) {
+    console.log('set to %s', cursorValue);
+    this.drawCanvas.defaultCursor = cursorValue === true ? 'pointer' :
+      cursorValue === false ? 'none' : cursorValue;
   }
 
   exitGame() {
