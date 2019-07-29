@@ -40,7 +40,7 @@ class CoreController {
     const rect = new this.fabric.Image(this.$('#handIcon')[0], {
       left: 50,
       top: 30,
-      opacity: 0
+      // opacity: 0
     });
     this.rect = rect;
     this.drawCanvas.defaultCursor = 'none';
@@ -48,17 +48,12 @@ class CoreController {
     this.drawCanvas.add(this.rect);
     const drawCanvas = this.drawCanvas;
     this.drawCanvas.on('mouse:move', function(options) {
-      // rect.set({
-      //   left: options.e.clientX,
-      //   top: options.e.clientY
-      // });
-      // drawCanvas.renderAll.bind(drawCanvas);
-      rect.animate({
+      rect.set({
         left: options.e.clientX,
         top: options.e.clientY
-      }, {
-        onChange: drawCanvas.renderAll.bind(drawCanvas)
       });
+      rect.setCoords();
+      drawCanvas.renderAll();
     });
   }
 
@@ -66,16 +61,18 @@ class CoreController {
   cursor(cursorValue) {
     console.log('set cursor to %s', cursorValue);
     if (cursorValue) {
-      this.rect.set('opacity', 100);
+      this.rect.animate({
+        opacity: 100
+      }, {
+        onChange: this.drawCanvas.renderAll.bind(this.drawCanvas)
+      });
     } else {
-      this.rect.set('opacity', 0);
+      this.rect.animate({
+        opacity: 0
+      }, {
+        onChange: this.drawCanvas.renderAll.bind(this.drawCanvas)
+      });
     }
-    // cursorValue === true ? 'pointer' :
-    //   cursorValue === false ? 'none' : cursorValue);
-    // this.$('body')[0].style.cursor = 'default';
-    // this.$('body')[0].classList.toggle('wait');
-    // this.drawCanvas.opacity = 0;
-    // this.drawCanvas.opacity = 1;
   }
 
   exitGame() {
