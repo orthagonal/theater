@@ -46,6 +46,9 @@ class VideoController extends EventEmitter {
     this.currentVideo.element.onplaying = () => {
       // console.log(`onplaying took ${new Date() - t1}`);
       this.switcher.mainVideoReady = true;
+      if (this.currentVideo.onstart) {
+        this.currentVideo.onstart(this);
+      }
     };
     this.currentVideo.element.currentTime = 0;
     this.currentVideo.element.play();

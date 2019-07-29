@@ -36,13 +36,46 @@ class CoreController {
     };
     this.fabric = this.theWindow.fabric;
     this.drawCanvas = new this.fabric.Canvas('textCanvas');
+    // todo: make this able to switch cursor:
+    const rect = new this.fabric.Image(this.$('#handIcon')[0], {
+      left: 50,
+      top: 30,
+      opacity: 0
+    });
+    this.rect = rect;
+    this.drawCanvas.defaultCursor = 'none';
+    this.drawCanvas.moveCursor = 'none';
+    this.drawCanvas.add(this.rect);
+    const drawCanvas = this.drawCanvas;
+    this.drawCanvas.on('mouse:move', function(options) {
+      // rect.set({
+      //   left: options.e.clientX,
+      //   top: options.e.clientY
+      // });
+      // drawCanvas.renderAll.bind(drawCanvas);
+      rect.animate({
+        left: options.e.clientX,
+        top: options.e.clientY
+      }, {
+        onChange: drawCanvas.renderAll.bind(drawCanvas)
+      });
+    });
   }
 
   //  to show/hide cursor, string to show a specific icon
   cursor(cursorValue) {
-    console.log('set to %s', cursorValue);
-    this.drawCanvas.defaultCursor = cursorValue === true ? 'pointer' :
-      cursorValue === false ? 'none' : cursorValue;
+    console.log('set cursor to %s', cursorValue);
+    if (cursorValue) {
+      this.rect.set('opacity', 100);
+    } else {
+      this.rect.set('opacity', 0);
+    }
+    // cursorValue === true ? 'pointer' :
+    //   cursorValue === false ? 'none' : cursorValue);
+    // this.$('body')[0].style.cursor = 'default';
+    // this.$('body')[0].classList.toggle('wait');
+    // this.drawCanvas.opacity = 0;
+    // this.drawCanvas.opacity = 1;
   }
 
   exitGame() {
