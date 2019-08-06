@@ -3,13 +3,19 @@ const VideoController = require('./VideoController');
 const AudioController = require('./AudioController');
 const InterfaceController = require('./InterfaceController');
 
-const Module = require('../modules/IrisOne/js/the_repository_1.js');
+// change this to compile for your own game module:
+const Module = require(`./modules/IrisOne/js/module.js`);
+global.ShaderDir = `./shaders`;
 
 class CoreController {
   constructor(options) {
     this.theWindow = options.theWindow;
     this.$ = options.$;
     this.devMode = options.devMode;
+    // todo: may need to do some weird things to compile:
+    // if (this.devMode) {
+    // ShaderDir = `${__dirname}/${ShaderDir}`;
+    // }
     this.dimensions = options.dimensions;
     this.currentSceneDescription = {};
     this.currentSceneVideo = {};
@@ -20,7 +26,7 @@ class CoreController {
 
     this.textContext = this.textCanvas.getContext('2d');
     this.audioController = new AudioController(options.$);
-    this.videoController = new VideoController(this, options.theWindow);
+    this.videoController = new VideoController(this, { theWindow: options.theWindow });
     this.interfaceController = new InterfaceController(this);
 
     // this loads any module:
