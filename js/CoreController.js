@@ -5,17 +5,12 @@ const InterfaceController = require('./InterfaceController');
 
 // change this to compile for your own game module:
 const Module = require(`./modules/IrisOne/js/module.js`);
-global.ShaderDir = `./shaders`;
 
 class CoreController {
   constructor(options) {
     this.theWindow = options.theWindow;
     this.$ = options.$;
     this.devMode = options.devMode;
-    // todo: may need to do some weird things to compile:
-    // if (this.devMode) {
-    // ShaderDir = `${__dirname}/${ShaderDir}`;
-    // }
     this.dimensions = options.dimensions;
     this.currentSceneDescription = {};
     this.currentSceneVideo = {};

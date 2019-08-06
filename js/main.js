@@ -7,7 +7,7 @@ let lastTime = new Date().getTime();
 // these are all singletons anyway
 exports.start = function start(options) {
   // create a game controller and kickstart a module with it:
-  options.modulePath = path.join('..', 'modules', 'IrisOne', 'js', 'the_repository_1.js');
+  options.modulePath = path.join('..', 'modules', 'IrisOne', 'js', 'module.js');
   coreController = new CoreController(options);
   coreController.kickstart('newGame', 'mainUser');
 };
