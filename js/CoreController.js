@@ -4,7 +4,7 @@ const AudioController = require('./AudioController');
 const InterfaceController = require('./InterfaceController');
 
 // change this to compile for your own game module:
-const Module = require(`./modules/IrisOne/js/module.js`);
+const Module = require(`../modules/IrisOne/js/module.js`);
 
 class CoreController {
   constructor(options) {
@@ -21,7 +21,7 @@ class CoreController {
 
     this.textContext = this.textCanvas.getContext('2d');
     this.audioController = new AudioController(options.$);
-    this.videoController = new VideoController(this, { theWindow: options.theWindow });
+    this.videoController = new VideoController(this, options.theWindow);
     this.interfaceController = new InterfaceController(this);
 
     // this loads any module:
