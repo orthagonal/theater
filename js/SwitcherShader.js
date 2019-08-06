@@ -17,11 +17,11 @@ class SwitcherShader {
     let vertexShaderSource;
     let pixelShaderSource;
     if (devMode) {
-      vertexShaderSource = require('./shaders/screen.vert')();
-      pixelShaderSource = require('./shaders/switcher.frag')();
+      vertexShaderSource = require(`screen.vert`)();
+      pixelShaderSource = require(`switcher.frag`)();
     } else {
-      vertexShaderSource = fs.readFileSync(path.join(__dirname, 'shaders', 'screen.vert'), 'utf-8').toString();
-      pixelShaderSource = fs.readFileSync(path.join(__dirname, 'shaders', 'switcher.frag'), 'utf-8').toString();
+      vertexShaderSource = fs.readFileSync(`${ShaderDir}/screen.vert`, 'utf-8').toString();
+      pixelShaderSource = fs.readFileSync(`${ShaderDir}/switcher.frag`, 'utf-8').toString();
     }
     this.goUp = true;
     this.videoController = videoController;
@@ -249,6 +249,17 @@ class SwitcherShader {
   hideText() {
     this.textReady = false;
   }
+
+
+  // this has to be here in siwtchershader
+  // todo: allow modules to overload shaders
+  showInventory() {
+    // set effect start time and turn it on
+    // intercept clicks and send them to Inventory query method
+    // set selected inventory object in game state and set icon
+    // wtf now
+  }
+
 
   // connect partial video to shader, partials are small videos
   // that lay over all or part of the main video:
