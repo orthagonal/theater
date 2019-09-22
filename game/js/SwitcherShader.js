@@ -20,8 +20,8 @@ class SwitcherShader {
       vertexShaderSource = require(`screen.vert`)();
       pixelShaderSource = require(`switcher.frag`)();
     } else {
-      vertexShaderSource = fs.readFileSync(`${ShaderDir}/screen.vert`, 'utf-8').toString();
-      pixelShaderSource = fs.readFileSync(`${ShaderDir}/switcher.frag`, 'utf-8').toString();
+      vertexShaderSource = fs.readFileSync(`${__dirname}/shaders/screen.vert`, 'utf-8').toString();
+      pixelShaderSource = fs.readFileSync(`${__dirname}/shaders/switcher.frag`, 'utf-8').toString();
     }
     this.goUp = true;
     this.videoController = videoController;

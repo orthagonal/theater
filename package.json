@@ -10,7 +10,7 @@
   "window": {
     "fullscreen": true,
     "resizable": false,
-    "toolbar": false,
+    "toolbar": true,
     "frame": false
   },
   "scripts": {

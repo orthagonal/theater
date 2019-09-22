@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="fabric.min.js"></script>
   <script>
   var main;
   var started = false;
@@ -23,12 +24,16 @@
     var theWindow = nw.Screen.screens[0];
     var finalDestinationCanvas = document.getElementById("finalDestinationCanvas");
     finalDestinationCanvas.addEventListener("keypress", onClick, false );
-    finalDestinationCanvas.width = theWindow.bounds.width;
-    finalDestinationCanvas.height = theWindow.bounds.height;
+    // finalDestinationCanvas.width = theWindow.bounds.width;
+    // finalDestinationCanvas.height = theWindow.bounds.height;
     var hitboxCanvas = document.getElementById("hitboxCanvas");
-    hitboxCanvas.width = theWindow.innerWidth;
-    hitboxCanvas.height = theWindow.innerHeight;
+    // hitboxCanvas.width = theWindow.innerWidth;
+    // hitboxCanvas.height = theWindow.innerHeight;
+    var textCanvas = document.getElementById("textCanvas");
+    // textCanvas.width = theWindow.innerWidth;
+    // textCanvas.height = theWindow.innerHeight;
     main.start({
+      textCanvas,
       finalDestinationCanvas,
       hitboxCanvas,
       $,
@@ -65,10 +70,12 @@
   }
   </style>
 </head>
-<body onload="onLoad();" onkeyup="onClick(event)" onmousedown="onClick(event);" onkeydown="onClick(event)" onkeypress="onClick(event)">
-  <canvas id="finalDestinationCanvas">
-  </canvas>
-  <canvas id="hitboxCanvas" hidden>
-  </canvas>
+<body onload="onLoad();" onkeyup="onClick(event)" onmousedown="onClick(event);" onkeydown="onClick(event)" onkeypress="onClick(event)" width="100%" height="100%">
+  <canvas id="finalDestinationCanvas" width="100%" height="100%"
+      style="position: absolute; left: 0; top: 0; z-index: 0;"></canvas>
+  <canvas id="hitboxCanvas" width="100%" height="100%"
+      style="position: absolute; left: 0; top: 0; z-index: 0;" hidden></canvas>
+   <canvas id="textCanvas" width="100%" height="100%"
+       style="position: absolute; left: 0; top: 0; z-index: 1;"></canvas>
 </body>
 </html>
