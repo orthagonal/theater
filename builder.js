@@ -3,9 +3,9 @@ const watchify = require('watchify');
 const browserify_shader = require('browserify-shader');
 const fs = require('fs');
 var b = browserify({
-  entries: ['./js/onLoad.js'],
+  entries: ['./game/js/onLoad.js'],
   cache: {},
-  paths: [`./modules/IrisOne/js/shaders`],
+  paths: [`./game/modules/IrisOne/js/shaders`],
   packageCache: {},
   transform: [browserify_shader],
   plugin: [watchify],

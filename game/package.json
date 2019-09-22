@@ -13,17 +13,14 @@
     "toolbar": false,
     "frame": false
   },
-  "scripts": {
-    "test": "mocha"
-  },
   "author": "chris harris",
   "license": "ISC",
   "dependencies": {
-    "aequery": "^0.6.0",
-    "after-effects": "^0.4.15",
-    "browserify-fs": "^1.0.0",
-    "browserify-shader": "^0.1.2",
-    "watchify": "^3.11.1"
+    "async": "^2.0.0-rc.6",
+    "jquery": "^3.1.0",
+    "json-fs-store": "^1.0.0",
+    "lodash": "^4.17.4",
+    "moment": "^2.24.0"
   },
   "devDependencies": {}
 }

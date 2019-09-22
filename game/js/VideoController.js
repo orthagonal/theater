@@ -164,6 +164,7 @@ class VideoController extends EventEmitter {
     this.nextVideo.element.load();
     this.switcher.connectVideo(this.currentVideo.element, true);
     this.currentVideo.element.onended = this.previousEnd.bind(this);
+    this.currentVideo.element.muted = true;
     this.currentVideo.element.oncanplay = () => {
       this.currentVideo.element.play();
     };
