@@ -25,7 +25,7 @@ class SwitcherShader {
     }
     this.goUp = true;
     this.videoController = videoController;
-    this.offscreenCanvas1 = videoController.controller.finalDestinationCanvas.transferControlToOffscreen();
+    this.offscreenCanvas1 = videoController.controller.finalDestinationCanvas;//.transferControlToOffscreen();
     // this.glWorker = new videoController.controller.theWindow.Worker('./js/PartialsShader.js');
     const data = { canvas: this.offscreenCanvas1, init: true, devMode, vertexShaderSource, pixelShaderSource, dimensions };
     this.gl = this.offscreenCanvas1.getContext('webgl');

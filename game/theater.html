@@ -20,18 +20,19 @@
   function onLoad() {
     // set size:
     main = require(process.cwd()+'/js/main.js');
-    nw.Screen.Init();
-    var theWindow = nw.Screen.screens[0];
     var finalDestinationCanvas = document.getElementById("finalDestinationCanvas");
     finalDestinationCanvas.addEventListener("keypress", onClick, false );
-    // finalDestinationCanvas.width = theWindow.bounds.width;
-    // finalDestinationCanvas.height = theWindow.bounds.height;
     var hitboxCanvas = document.getElementById("hitboxCanvas");
-    // hitboxCanvas.width = theWindow.innerWidth;
-    // hitboxCanvas.height = theWindow.innerHeight;
     var textCanvas = document.getElementById("textCanvas");
-    // textCanvas.width = theWindow.innerWidth;
-    // textCanvas.height = theWindow.innerHeight;
+    console.log('nw screen:');
+    nw.Screen.Init();
+    var theWindow = nw.Screen.screens[0];
+    textCanvas.width = theWindow.bounds.width;
+    textCanvas.height = theWindow.bounds.height;
+    finalDestinationCanvas.width = theWindow.bounds.width;
+    finalDestinationCanvas.height = theWindow.bounds.height;
+    hitboxCanvas.width = theWindow.bounds.width;
+    hitboxCanvas.height = theWindow.bounds.height;
     main.start({
       textCanvas,
       finalDestinationCanvas,
@@ -40,11 +41,6 @@
       dimensions: {
         width: finalDestinationCanvas.width,
         height: finalDestinationCanvas.height,
-        // todo: use these in the future
-        videoWidth: finalDestinationCanvas.width,
-        videoHeight: finalDestinationCanvas.height,
-        outputWidth: finalDestinationCanvas.width,
-        outputHeight: finalDestinationCanvas.height
       },
       devMode: false,
       theWindow: window
