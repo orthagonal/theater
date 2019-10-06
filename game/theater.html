@@ -7,13 +7,19 @@
   <script>
   var main;
   var started = false;
-  function onClick(evt) {
+  document.addEventListener('DOMContentLoaded', (event) => {
     if (!started) {
       started = true;
       return onLoad();
     }
-    main.query(evt);
+  });
+
+  function onClick(evt) {
+    if (started) {
+      main.query(evt);
+    }
   }
+
   function onMouseMove(evt) {
     main.query(evt);
   }
@@ -67,6 +73,7 @@
   </style>
 </head>
 <body onload="onLoad();" onkeyup="onClick(event)" onmousedown="onClick(event);" onkeydown="onClick(event)" onkeypress="onClick(event)" width="100%" height="100%">
+  <img id="handIcon" src="symbol.png" hidden>
   <canvas id="finalDestinationCanvas" width="100%" height="100%"
       style="position: absolute; left: 0; top: 0; z-index: 0;"></canvas>
   <canvas id="hitboxCanvas" width="100%" height="100%"
