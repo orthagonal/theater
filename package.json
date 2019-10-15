@@ -10,11 +10,8 @@
   "window": {
     "fullscreen": true,
     "resizable": false,
-    "toolbar": true,
+    "toolbar": false,
     "frame": false
-  },
-  "scripts": {
-    "test": "mocha"
   },
   "author": "chris harris",
   "license": "ISC",
@@ -23,6 +20,7 @@
     "after-effects": "^0.4.15",
     "browserify-fs": "^1.0.0",
     "browserify-shader": "^0.1.2",
+    "nw-builder": "^3.5.7",
     "watchify": "^3.11.1"
   },
   "devDependencies": {}

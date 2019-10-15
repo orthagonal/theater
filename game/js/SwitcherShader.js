@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 
 class SwitcherShader {
-  constructor(videoController, dimensions, devMode = true) {
+  constructor(videoController, dimensions, devMode = false) {
     this.noShow = false;
     this.frameCount = 0;
     this.dimensions = dimensions;
@@ -49,7 +49,7 @@ class SwitcherShader {
       return null;
     }
     gl.useProgram(program);
-
+    this.programReady = true;
     this.defaultScreenCoordinates = [-1, 1, -1, -1, 1, -1, 1, 1];
     // setup the video elements and textures:
     this.mainVideo = undefined;
@@ -152,12 +152,11 @@ class SwitcherShader {
     gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    gl.useProgram(this.program);
+    // gl.useProgram(this.program);
     // this.glWorker.postMessage({ canvas: this.offscreenCanvas1, init: true, devMode, vertexShaderSource, pixelShaderSource, dimensions }, [this.offscreenCanvas1]);
     this.requestAnimationFrame = this.videoController.theWindow.requestAnimationFrame.bind(this.videoController.theWindow);
-    setTimeout(() => {
-      this.videoController.theWindow.requestAnimationFrame(this.render.bind(this));
-    }, 2500);
+    this.render = this.render.bind(this);
+    this.videoController.theWindow.requestAnimationFrame(this.render);
   }
 
   initTexture(texture) {
@@ -211,15 +210,14 @@ class SwitcherShader {
   connectVideo(element, waitForIt) {
     this.mainVideo = element;
     // wait for next video to be ready, use for 'normal' behavior
-    // this.mainVideoReady = false;
+    this.mainVideoReady = false;
     // todo: this seems hacky:
     const obj = this;
     function p() {
       obj.mainVideoReady = true;
-      delete element.ontimeupdate;
       element.ontimeupdate = undefined;
     }
-    element.ontimeupdate = p.bind(this);
+    element.onplaying = p.bind(this);
   }
 
   disconnectMask() {
@@ -307,26 +305,32 @@ class SwitcherShader {
 
   //////// event listeners:
   render(now) {
-    const gl = this.gl;
-    this.frameCount ++;
-    // transitioning ones update every single frame
-    for (let nextFrame = 0; nextFrame < 5; nextFrame++) {
-      if (this.partialVideoReady[nextFrame]) {
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
-        gl.uniform1i(this.gpuVars[nextFrame], nextFrame + 3);
-        gl.activeTexture(this.gpuTextures[nextFrame]);
-        gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[nextFrame]);
-        gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partials[nextFrame].element);
+    try {
+      const gl = this.gl;
+      gl.useProgram(this.program);
+      this.frameCount ++;
+      // transitioning ones update every single frame
+      for (let nextFrame = 0; nextFrame < 5; nextFrame++) {
+        if (this.partialVideoReady[nextFrame]) {
+          gl.bindBuffer(gl.ARRAY_BUFFER, this.partialVertexBuffer);
+          gl.uniform1i(this.gpuVars[nextFrame], nextFrame + 3);
+          gl.activeTexture(this.gpuTextures[nextFrame]);
+          gl.bindTexture(gl.TEXTURE_2D, this.partialVideoTextures[nextFrame]);
+          gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.partials[nextFrame].element);
+        }
       }
+      if (this.mainVideoReady) {
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+        gl.uniform1i(gl.getUniformLocation(this.program, 'u_mainVideo'), 0);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, this.mainVideoTexture);
+        gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.mainVideo);
+      }
+      this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, 4);
+    } catch (e) {
+      console.log('RENDER LOOP ERROR:');
+      console.log(e);
     }
-    if (this.mainVideoReady) {
-      gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
-      gl.uniform1i(gl.getUniformLocation(this.program, 'u_mainVideo'), 0);
-      gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, this.mainVideoTexture);
-      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.mainVideo);
-    }
-    this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, 4);
     this.requestAnimationFrame(this.render.bind(this));
   }
 
@@ -336,7 +340,8 @@ class SwitcherShader {
     setTimeout(() => {
       this.gl.uniform1f(this.u_activeEffect, global.NO_EFFECT);
     }, videoDuration);
-    this.gl.useProgram(this.program);
+    // is this needed?
+    // this.gl.useProgram(this.program);
     this.gl.uniform1f(this.u_activeEffect, global.MOUSE_FLARE_EFFECT);
     this.gl.uniform1f(this.u_percentDone, 0.0);
     this.gl.uniform2fv(this.u_mouse, [mouseEvent.clientX * 1.0, mouseEvent.clientY]);
