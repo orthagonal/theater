@@ -7,31 +7,37 @@
   <script>
   var main;
   var started = false;
-  function onClick(evt) {
+  document.addEventListener('DOMContentLoaded', (event) => {
     if (!started) {
       started = true;
       return onLoad();
     }
-    main.query(evt);
+  });
+
+  function onClick(evt) {
+    if (started) {
+      main.query(evt);
+    }
   }
+
   function onMouseMove(evt) {
     main.query(evt);
   }
   function onLoad() {
     // set size:
     main = require(process.cwd()+'/js/main.js');
-    nw.Screen.Init();
-    var theWindow = nw.Screen.screens[0];
     var finalDestinationCanvas = document.getElementById("finalDestinationCanvas");
     finalDestinationCanvas.addEventListener("keypress", onClick, false );
-    // finalDestinationCanvas.width = theWindow.bounds.width;
-    // finalDestinationCanvas.height = theWindow.bounds.height;
     var hitboxCanvas = document.getElementById("hitboxCanvas");
-    // hitboxCanvas.width = theWindow.innerWidth;
-    // hitboxCanvas.height = theWindow.innerHeight;
     var textCanvas = document.getElementById("textCanvas");
-    // textCanvas.width = theWindow.innerWidth;
-    // textCanvas.height = theWindow.innerHeight;
+    nw.Screen.Init();
+    var theWindow = nw.Screen.screens[0];
+    textCanvas.width = theWindow.bounds.width;
+    textCanvas.height = theWindow.bounds.height;
+    finalDestinationCanvas.width = theWindow.bounds.width;
+    finalDestinationCanvas.height = theWindow.bounds.height;
+    hitboxCanvas.width = theWindow.bounds.width;
+    hitboxCanvas.height = theWindow.bounds.height;
     main.start({
       textCanvas,
       finalDestinationCanvas,
@@ -40,11 +46,6 @@
       dimensions: {
         width: finalDestinationCanvas.width,
         height: finalDestinationCanvas.height,
-        // todo: use these in the future
-        videoWidth: finalDestinationCanvas.width,
-        videoHeight: finalDestinationCanvas.height,
-        outputWidth: finalDestinationCanvas.width,
-        outputHeight: finalDestinationCanvas.height
       },
       devMode: false,
       theWindow: window
@@ -71,6 +72,7 @@
   </style>
 </head>
 <body onload="onLoad();" onkeyup="onClick(event)" onmousedown="onClick(event);" onkeydown="onClick(event)" onkeypress="onClick(event)" width="100%" height="100%">
+  <img id="handIcon" src="symbol.png" hidden>
   <canvas id="finalDestinationCanvas" width="100%" height="100%"
       style="position: absolute; left: 0; top: 0; z-index: 0;"></canvas>
   <canvas id="hitboxCanvas" width="100%" height="100%"

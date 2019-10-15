@@ -2,9 +2,11 @@
 const VideoController = require('./VideoController');
 const AudioController = require('./AudioController');
 const InterfaceController = require('./InterfaceController');
+const path = require('path');
+const r = path.resolve(`E:\\Users\\chris\\Documents\\GitHub\\theater/modules/IrisOne/js/module.js`);
 
 // change this to compile for your own game module:
-const Module = require(`../modules/IrisOne/js/module.js`);
+const Module = require(r);
 
 class CoreController {
   constructor(options) {
@@ -51,7 +53,7 @@ class CoreController {
     this.drawCanvas.on('mouse:move', function(options) {
       rect.set({
         left: options.e.clientX,
-        top: options.e.clientY
+        top: options.e.clientY,
       });
       rect.setCoords();
       drawCanvas.renderAll();
@@ -60,18 +62,13 @@ class CoreController {
 
   //  to show/hide cursor, string to show a specific icon
   cursor(cursorValue) {
-    console.log('set cursor to %s', cursorValue);
     if (cursorValue) {
-      this.rect.animate({
-        opacity: 100
-      }, {
-        onChange: this.drawCanvas.renderAll.bind(this.drawCanvas)
+      this.rect.set({
+        opacity: 1
       });
     } else {
-      this.rect.animate({
+      this.rect.set({
         opacity: 0
-      }, {
-        onChange: this.drawCanvas.renderAll.bind(this.drawCanvas)
       });
     }
   }
@@ -140,7 +137,6 @@ class CoreController {
     }
     if (info.when === 'videoEnd') {
       info.when = this.videoController.getRemainingTime();
-      console.log(info.when);
     }
     if (info.when && info.callback) {
       setTimeout(info.callback.bind(this), info.when);

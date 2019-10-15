@@ -3,9 +3,14 @@ const CoreController = require('./CoreController.js');
 const path = require('path');
 let coreController = null;
 let lastTime = new Date().getTime();
+let started = false;
 
 // these are all singletons anyway
 exports.start = function start(options) {
+  if (started) {
+    return;
+  }
+  started = true;
   // create a game controller and kickstart a module with it:
   options.modulePath = path.join('..', 'modules', 'IrisOne', 'js', 'module.js');
   coreController = new CoreController(options);

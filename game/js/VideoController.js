@@ -44,7 +44,6 @@ class VideoController extends EventEmitter {
     this.switcher.connectVideo(this.currentVideo.element);
     this.currentVideo.element.onended = this.previousEnd.bind(this);
     this.currentVideo.element.onplaying = () => {
-      // console.log(`onplaying took ${new Date() - t1}`);
       this.switcher.mainVideoReady = true;
       if (this.currentVideo.onstart) {
         this.currentVideo.onstart(this);
@@ -110,7 +109,7 @@ class VideoController extends EventEmitter {
     this.backgroundVideo = this.currentVideo;
     this.currentVideo = temp;
     this.switcher.connectVideo(this.currentVideo.element);
-    this.currentVideo.muted = 'true';
+    // this.currentVideo.muted = 'true';
     this.currentVideo.element.play();
     this.backgroundVideo.element.play();
     // todo: make sure this still works:
@@ -150,6 +149,7 @@ class VideoController extends EventEmitter {
   }
 
   // Active object will call this:
+  // make sure the first and second video are started rightly
   startScene(scene) {
     if (scene.behavior.behavior_type === 'syncSwitch') {
       return this.startSyncSwitch(scene);
@@ -164,7 +164,7 @@ class VideoController extends EventEmitter {
     this.nextVideo.element.load();
     this.switcher.connectVideo(this.currentVideo.element, true);
     this.currentVideo.element.onended = this.previousEnd.bind(this);
-    this.currentVideo.element.muted = true;
+    // this.currentVideo.element.muted = true;
     this.currentVideo.element.oncanplay = () => {
       this.currentVideo.element.play();
     };
