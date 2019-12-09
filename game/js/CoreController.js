@@ -37,40 +37,41 @@ class CoreController {
         started: false
       }
     };
-    this.fabric = this.theWindow.fabric;
-    this.drawCanvas = new this.fabric.Canvas('textCanvas');
-    // todo: make this able to switch cursor:
-    const rect = new this.fabric.Image(this.$('#handIcon')[0], {
-      left: 50,
-      top: 30,
-      // opacity: 0
-    });
-    this.rect = rect;
-    this.drawCanvas.defaultCursor = 'none';
-    this.drawCanvas.moveCursor = 'none';
-    this.drawCanvas.add(this.rect);
-    const drawCanvas = this.drawCanvas;
-    this.drawCanvas.on('mouse:move', function(options) {
-      rect.set({
-        left: options.e.clientX,
-        top: options.e.clientY,
-      });
-      rect.setCoords();
-      drawCanvas.renderAll();
-    });
+    // this.fabric = this.theWindow.fabric;
+    // this.drawCanvas = new this.fabric.Canvas('textCanvas', { renderOnAddRemove: false, selection: false });
+    // // todo: make this able to switch cursor:
+    // const rect = new this.fabric.Image(this.$('#handIcon')[0], {
+    //   left: 50,
+    //   top: 30,
+    //   selectable: false,
+    //   hasRotatingPoint: false
+    // });
+    // this.rect = rect;
+    // this.drawCanvas.defaultCursor = 'none';
+    // this.drawCanvas.moveCursor = 'none';
+    // this.drawCanvas.add(this.rect);
+    // const drawCanvas = this.drawCanvas;
+    // this.drawCanvas.on('mouse:move', function(options) {
+    //   rect.set({
+    //     left: options.e.clientX,
+    //     top: options.e.clientY,
+    //   });
+    //   // rect.setCoords();
+    //   drawCanvas.renderAll();
+    // });
   }
 
   //  to show/hide cursor, string to show a specific icon
   cursor(cursorValue) {
-    if (cursorValue) {
-      this.rect.set({
-        opacity: 1
-      });
-    } else {
-      this.rect.set({
-        opacity: 0
-      });
-    }
+    // if (cursorValue) {
+    //   this.rect.set({
+    //     opacity: 1
+    //   });
+    // } else {
+    //   this.rect.set({
+    //     opacity: 0
+    //   });
+    // }
   }
 
   exitGame() {
@@ -106,13 +107,13 @@ class CoreController {
     this.module.startNewGame(userId);
   }
 
-  loadGameObject(gameObject) {
+  loadGameObject(gameObject, firstTime=false) {
     // deactivate old object:
     if (this.activeObject) {
       this.activeObject.deactivate();
     }
     this.activeObject = gameObject;
-    gameObject.activate(this.videoController);
+    gameObject.activate(this.videoController, firstTime);
     // todo: this.audiController.setActiveObject(gameObject);
   }
 
