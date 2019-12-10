@@ -60,9 +60,10 @@ class InterfaceController {
 		if (this.controller.branching) {
 			return;
 		}
-		// you need to figure this part out it breaks ask you transition between mask/no mask
 		let data = [0,0,0,0];
     this.currentMouseEvent = mouseEvent;
+		// you might need to figure this part out it breaks ask you transition between mask/no mask
+		// hence the try/catch
 		if (this.hasMask) {
 			try {
 				this.hitboxCanvasContext.drawImage(this.videoElement,
