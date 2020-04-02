@@ -61,9 +61,6 @@ class VideoController extends EventEmitter {
     } else {
       this.switcher.disconnectMask();
     }
-    console.log('previousEnd exiting, current and next vids are ');
-    // console.log(this.currentVideo);
-    // console.log(this.nextVideo);
   }
 
   // when the branch to the new game object ends this will transition control to the new object:

@@ -5,6 +5,8 @@ const InterfaceController = require('./InterfaceController');
 const path = require('path');
 const r = path.resolve(`E:\\Users\\chris\\Documents\\GitHub\\theater/modules/IrisOne/js/module.js`);
 
+let drawCanvas = false;
+
 // change this to compile for your own game module:
 const Module = require(r);
 
@@ -50,13 +52,12 @@ class CoreController {
     this.drawCanvas.defaultCursor = 'none';
     this.drawCanvas.moveCursor = 'none';
     this.drawCanvas.add(this.rect);
-    const drawCanvas = this.drawCanvas;
+    drawCanvas = this.drawCanvas;
     this.drawCanvas.on('mouse:move', function(options) {
       rect.set({
         left: options.e.clientX,
         top: options.e.clientY,
       });
-      // rect.setCoords();
       drawCanvas.renderAll();
     });
   }
@@ -71,6 +72,9 @@ class CoreController {
       this.rect.set({
         opacity: 0
       });
+    }
+    if (drawCanvas) {
+      drawCanvas.renderAll();
     }
   }
 
