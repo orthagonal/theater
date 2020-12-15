@@ -12,21 +12,41 @@ class AudioController {
 
   // call on cleanup:
   clear() {
+    if (!this.jqueryElement || this.jqueryElement.length === 0) {
+      return;
+    }
     this.jqueryElement[0].src = '';
     this.jqueryElement[0].load();
     this.jqueryElement.remove();
     delete(this.jqueryElement);
   }
 
+  playSoundtrack(e) {
+    console.log('playSoundtrack');
+    console.log(e);
+    e[0].play();
+    e[0].volume = 1.0;
+    e[0].loop = true;
+  }
+
   setSoundtrack(src) {
-    if (this.soundtrack) {
-      this.clear();
+    // if (this.soundtrack) {
+    //   this.clear();
+    // }
+    console.log('loading it');
+    try {
+      this.soundtrackJquery = this.$(`<audio src="${src}" type='audio/mpeg'></audio>`);
+      console.log(this.soundtrackJquery);
+      this.soundtrack = this.soundtrackJquery[0];
+      this.soundtrack.play();
+      this.soundtrack.volume = 1.0;
+      this.soundtrack.loop = true;
+
+    } catch (e) {
+      console.log('++');
+      console.log('++');
+      console.log(e);
     }
-    this.soundtrackJquery = this.$(`<audio src="${config.soundsDir}${path.sep}${src}" type='audio/mpeg'></audio>`);
-    this.soundtrack = this.soundtrackJquery[0];
-    this.soundtrack.play();
-    this.soundtrack.volume = 0.2;
-    this.soundtrack.loop = true;
   }
 
   loadEffect(data) {

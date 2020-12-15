@@ -5,6 +5,8 @@ const InterfaceController = require('./InterfaceController');
 const path = require('path');
 const r = path.resolve(`E:\\Users\\chris\\Documents\\GitHub\\theater/modules/IrisOne/js/module.js`);
 
+let drawCanvas = false;
+
 // change this to compile for your own game module:
 const Module = require(r);
 
@@ -38,24 +40,24 @@ class CoreController {
       }
     };
     this.fabric = this.theWindow.fabric;
-    this.drawCanvas = new this.fabric.Canvas('textCanvas');
+    this.drawCanvas = new this.fabric.Canvas('textCanvas', { renderOnAddRemove: false, selection: false });
     // todo: make this able to switch cursor:
     const rect = new this.fabric.Image(this.$('#handIcon')[0], {
       left: 50,
       top: 30,
-      // opacity: 0
+      selectable: false,
+      hasRotatingPoint: false
     });
     this.rect = rect;
     this.drawCanvas.defaultCursor = 'none';
     this.drawCanvas.moveCursor = 'none';
     this.drawCanvas.add(this.rect);
-    const drawCanvas = this.drawCanvas;
+    drawCanvas = this.drawCanvas;
     this.drawCanvas.on('mouse:move', function(options) {
       rect.set({
         left: options.e.clientX,
         top: options.e.clientY,
       });
-      rect.setCoords();
       drawCanvas.renderAll();
     });
   }
@@ -70,6 +72,9 @@ class CoreController {
       this.rect.set({
         opacity: 0
       });
+    }
+    if (drawCanvas) {
+      drawCanvas.renderAll();
     }
   }
 
@@ -106,13 +111,13 @@ class CoreController {
     this.module.startNewGame(userId);
   }
 
-  loadGameObject(gameObject) {
+  loadGameObject(gameObject, firstTime=false) {
     // deactivate old object:
     if (this.activeObject) {
       this.activeObject.deactivate();
     }
     this.activeObject = gameObject;
-    gameObject.activate(this.videoController);
+    gameObject.activate(this.videoController, firstTime);
     // todo: this.audiController.setActiveObject(gameObject);
   }
 

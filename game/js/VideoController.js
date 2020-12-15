@@ -39,7 +39,10 @@ class VideoController extends EventEmitter {
       return this.branchEnd();
     }
     this.currentVideo.element.pause();
-    // todo:
+    this.currentVideo.element.onended = null;
+    this.currentVideo.element.onplaying = null;
+    this.currentVideo.element.oncanplay = null;
+
     this.currentVideo = this.nextVideo;
     this.switcher.connectVideo(this.currentVideo.element);
     this.currentVideo.element.onended = this.previousEnd.bind(this);
@@ -76,10 +79,10 @@ class VideoController extends EventEmitter {
 
   // call to branch control to a new game object:
   branchTo(sourceVideo, destinationObject, type) {
+    // load the videos in the destination object:
+    destinationObject.load();
     // make sure mask is disco
     this.switcher.disconnectMask();
-    // play source video
-    // todo: this needs work i think?
     if (type === 'cut') {
       // when the video is done activate the new object:
       sourceVideo.element.onended = () => {

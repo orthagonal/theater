@@ -324,6 +324,7 @@ class SwitcherShader {
         gl.uniform1i(gl.getUniformLocation(this.program, 'u_mainVideo'), 0);
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, this.mainVideoTexture);
+        // this is where the app spends  virtually all its time:
         gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, this.mainVideo);
       }
       this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, 4);
