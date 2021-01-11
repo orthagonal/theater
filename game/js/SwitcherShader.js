@@ -157,6 +157,7 @@ class SwitcherShader {
     this.requestAnimationFrame = this.videoController.theWindow.requestAnimationFrame.bind(this.videoController.theWindow);
     this.render = this.render.bind(this);
     this.videoController.theWindow.requestAnimationFrame(this.render);
+    this.numberOfPartialChannels = 0;
   }
 
   initTexture(texture) {
@@ -179,6 +180,7 @@ class SwitcherShader {
   }
 
   setPartialChannels(count) {
+    this.numberOfPartialChannels = count;
     for (let i = 0; i < 6; i++) {
       if (i < count) {
         this.setShaderVariable(`u_showPartial${i}`, 1);
@@ -257,7 +259,6 @@ class SwitcherShader {
     // set selected inventory object in game state and set icon
     // wtf now
   }
-
 
   // connect partial video to shader, partials are small videos
   // that lay over all or part of the main video:

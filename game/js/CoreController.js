@@ -1,9 +1,8 @@
-'use strict';
 const VideoController = require('./VideoController');
 const AudioController = require('./AudioController');
 const InterfaceController = require('./InterfaceController');
 const path = require('path');
-const r = path.resolve(`E:\\Users\\chris\\Documents\\GitHub\\theater/modules/IrisOne/js/module.js`);
+const r = path.resolve(`C:\\GitHub\\theater/modules/IrisOne/js/module.js`);
 
 let drawCanvas = false;
 
@@ -42,34 +41,54 @@ class CoreController {
     this.fabric = this.theWindow.fabric;
     this.drawCanvas = new this.fabric.Canvas('textCanvas', { renderOnAddRemove: false, selection: false });
     // todo: make this able to switch cursor:
-    const rect = new this.fabric.Image(this.$('#handIcon')[0], {
+    const cursor = new this.fabric.Image(this.$('#symbolIcon')[0], {
       left: 50,
       top: 30,
       selectable: false,
       hasRotatingPoint: false
     });
-    this.rect = rect;
+    this.cursor = cursor;
+    this.inventoryIcons = {};
     this.drawCanvas.defaultCursor = 'none';
     this.drawCanvas.moveCursor = 'none';
-    this.drawCanvas.add(this.rect);
+    this.drawCanvas.add(this.cursor);
     drawCanvas = this.drawCanvas;
     this.drawCanvas.on('mouse:move', function(options) {
-      rect.set({
+      cursor.set({
         left: options.e.clientX,
         top: options.e.clientY,
       });
       drawCanvas.renderAll();
     });
+    this.module.init();
+  }
+
+  showInventoryIcons(iconName) {
+    this.inventoryIcons[iconName].set({
+      opacity: 1
+    });
+  }
+
+  hideInventoryIcons(iconName) {
+    this.inventoryIcons[iconName].set({
+      opacity: 0
+    });
+  }
+
+  changeIcon(iconValue) {
+    console.log('change icon');
+    this.cursor.setElement(this.$(`#${iconValue}`)[0]);
+    this.drawCanvas.renderAll();
   }
 
   //  to show/hide cursor, string to show a specific icon
-  cursor(cursorValue) {
+  showCursor(cursorValue) {
     if (cursorValue) {
-      this.rect.set({
+      this.cursor.set({
         opacity: 1
       });
     } else {
-      this.rect.set({
+      this.cursor.set({
         opacity: 0
       });
     }
