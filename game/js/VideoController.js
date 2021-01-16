@@ -97,53 +97,30 @@ class VideoController extends EventEmitter {
       this.currentVideo.element.play();
       return;
     }
-    // play a partial overlay while we transition
-    // to next video
-    // todo: needs to keep playing underlying object's video
-    // until the branch is done
-
-    // can't instantly interrupt a video
-    // try playing two partials
-    // a transition partial and a dest partial
-    // when dest partial onended switch back to next object
     if (type === 'overlay') {
       const newPartialCount = this.switcher.numberOfPartialChannels + 1
-      // when the video is done activate the new object:
-      sourceVideo.element.onended = () => {
-        this.switcher.setPartialChannels(newPartialCount - 1);
+      // only after the partial video is done immediately activate the new object:
+      setTimeout(() => {
         destinationObject.activate(this);
-        this.controller.branching = false;
-      };
-      // the current video when it ends needs to play a
-      // video from the dest object instead
-      if (this.currentVideo) {
-        this.nextVideo = destinationObject.getNextVideo();
-        // this.currentVideo.element.onended = undefined;
-        // this.currentVideo.element.onended = () ==> {
-      }
-      // now play the sourceVideo as a partial in the last-available partial slot:
+        this.branching = false;
+      }, sourceVideo.activateDelay);
+      setTimeout(() => {
+        this.switcher.setPartialChannels(newPartialCount - 1);
+      }, sourceVideo.switchDelay);
       this.switcher.setPartialChannels(newPartialCount);
       this.switcher.connectPartial(sourceVideo, 0, true);
+      return;
     }
     // play the next object's video while we play the overlay
     if (type === 'reverse_overlay') {
+      destinationObject.activate(this);
       const newPartialCount = this.switcher.numberOfPartialChannels + 1
-      // when the video is done activate the new object:
-      sourceVideo.element.onended = () => {
+      setTimeout(() => {
         this.switcher.setPartialChannels(newPartialCount - 1);
-        destinationObject.activate(this);
-        this.controller.branching = false;
-      };
-      // the current video when it ends needs to play a
-      // video from the dest object instead
-      if (this.currentVideo) {
-        this.nextVideo = destinationObject.getNextVideo();
-        // this.currentVideo.element.onended = undefined;
-        // this.currentVideo.element.onended = () ==> {
-      }
-      // now play the sourceVideo as a partial in the last-available partial slot:
+      }, sourceVideo.switchDelay);
       this.switcher.setPartialChannels(newPartialCount);
       this.switcher.connectPartial(sourceVideo, 0, true);
+      return;
     }
     if (type === 'transition') {
       this.branching = { sourceVideo, destinationObject };

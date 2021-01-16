@@ -270,7 +270,7 @@ class SwitcherShader {
         partial.element.ontimeupdate = () => {
           this.partials[index] = partial;
           this.partialVideoReady[index] = true;
-          delete partial.element.ontimeupdate;
+          partial.element.ontimeupdate = undefined;
         };
         partial.element.currentTime = 0;
         partial.element.oncanplay = () => {
