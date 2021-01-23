@@ -39,13 +39,18 @@ class CoreController {
       }
     };
     this.fabric = this.theWindow.fabric;
-    this.drawCanvas = new this.fabric.Canvas('textCanvas', { renderOnAddRemove: false, selection: false });
+    this.drawCanvas = new this.fabric.Canvas('textCanvas', {
+      renderOnAddRemove: false,
+      selection: false,
+      fireRightClick: true
+    });
     // todo: make this able to switch cursor:
     const cursor = new this.fabric.Image(this.$('#symbolIcon')[0], {
       left: 50,
       top: 30,
       selectable: false,
-      hasRotatingPoint: false
+      hasRotatingPoint: false,
+      fireRightClick: true
     });
     this.cursor = cursor;
     this.inventoryIcons = {};
@@ -65,19 +70,21 @@ class CoreController {
 
   showInventoryIcons(iconName) {
     this.inventoryIcons[iconName].set({
-      opacity: 1
+      opacity: 1,
     });
   }
 
   hideInventoryIcons(iconName) {
     this.inventoryIcons[iconName].set({
-      opacity: 0
+      opacity: 0,
     });
   }
 
   changeIcon(iconValue) {
-    console.log('change icon');
-    this.cursor.setElement(this.$(`#${iconValue}`)[0]);
+    console.log('changeicon icon value');
+    console.log(iconValue);
+    // iconValue can be either the icon element id or the element itself:
+    this.cursor.setElement(typeof iconValue === 'string' ? this.$(`#${iconValue}`)[0] : iconValue);
     this.drawCanvas.renderAll();
   }
 

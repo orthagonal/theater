@@ -15,8 +15,17 @@
   });
 
   function onClick(evt) {
+    evt.preventDefault();
     if (started) {
       main.query(evt);
+    }
+  }
+
+  function onRightClick(evt) {
+    if (!evt.altKey) {
+      onClick(evt);
+      evt.preventDefault();
+      return false;
     }
   }
 
@@ -31,6 +40,7 @@
     var hitboxCanvas = document.getElementById("hitboxCanvas");
     var textCanvas = document.getElementById("textCanvas");
     nw.Screen.Init();
+    nw.Window.get().showDevTools();
     var theWindow = nw.Screen.screens[0];
     textCanvas.width = theWindow.bounds.width;
     textCanvas.height = theWindow.bounds.height;
@@ -51,6 +61,7 @@
       theWindow: window
     });
   }
+
   </script>
   <style>
   @font-face {
@@ -71,7 +82,8 @@
   }
   </style>
 </head>
-<body onload="onLoad();" onkeyup="onClick(event)" onmousedown="onClick(event);" onkeydown="onClick(event)" onkeypress="onClick(event)" width="100%" height="100%">
+
+<body oncontextmenu="onRightClick(event);" onload="onLoad();" onkeyup="onClick(event)" onmousedown="onClick(event);" onkeydown="onClick(event)" onkeypress="onClick(event)" width="100%" height="100%">
   <img id="scroll_icon" src="scroll_icon.png" hidden>
   <img id="cursor" src="cursor.png" hidden>
   <img id="symbolIcon" src="symbol.png" hidden>
