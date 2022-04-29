@@ -16,7 +16,7 @@
   "author": "chris harris",
   "license": "ISC",
   "dependencies": {
-    "async": "^2.0.0-rc.6",
+    "async": "^2.6.4",
     "jquery": "^3.1.0",
     "json-fs-store": "^1.0.0",
     "lodash": "^4.17.4",
